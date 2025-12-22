@@ -8,7 +8,7 @@ import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 
 const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [
@@ -61,6 +61,16 @@ const app = new Elysia()
     return response ?? new Response("Not Found", { status: 404 });
   })
   .get("/", () => "OK")
+  .get("/hi", () => "Hi from Elysia")
+  .get("/id/:id", ({ params: { id } }) => id)
+  .post("/mirror", ({ body }) => body, {
+    body: t.Object({
+      id: t.Number(),
+      name: t.String(),
+    }),
+  })
   .listen(3000, () => {
     console.log("Server is running on http://localhost:3000");
   });
+
+export type App = typeof app;

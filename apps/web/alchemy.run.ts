@@ -2,7 +2,7 @@ import alchemy from "alchemy";
 import { TanStackStart } from "alchemy/cloudflare";
 import { config } from "dotenv";
 
-config({ path: "./.env" });
+config({ path: "../server/.env" });
 
 const app = await alchemy("interviews-tool");
 

@@ -1,0 +1,307 @@
+---
+title: User Stories & Flows
+description: User stories and interaction flows for the interviews tool
+---
+
+## Overview
+
+This document outlines the key user stories and their corresponding interaction flows, showing how job seekers interact with the Interview Tracker application.
+
+## Epic 1: Interview Management
+
+**As a** job seeker,  
+**I want to** create and manage multiple interview processes,  
+**So that** I can keep track of all my job applications in one place.
+
+### User Flow: Managing Interviews
+
+```mermaid
+flowchart TD
+    Start([User Opens Application]) --> Dashboard[View Interview Dashboard]
+
+    Dashboard --> Decision1{What does user want?}
+
+    Decision1 -->|Create New| Create[Click 'Create Interview']
+    Decision1 -->|View Existing| View[Click on Interview Row]
+    Decision1 -->|Edit Existing| Edit[Click Edit Button]
+    Decision1 -->|Delete| Delete[Click Delete Button]
+    Decision1 -->|Filter/Sort| Filter[Use Filter/Sort Options]
+
+    Create --> Form1[Fill Interview Form]
+    Form1 --> Input1[Enter Company Name]
+    Input1 --> Input2[Select Status]
+    Input2 --> Input3[Set Salary Optional]
+    Input3 --> Save1[Click Save]
+    Save1 --> Success1[Interview Created]
+    Success1 --> Dashboard
+
+    View --> Detail[View Interview Details]
+    Detail --> Dashboard
+
+    Edit --> Form2[Edit Interview Form]
+    Form2 --> Update[Update Information]
+    Update --> Save2[Click Save]
+    Save2 --> Success2[Interview Updated]
+    Success2 --> Dashboard
+
+    Delete --> Confirm[Confirm Deletion]
+    Confirm --> Success3[Interview Deleted]
+    Success3 --> Dashboard
+
+    Filter --> Results[View Filtered Results]
+    Results --> Dashboard
+
+    style Start fill:#3b82f6,stroke:#1e40af,stroke-width:2px,color:#fff
+    style Dashboard fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style Success1 fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+    style Success2 fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+    style Success3 fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+```
+
+### Key User Actions
+
+1. **Create Interview** - Add new company to tracking list
+2. **View Interviews** - Browse all applications in table format
+3. **Edit Interview** - Update company information or status
+4. **Delete Interview** - Remove completed or cancelled applications
+5. **Filter/Sort** - Organize interviews by status, salary, or date
+
+---
+
+## Epic 2: Interaction Tracking
+
+**As a** job seeker,  
+**I want to** record all interactions with companies,  
+**So that** I can maintain a chronological history of communications and activities.
+
+### User Flow: Recording Interactions
+
+```mermaid
+flowchart TD
+    Start([User Opens Interview Detail]) --> Detail[View Company Details]
+
+    Detail --> Timeline[View Interaction Timeline]
+    Timeline --> Decision{What does user want?}
+
+    Decision -->|Add New Note| AddNote[Click Add Interaction]
+    Decision -->|View History| ViewHistory[Scroll Through Timeline]
+    Decision -->|Edit Note| EditNote[Click Edit on Note]
+
+    AddNote --> InputArea[Open Markdown Input]
+    InputArea --> TypeTitle[Enter Title Optional]
+    TypeTitle --> SelectType[Select Interaction Type]
+    SelectType --> TypeContent[Write Markdown Content]
+    TypeContent --> FormatText[Format with Markdown]
+    FormatText --> Preview[Preview Content]
+    Preview --> Submit[Click Submit Button]
+    Submit --> Success1[Interaction Added]
+    Success1 --> Timeline
+
+    ViewHistory --> ReadNotes[Read Past Interactions]
+    ReadNotes --> Timeline
+
+    EditNote --> EditForm[Edit Interaction Form]
+    EditForm --> UpdateContent[Update Title/Content]
+    UpdateContent --> SaveEdit[Click Save]
+    SaveEdit --> Success2[Interaction Updated]
+    Success2 --> Timeline
+
+    style Start fill:#3b82f6,stroke:#1e40af,stroke-width:2px,color:#fff
+    style Detail fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style Timeline fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style Success1 fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+    style Success2 fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+```
+
+### Interaction Types
+
+- **Email** - Correspondence with recruiters or hiring managers
+- **Phone Call** - Phone screening or follow-up calls
+- **Meeting** - In-person or virtual interviews
+- **Technical Challenge** - Coding tests or assignments
+- **Offer** - Job offer received
+- **Rejection** - Application declined
+- **Follow-up** - Status check or thank you notes
+
+### Key User Actions
+
+1. **Add Interaction** - Record new communication or event
+2. **Format with Markdown** - Rich text formatting for detailed notes
+3. **Specify Type** - Categorize interaction for better organization
+4. **View Timeline** - Browse chronological history
+5. **Edit Notes** - Update or correct previous interactions
+
+---
+
+## Epic 3: Company Information Management
+
+**As a** job seeker,  
+**I want to** store detailed company information,  
+**So that** I can quickly reference salary, benefits, and contact details.
+
+### User Flow: Managing Company Information
+
+```mermaid
+flowchart TD
+    Start([User Creates/Edits Interview]) --> Form[Interview Form]
+
+    Form --> BasicInfo[Enter Basic Information]
+    BasicInfo --> CompanyName[Company Name]
+    CompanyName --> Status[Interview Status]
+    Status --> Decision{Add Details?}
+
+    Decision -->|Yes| Details[Company Details Section]
+    Decision -->|Skip for Now| QuickSave[Save Basic Info]
+
+    Details --> Website[Website URL]
+    Website --> Location[Location]
+    Location --> Salary[Expected Salary]
+    Salary --> Benefits[Benefits Description]
+    Benefits --> Contact[Contact Information]
+    Contact --> ContactPerson[Contact Person Name]
+    ContactPerson --> ContactSource[How Contacted]
+    ContactSource --> Steps[Interview Steps Count]
+    Steps --> SaveAll[Save Complete Info]
+
+    QuickSave --> Success1[Interview Saved]
+    SaveAll --> Success2[Complete Profile Saved]
+
+    Success1 --> Detail[View Detail Page]
+    Success2 --> Detail
+
+    Detail --> Access{Need Information?}
+    Access -->|View Salary| ShowSalary[Display Salary Info]
+    Access -->|View Benefits| ShowBenefits[Display Benefits]
+    Access -->|View Contact| ShowContact[Display Contact Person]
+    Access -->|View Source| ShowSource[Display Contact Source]
+
+    ShowSalary --> Detail
+    ShowBenefits --> Detail
+    ShowContact --> Detail
+    ShowSource --> Detail
+
+    style Start fill:#3b82f6,stroke:#1e40af,stroke-width:2px,color:#fff
+    style Form fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style Detail fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style Success1 fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+    style Success2 fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+```
+
+### Company Information Fields
+
+**Required:**
+
+- Company Name
+- Interview Status
+
+**Optional but Recommended:**
+
+- Website URL
+- Location
+- Expected Salary
+- Benefits Description
+- Contact Person
+- Source (LinkedIn, Email, Referral, etc.)
+- Number of Interview Steps
+
+### Key User Actions
+
+1. **Input Basic Info** - Add company name and status (minimum requirement)
+2. **Add Detailed Info** - Include salary, benefits, and contact details
+3. **Specify Contact Source** - Track where the opportunity came from
+4. **Access Information** - Quick reference from detail view
+5. **Update Details** - Modify information as interview progresses
+
+---
+
+## Complete User Journey
+
+### End-to-End Flow: From Application to Outcome
+
+```mermaid
+flowchart LR
+    A([Job Seeker]) --> B[Create Interview]
+    B --> C[Add Company Info]
+    C --> D[First Interaction:<br/>Application Sent]
+    D --> E[Track Progress]
+
+    E --> F{Interview Stage}
+
+    F -->|Screening| G[Record Call Notes]
+    F -->|Technical| H[Document Challenge]
+    F -->|Final| I[Record Interview]
+
+    G --> E
+    H --> E
+    I --> E
+
+    E --> J{Outcome?}
+
+    J -->|Offer| K[Update Status: Hired]
+    J -->|Rejection| L[Update Status: Rejected]
+    J -->|Withdraw| M[Update Status: Dropped Out]
+
+    K --> N[Archive/Reference]
+    L --> N
+    M --> N
+
+    N --> O([Complete])
+
+    style A fill:#3b82f6,stroke:#1e40af,stroke-width:3px,color:#fff
+    style O fill:#10b981,stroke:#059669,stroke-width:3px,color:#fff
+    style B fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style C fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style K fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+    style L fill:#ef4444,stroke:#dc2626,stroke-width:2px,color:#fff
+    style M fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
+```
+
+---
+
+## User Scenarios
+
+### Scenario 1: New Job Application
+
+1. User sees job posting on LinkedIn
+2. Opens Interview Tracker
+3. Clicks "Create Interview"
+4. Enters company name and initial status
+5. Adds note: "Applied via LinkedIn, position: Senior Developer"
+6. Saves and continues job search
+
+### Scenario 2: Interview Preparation
+
+1. User receives interview invitation email
+2. Opens interview detail in tracker
+3. Adds new interaction: "Interview scheduled for Dec 25"
+4. Reviews previous notes and company information
+5. Adds preparation notes in markdown
+6. Checks salary expectations before interview
+
+### Scenario 3: Post-Interview Follow-up
+
+1. User completes interview
+2. Opens interview detail immediately after
+3. Adds detailed notes while fresh in memory
+4. Includes: questions asked, interviewer names, key points discussed
+5. Sets reminder to follow up in 3 days
+6. Updates status to "Awaiting Response"
+
+### Scenario 4: Managing Multiple Applications
+
+1. User has 10+ active applications
+2. Opens dashboard to see all interviews
+3. Filters by "Ongoing" status
+4. Sorts by "Last Updated" to prioritize follow-ups
+5. Quickly identifies applications needing attention
+6. Updates statuses and adds notes as needed
+
+---
+
+## Success Metrics
+
+- **Time Saved**: 50% reduction in time spent managing applications
+- **Organization**: 100% of applications tracked in one place
+- **History**: Complete chronological record of all interactions
+- **Decision Making**: Quick access to salary and benefits for comparison
+- **Follow-ups**: Never miss a follow-up opportunity

@@ -1,0 +1,674 @@
+---
+title: Concept V1 - Interview Tracker Application
+description: Comprehensive concept document for the job interview tracking and management application.
+tags:
+  - concepts
+  - ideas
+  - product-design
+---
+
+## Document Information
+
+| Field            | Value             |
+| ---------------- | ----------------- |
+| **Version**      | 1.0.0             |
+| **Date**         | December 22, 2025 |
+| **Status**       | Draft             |
+| **Author**       | Development Team  |
+| **Last Updated** | December 22, 2025 |
+
+---
+
+## Overview
+
+### Purpose
+
+The goal is to build a web application that enables users to create and manage job interviews throughout the hiring process.
+
+### Core Features
+
+**Interview Management:**
+
+- Define and track job interview processes with various statuses (e.g., call-with-HR, in-progress, dropped-out, hired, technical-challenge, rejected, etc.)
+- Store comprehensive company information including: salary, benefits, location, name, website, and contact details
+
+**Interaction Tracking:**
+With that information, we want to be able to create a list of meetings related to those interviews, or to be precise, a list of steps related to the hiring process. For example:
+
+- If we were contacted from LinkedIn, Gmail, Facebook, etc.
+- If we had a call with HR (RRHH - Recursos Humanos)
+- If we had a technical challenge
+- If we were hired
+- If we dropped out
+- If we received an email, we should be able to store the email content and the sender information
+
+### Target Audience
+
+- **Primary Users:** Job seekers actively applying to multiple companies
+- **Use Cases:** Track applications, manage interview schedules, record interactions, organize company information
+
+### Success Metrics
+
+- User can create and track multiple interview processes
+- All company information is stored in one centralized location
+- Users can quickly access historical interactions with companies
+- Reduced time spent managing job applications by 50%
+
+---
+
+## User Stories
+
+### Epic 1: Interview Management
+
+**As a** job seeker,  
+**I want to** create and manage multiple interview processes,  
+**So that** I can keep track of all my job applications in one place.
+
+**Acceptance Criteria:**
+
+- User can create a new interview entry with company name and status
+- User can view all interviews in a table format
+- User can filter and sort interviews by status, salary, or date
+- User can edit or delete interview entries
+
+### Epic 2: Interaction Tracking
+
+**As a** job seeker,  
+**I want to** record all interactions with companies,  
+**So that** I can maintain a chronological history of communications and activities.
+
+**Acceptance Criteria:**
+
+- User can add notes for each interaction with timestamps
+- User can specify the type of interaction (email, call, meeting, etc.)
+- User can use markdown formatting for detailed notes
+- User can view all interactions in a chat-style thread
+
+### Epic 3: Company Information
+
+**As a** job seeker,  
+**I want to** store detailed company information,  
+**So that** I can quickly reference salary, benefits, and contact details.
+
+**Acceptance Criteria:**
+
+- User can input company details (name, website, salary, benefits)
+- User can track where they were contacted from (LinkedIn, email, etc.)
+- User can store contact person information
+- All information is easily accessible from the detail view
+
+---
+
+## Data Model
+
+### Entities
+
+#### Interview Process
+
+| Field       | Type     | Required | Description                                           |
+| ----------- | -------- | -------- | ----------------------------------------------------- |
+| id          | UUID     | Yes      | Unique identifier                                     |
+| companyName | String   | Yes      | Name of the company                                   |
+| status      | Enum     | Yes      | Current status (Ongoing, Rejected, Dropped out, etc.) |
+| salary      | Number   | No       | Offered/expected salary in USD                        |
+| createdAt   | DateTime | Yes      | Creation timestamp                                    |
+| updatedAt   | DateTime | Yes      | Last update timestamp                                 |
+| userId      | UUID     | Yes      | Foreign key to User                                   |
+
+#### Company Details
+
+| Field          | Type   | Required | Description                               |
+| -------------- | ------ | -------- | ----------------------------------------- |
+| id             | UUID   | Yes      | Unique identifier                         |
+| interviewId    | UUID   | Yes      | Foreign key to Interview Process          |
+| website        | String | No       | Company website URL                       |
+| location       | String | No       | Company location                          |
+| benefits       | Text   | No       | Company benefits description              |
+| contactedVia   | String | No       | Platform where contacted (LinkedIn, etc.) |
+| contactPerson  | String | No       | Name/handle of contact person             |
+| interviewSteps | Number | No       | Total number of interview steps           |
+
+#### Interaction
+
+| Field       | Type     | Required | Description                       |
+| ----------- | -------- | -------- | --------------------------------- |
+| id          | UUID     | Yes      | Unique identifier                 |
+| interviewId | UUID     | Yes      | Foreign key to Interview Process  |
+| title       | String   | No       | Title of the interaction          |
+| content     | Text     | Yes      | Markdown-formatted content        |
+| type        | Enum     | No       | Type (Email, Call, Meeting, etc.) |
+| createdAt   | DateTime | Yes      | Creation timestamp                |
+
+### Relationships
+
+- One Interview Process has one Company Details (1:1)
+- One Interview Process has many Interactions (1:N)
+- One User has many Interview Processes (1:N)
+
+---
+
+## User Interface Screens
+
+### Screen 1: Interview List (Dashboard)
+
+**Purpose:** Provide users with an overview of all their job interview processes in a table format, enabling quick access, sorting, and management.
+
+**User Goal:** View, filter, and manage all interview processes from a single location.
+
+**Primary Actions:**
+
+- Create new interview process
+- View interview details
+- Edit interview information
+- Delete interview entry
+- Sort and filter by status, salary, or date
+
+![Concept idea visualization](/images/v1-image1.png)
+
+#### Interface Details
+
+**Layout Structure:**
+
+- Main container with rounded corners, representing the primary content area
+- Grid-based background (wireframe style)
+
+**Top Section:**
+
+- **CTA Button** (top right corner):
+  - Rounded rectangular button
+  - Label: "Create a hiring process"
+  - Purpose: Navigate to create new interview form
+
+**Main Table Section:**
+
+- Large rounded rectangular container for the data table
+- **Table Header Columns:**
+  1. **Company name** - Text column for company/organization name
+  2. **Status** - Status of the interview process
+  3. **Salary** - Salary information (displayed with currency)
+  4. **Last update** - Timestamp of last activity (format: "YYYY-MM-DD HH:MMam/pm")
+  5. **Actions** - Action buttons column
+
+**Table Data Examples:**
+
+- **Row 1:**
+  - Company: "Acme corp 1"
+  - Status: "Ongoing"
+  - Salary: "3000 USD"
+  - Last update: "2025-12-20 05:30pm"
+  - Actions: Edit and Delete buttons (icon-based)
+
+- **Row 2:**
+  - Company: "Acme corp 2"
+  - Status: "Rejected"
+  - Salary: "5000 USD"
+  - Last update: "2025-12-01 05:30pm"
+  - Actions: Edit and Delete buttons
+
+- **Row 3:**
+  - Company: "Acme corp 2"
+  - Status: "Dropped out"
+  - Salary: "6000 USD"
+  - Last update: "2025-12-04 05:30pm"
+  - Actions: Edit and Delete buttons
+
+**Status Values Observed:**
+
+- "Ongoing" - Active interview process
+- "Rejected" - Application was rejected
+- "Dropped out" - Candidate dropped out
+
+**Note:** Status values may be displayed as dropdown/select options or free text input depending on implementation.
+
+**Bottom Section:**
+
+- **Pagination Control:**
+  - Label: "Pages"
+  - Navigation: "< 1 2 3 .... 99 >"
+  - Supports navigation through multiple pages of interview records
+
+### Screen 2: Interview Form (Create/Edit)
+
+**Purpose:** Enable users to create new interview entries or edit existing ones with company and salary information.
+
+**User Goal:** Input or update interview process details efficiently.
+
+**Primary Actions:**
+
+- Enter company name
+- Set interview status
+- Define salary expectations
+- Save or update interview information
+
+**Screen 2A: Create Interview Form**
+
+![create interview form](/images/v1-image2.png)
+
+#### Interface Details
+
+**Layout Structure:**
+
+- Mobile/dialog-style form with rounded corners
+- Left side: Form container
+- Right side: Explanatory notes
+
+**Form Fields (Top to Bottom):**
+
+1. **Company Name Field:**
+   - Label: "Create Company name"
+   - Input type: Text input (horizontal rectangular field)
+   - Purpose: Enter the name of the company or organization
+
+2. **Status Field:**
+   - Label: "Status"
+   - Input type: Text input or dropdown/select (horizontal rectangular field)
+   - Purpose: Set the current status of the interview process
+   - Note: Implementation may use dropdown for predefined statuses or free text input
+
+3. **Amount Slider:**
+   - Label: "Amount"
+   - Input type: Horizontal slider control
+   - Range: 0 to 100,000 (currency: USD)
+   - Display: Numerical labels on both ends (0 on left, 100000 on right)
+   - Default position: Circular handle approximately in the middle
+   - Purpose: Set payment/salary amount interval (optional field)
+
+**Action Button:**
+
+- **Save Button:**
+  - Position: Bottom of the form
+  - Style: Rectangular button
+  - Label: "Guardar" (Spanish for "Save")
+  - Purpose: Submit and save the new company/interview record
+
+**Core Information Captured:**
+
+- Company name (required)
+- Status (required)
+- Payment amount interval (optional)
+
+**Screen 2B: Edit Interview Form**
+
+![edit interview form](/images/v1-image3.png)
+
+#### Interface Details
+
+**Layout Structure:**
+
+- Mobile/dialog-style form with rounded corners
+- Left side: Form container with pre-filled data
+- Right side: Explanatory notes
+
+**Form Header:**
+
+- **Title:** "Edit Company name"
+- Indicates this is an edit mode for existing records
+
+**Form Fields (Top to Bottom):**
+
+1. **Company Name Field:**
+   - Input type: Text input (horizontal rectangular field)
+   - Pre-populated with existing company name
+   - Purpose: Update the name of the company or organization
+
+2. **Status Field:**
+   - Label: "Status"
+   - Input type: Text input or dropdown/select (horizontal rectangular field)
+   - Pre-populated with current status
+   - Purpose: Update the current status of the interview process
+   - Note: Implementation may use dropdown for predefined statuses or free text input
+
+3. **Amount Slider:**
+   - Label: "Amount"
+   - Input type: Horizontal slider control
+   - Range: 0 to 100,000 (currency: USD)
+   - Display: Numerical labels on both ends (0 on left, 100000 on right)
+   - Default position: Circular handle positioned based on existing value
+   - Purpose: Update payment/salary amount interval (optional field)
+
+**Action Button:**
+
+- **Save Button:**
+  - Position: Bottom of the form
+  - Style: Rounded rectangular button
+  - Label: "Guardar" (Spanish for "Save")
+  - Purpose: Submit and save the updated company/interview record
+
+**Core Information Updated:**
+
+- Company name
+- Status
+- Payment amount interval (optional)
+
+**Key Difference from Create Form:**
+
+- Form is pre-populated with existing data
+- Title indicates edit mode
+- Same field structure as create form
+
+### Screen 3: Interview Detail View
+
+**Purpose:** Display comprehensive information about a specific interview process with a chat-style interaction timeline.
+
+**User Goal:** View all company details and chronological interactions in one place, and add new notes quickly.
+
+**Primary Actions:**
+
+- View company information at a glance
+- Browse interaction history
+- Add new interaction notes with markdown
+- Track interview progress through steps
+
+**Key Components:**
+
+- **Header with company core information:**
+  - Name
+  - Website
+  - Salary
+  - Benefits
+  - Contact information
+  - Where we were contacted from
+
+- **Interaction history:**
+  - A list of interactions with the company, which could include meetings, emails, phone calls, etc.
+  - Chat-style view for quick and customizable note-taking
+  - Each interaction should display a description and allow creating a title
+  - Thread-like structure similar to Microsoft Teams threads
+
+- **Create new interactions:**
+  - Ability to create a new thread and leave detailed notes there
+
+![interview process detail](/images/v1-image4.png)
+
+#### Interface Details
+
+**Layout Structure:**
+
+- Mobile application screen layout
+- Three distinct sections: Header, Notes List, Input Area
+- Chat-style interface design
+
+**Section 1: Company Information Header**
+
+Located at the top of the screen, displays core company details:
+
+- **Company Name:** "Acme company"
+- **Status:** "on hold" (indicates current interview status)
+- **Salary:** "2000 USD" (salary amount with currency)
+- **Interview Steps:** "5" (count of steps in the interview process)
+- **Contacted On:** "LinkedIn" (source/platform where initial contact was made)
+- **Person to Contact:** "@asdw" (contact person identifier/username)
+
+**Visual Separator:**
+
+- Horizontal line dividing the header from the content below
+
+**Section 2: Interaction Notes Section**
+
+Below the company information, displays a chronological list of interactions:
+
+- **Note Format:**
+  - Rounded rectangular containers for each note
+  - Each note is a separate card/thread
+
+- **Example Notes:**
+  - **Notes 1:**
+    - Date: "12-10-2025" (format: MM-DD-YYYY)
+    - Content: "Lorem ipsum etc etc" (placeholder for interaction details)
+  - **Notes 2:**
+    - Date: "12-10-2025" (format: MM-DD-YYYY)
+    - Content: "Lorem ipsum etc etc" (placeholder for interaction details)
+
+- **Purpose:**
+  - Store all interactions with the company
+  - Can include: meetings, emails, phone calls, technical challenges, etc.
+  - Chat-style presentation for quick reference
+  - Thread-like structure similar to Microsoft Teams
+
+**Section 3: Chat-style Input and CTA**
+
+Located at the bottom of the screen:
+
+- **Markdown Text Input:**
+  - Large rounded rectangular input field
+  - Label: "Markdown text"
+  - Purpose: Enter new interaction notes with markdown formatting support
+  - Supports rich text formatting for detailed notes
+
+- **CTA Button:**
+  - Position: To the right of the input field
+  - Style: Circular button
+  - Label: "CTA button" (Call To Action)
+  - Purpose: Submit and create a new interaction note/thread
+
+**Key Features:**
+
+- Chat-style interface for quick note-taking
+- Markdown support for rich formatting
+- Thread-based organization of interactions
+- Quick access to company core information
+- Chronological display of all interactions
+
+---
+
+## Navigation Flow
+
+```
+[Login/Home]
+     │
+     ├─→ [Interview List Dashboard] ←─────┐
+     │         │                          │
+     │         ├─→ [Create Interview Form] ─┘
+     │         │
+     │         ├─→ [Interview Detail View]
+     │         │         │
+     │         │         └─→ [Edit Interview Form] ─┐
+     │         │                                     │
+     │         └─────────────────────────────────────┘
+     │
+     └─→ [User Settings]
+```
+
+**Flow Description:**
+
+1. User lands on Interview List Dashboard (home screen)
+2. User can create new interview via "Create" button → Form → Save → Returns to Dashboard
+3. User can click any interview row → Detail View
+4. From Detail View, user can edit interview → Edit Form → Save → Returns to Detail View
+5. User can delete interview from Dashboard or Detail View
+6. User can navigate to Settings from any screen
+
+---
+
+## Technical Requirements
+
+### Technology Stack
+
+- **Frontend Framework:** React with TanStack Start (SSR)
+- **UI Framework:** TailwindCSS with shadcn/ui components
+- **Backend:** Elysia (TypeScript)
+- **API Layer:** ORPC (type-safe RPC)
+- **Database:** PostgreSQL with Drizzle ORM
+- **Authentication:** Better-Auth
+- **Runtime:** Bun
+
+### Key Dependencies
+
+- **State Management:** TanStack Query for server state
+- **Form Handling:** TanStack Form
+- **Routing:** TanStack Router
+- **Markdown Editor:** To be determined (e.g., react-markdown, MDX)
+- **Date Handling:** To be determined (e.g., date-fns, dayjs)
+
+### API Endpoints (Proposed)
+
+```typescript
+// Interviews
+GET    /api/interviews          // List all interviews
+POST   /api/interviews          // Create interview
+GET    /api/interviews/:id      // Get interview details
+PUT    /api/interviews/:id      // Update interview
+DELETE /api/interviews/:id      // Delete interview
+
+// Interactions
+GET    /api/interviews/:id/interactions     // List interactions
+POST   /api/interviews/:id/interactions     // Create interaction
+PUT    /api/interactions/:id                // Update interaction
+DELETE /api/interactions/:id                // Delete interaction
+```
+
+---
+
+## Non-Functional Requirements
+
+### Performance
+
+- Page load time < 2 seconds
+- Table should handle 100+ interview entries smoothly
+- Interaction list should support virtual scrolling for large datasets
+- API responses < 500ms for standard queries
+
+### Accessibility
+
+- WCAG 2.1 Level AA compliance
+- Keyboard navigation support for all interactive elements
+- Screen reader compatible
+- High contrast mode support
+- Proper ARIA labels and roles
+
+### Security
+
+- Authentication required for all pages
+- User can only access their own interview data
+- Input sanitization to prevent XSS attacks
+- SQL injection protection via ORM parameterized queries
+- HTTPS enforced in production
+
+### Responsive Design
+
+- Mobile-first approach
+- Breakpoints: Mobile (< 640px), Tablet (640-1024px), Desktop (> 1024px)
+- Table should adapt to mobile with card view
+- Forms should be optimized for mobile input
+
+### Browser Support
+
+- Chrome (last 2 versions)
+- Firefox (last 2 versions)
+- Safari (last 2 versions)
+- Edge (last 2 versions)
+
+---
+
+## Assumptions and Constraints
+
+### Assumptions
+
+- Users have an active internet connection
+- Users are familiar with basic web applications
+- Users understand job interview terminology
+- Users will primarily access from desktop but may use mobile
+
+### Constraints
+
+- Initial version will support single user (no team collaboration)
+- English language only for v1
+- No email/calendar integrations in v1
+- No file attachments in v1 (markdown text only)
+- No real-time collaboration features
+
+### Dependencies
+
+- Requires PostgreSQL database
+- Requires authentication service (Better-Auth)
+- Requires Bun runtime environment
+
+---
+
+## Future Enhancements (v2+)
+
+### Phase 2 Features
+
+1. **Email Integration**
+   - Auto-import emails from Gmail/Outlook
+   - Parse interview invites automatically
+   - Send follow-up email templates
+
+2. **Calendar Integration**
+   - Sync interview dates with Google Calendar/Outlook
+   - Set reminders for upcoming interviews
+   - Display timeline view of interviews
+
+3. **File Attachments**
+   - Upload resumes, cover letters
+   - Attach offer letters or contracts
+   - Store interview preparation documents
+
+4. **Analytics Dashboard**
+   - Success rate by company/industry
+   - Average time from application to offer
+   - Salary trend analysis
+
+### Phase 3 Features
+
+5. **Team Collaboration**
+   - Share interview notes with mentors/advisors
+   - Collaborative interview preparation
+
+6. **Mobile Native App**
+   - iOS and Android applications
+   - Offline support
+
+7. **AI Features**
+   - Interview preparation tips
+   - Salary negotiation recommendations
+   - Company research automation
+
+8. **Multi-language Support**
+   - Spanish, French, German, etc.
+
+---
+
+## Glossary
+
+| Term                  | Definition                                                                                                  |
+| --------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Interview Process** | The complete journey from initial contact with a company to final outcome (hired, rejected, or dropped out) |
+| **Interaction**       | Any communication or activity with a company (email, call, meeting, technical challenge, etc.)              |
+| **Status**            | Current state of the interview process (Ongoing, Rejected, Dropped out, Hired, etc.)                        |
+| **HR (RRHH)**         | Human Resources (Recursos Humanos in Spanish) - the department handling recruitment                         |
+| **Thread**            | A conversation-style grouping of related notes or interactions                                              |
+| **Markdown**          | A lightweight markup language for formatting text                                                           |
+| **CTA**               | Call To Action - a button or element that prompts user action                                               |
+
+---
+
+## Appendix: Concept Document Template
+
+For future concept documents, use the following structure:
+
+### Template Structure
+
+1. **Document Information** - Version, date, status, author
+2. **Overview** - Purpose, core features, target audience
+3. **User Stories** - Epic-level stories with acceptance criteria
+4. **Data Model** - Entities, fields, relationships
+5. **User Interface Screens** - Screen-by-screen breakdown with purpose
+6. **Navigation Flow** - Diagram and description
+7. **Technical Requirements** - Stack, dependencies, API design
+8. **Non-Functional Requirements** - Performance, accessibility, security
+9. **Assumptions and Constraints** - Boundaries and dependencies
+10. **Future Enhancements** - Roadmap for next versions
+11. **Glossary** - Key terms and definitions
+
+### Screen Documentation Template
+
+For each screen, document:
+
+- **Screen Name**: Clear, descriptive name
+- **Purpose**: Why this screen exists
+- **User Goal**: What the user wants to accomplish
+- **Primary Actions**: List of main actions available
+- **Wireframe/Mockup**: Visual representation
+- **Interface Details**: Detailed breakdown of UI elements
+- **User Flow**: How users enter/exit this screen

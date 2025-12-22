@@ -1,0 +1,147 @@
+---
+title: Architecture
+description: Architecture of the interviews tool
+---
+
+## System Architecture
+
+This document outlines the architecture of the Interview Tracker application.
+
+### Overview
+
+It's going to be a client-server application. We're going to use a monorepo approach to manage the project using Bun workspaces.
+
+### System Diagram
+
+```mermaid
+graph TB
+    subgraph Monorepo["Monorepo (Bun Workspaces)"]
+        subgraph Apps["Applications"]
+            Web[Web Client<br/>TanStack Start]
+            Server[API Server<br/>Elysia]
+            Docs[Documentation<br/>Fumadocs]
+        end
+
+        subgraph Packages["Shared Packages"]
+            Domain[Domain<br/>Entities & Value Objects]
+            Application[Application<br/>Use Cases & Business Logic]
+            Database[Database<br/>Drizzle ORM]
+            Auth[Auth<br/>Authentication & Authorization]
+        end
+    end
+
+    subgraph External["External Services"]
+        DB[(Neon PostgreSQL)]
+    end
+
+    Web -->|Eden Treaty| Server
+    Web -->|TanStack Query| Server
+    Server --> Application
+    Server --> Auth
+    Application --> Domain
+    Application --> Database
+    Auth --> Database
+    Database --> DB
+
+    style Web fill:#3b82f6,stroke:#1e40af,stroke-width:2px,color:#fff
+    style Server fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style Docs fill:#06b6d4,stroke:#0891b2,stroke-width:2px,color:#fff
+    style Domain fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
+    style Application fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
+    style Database fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
+    style Auth fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
+    style DB fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+```
+
+### Applications
+
+We're going to have the following applications:
+
+- **client (web)**: we're going to use the following packages:
+  - tanstack start
+  - tanstack query
+  - tanstack Form
+  - tanstack table
+  - zod
+  - zustand
+  - shadcn/ui
+  - tailwindcss
+  - typescript
+  - react
+  - react-dom
+  - react-router
+  - react-router-dom
+  - react-router-dom-v5
+  - alchemy
+  - cloudflare
+- **server**: we're going to use the following packages:
+  - elysia
+  - eden treaty
+  - tanstack query
+  - zod
+  - drizzle orm
+  - neon postgres
+  - better auth
+- **docs**: we're going to use the following packages:
+  - fumadocs
+  - typescript
+  - react
+  - react-dom
+  - react-router
+  - react-router-dom
+  - react-router-dom-v5
+
+### Shared Packages
+
+We're going to have the following packages:
+
+- **domain**: For the domain entities and value objects
+- **application**: For the use cases and the business logic
+- **database**: For the database interactions
+- **auth**: For the authentication and authorization implementation
+
+### Database
+
+For the database we're going to use:
+
+- **Neon Postgres** as the database provider
+- **Drizzle ORM** for type-safe database interactions
+
+### Communication Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Web as Web Client<br/>(TanStack Start)
+    participant Server as API Server<br/>(Elysia)
+    participant App as Application Layer
+    participant Domain as Domain Layer
+    participant DB as Database<br/>(Neon PostgreSQL)
+
+    User->>Web: User Action
+    Web->>Server: Eden Treaty Request<br/>(Type-safe API)
+    Server->>App: Execute Use Case
+    App->>Domain: Validate Business Rules
+    Domain-->>App: Validated
+    App->>DB: Drizzle ORM Query
+    DB-->>App: Data
+    App-->>Server: Result
+    Server-->>Web: Type-safe Response
+    Web->>Web: TanStack Query<br/>(Cache & Update)
+    Web-->>User: UI Update
+```
+
+### Backend ↔ Frontend Communication
+
+How we're going to communicate the backend and the frontend:
+
+- **Elysia + Eden Treaty** for API type safety
+- **TanStack Query** to manage data fetching and caching
+- **Domain package** to share entities and value objects between backend and frontend
+
+### Key Design Decisions
+
+1. **Type Safety:** End-to-end type safety with TypeScript, Elysia, and Eden Treaty
+2. **Monorepo Structure:** Organized with Bun workspaces for better code sharing
+3. **Domain-Driven Design:** Separation of concerns with domain, application, and infrastructure layers
+4. **Modern Stack:** Leveraging cutting-edge tools for performance and developer experience
