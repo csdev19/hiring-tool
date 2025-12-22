@@ -8,97 +8,170 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as LoginRouteImport } from "./routes/login";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as InterviewsIndexRouteImport } from "./routes/interviews/index";
+import { Route as InterviewsNewRouteImport } from "./routes/interviews/new";
+import { Route as InterviewsIdRouteImport } from "./routes/interviews/$id";
+import { Route as InterviewsIdEditRouteImport } from "./routes/interviews/$id_.edit";
 
 const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+  id: "/login",
+  path: "/login",
   getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
+const InterviewsIndexRoute = InterviewsIndexRouteImport.update({
+  id: "/interviews/",
+  path: "/interviews/",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const InterviewsNewRoute = InterviewsNewRouteImport.update({
+  id: "/interviews/new",
+  path: "/interviews/new",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const InterviewsIdRoute = InterviewsIdRouteImport.update({
+  id: "/interviews/$id",
+  path: "/interviews/$id",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const InterviewsIdEditRoute = InterviewsIdEditRouteImport.update({
+  id: "/interviews/$id_/edit",
+  path: "/interviews/$id/edit",
+  getParentRoute: () => rootRouteImport,
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
+  "/": typeof IndexRoute;
+  "/login": typeof LoginRoute;
+  "/interviews/$id": typeof InterviewsIdRoute;
+  "/interviews/new": typeof InterviewsNewRoute;
+  "/interviews": typeof InterviewsIndexRoute;
+  "/interviews/$id/edit": typeof InterviewsIdEditRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
+  "/": typeof IndexRoute;
+  "/login": typeof LoginRoute;
+  "/interviews/$id": typeof InterviewsIdRoute;
+  "/interviews/new": typeof InterviewsNewRoute;
+  "/interviews": typeof InterviewsIndexRoute;
+  "/interviews/$id/edit": typeof InterviewsIdEditRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/login": typeof LoginRoute;
+  "/interviews/$id": typeof InterviewsIdRoute;
+  "/interviews/new": typeof InterviewsNewRoute;
+  "/interviews/": typeof InterviewsIndexRoute;
+  "/interviews/$id_/edit": typeof InterviewsIdEditRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login'
-  id: '__root__' | '/' | '/dashboard' | '/login'
-  fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath;
+  fullPaths:
+    | "/"
+    | "/login"
+    | "/interviews/$id"
+    | "/interviews/new"
+    | "/interviews"
+    | "/interviews/$id/edit";
+  fileRoutesByTo: FileRoutesByTo;
+  to:
+    | "/"
+    | "/login"
+    | "/interviews/$id"
+    | "/interviews/new"
+    | "/interviews"
+    | "/interviews/$id/edit";
+  id:
+    | "__root__"
+    | "/"
+    | "/login"
+    | "/interviews/$id"
+    | "/interviews/new"
+    | "/interviews/"
+    | "/interviews/$id_/edit";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  DashboardRoute: typeof DashboardRoute
-  LoginRoute: typeof LoginRoute
+  IndexRoute: typeof IndexRoute;
+  LoginRoute: typeof LoginRoute;
+  InterviewsIdRoute: typeof InterviewsIdRoute;
+  InterviewsNewRoute: typeof InterviewsNewRoute;
+  InterviewsIndexRoute: typeof InterviewsIndexRoute;
+  InterviewsIdEditRoute: typeof InterviewsIdEditRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+    "/login": {
+      id: "/login";
+      path: "/login";
+      fullPath: "/login";
+      preLoaderRoute: typeof LoginRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/interviews/": {
+      id: "/interviews/";
+      path: "/interviews";
+      fullPath: "/interviews";
+      preLoaderRoute: typeof InterviewsIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/interviews/new": {
+      id: "/interviews/new";
+      path: "/interviews/new";
+      fullPath: "/interviews/new";
+      preLoaderRoute: typeof InterviewsNewRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/interviews/$id": {
+      id: "/interviews/$id";
+      path: "/interviews/$id";
+      fullPath: "/interviews/$id";
+      preLoaderRoute: typeof InterviewsIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/interviews/$id_/edit": {
+      id: "/interviews/$id_/edit";
+      path: "/interviews/$id/edit";
+      fullPath: "/interviews/$id/edit";
+      preLoaderRoute: typeof InterviewsIdEditRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
-}
+  InterviewsIdRoute: InterviewsIdRoute,
+  InterviewsNewRoute: InterviewsNewRoute,
+  InterviewsIndexRoute: InterviewsIndexRoute,
+  InterviewsIdEditRoute: InterviewsIdEditRoute,
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
+import type { getRouter } from "./router.tsx";
+import type { createStart } from "@tanstack/react-start";
+declare module "@tanstack/react-start" {
   interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
+    ssr: true;
+    router: Awaited<ReturnType<typeof getRouter>>;
   }
 }
