@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { clientTreaty } from "@/lib/client-treaty";
+import type { Currency, InterviewStatus } from "@interviews-tool/domain/constants";
 
 // Helper to extract error message from Eden Treaty error response
 function getErrorMessage(error: unknown): string {
@@ -21,10 +22,10 @@ function getErrorMessage(error: unknown): string {
   return "An error occurred";
 }
 
-// Type definitions based on our schema
-export type InterviewStatus = "ongoing" | "rejected" | "dropped-out" | "hired";
-export type Currency = "USD" | "PEN";
+// Re-export types from domain package
+export type { Currency, InterviewStatus } from "@interviews-tool/domain/constants";
 
+// Type definitions based on our schema
 export interface Interview {
   id: string;
   companyName: string;

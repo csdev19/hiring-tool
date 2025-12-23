@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "./status-badge";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import type { Interview } from "@/hooks/use-interviews";
+import type { Currency } from "@interviews-tool/domain/constants";
 import { Pencil, Trash2, Eye } from "lucide-react";
 
 interface InterviewTableProps {
@@ -51,11 +52,11 @@ export function InterviewTable({ interviews, onDelete, isDeleting = false }: Int
     });
   };
 
-  const formatSalary = (salary: number | null) => {
+  const formatSalary = (salary: number | null, currency: Currency = "USD") => {
     if (!salary) return "-";
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD",
+      currency: currency,
       minimumFractionDigits: 0,
     }).format(salary);
   };
@@ -126,7 +127,7 @@ export function InterviewTable({ interviews, onDelete, isDeleting = false }: Int
                 <td className="p-2">
                   <StatusBadge status={interview.status} />
                 </td>
-                <td className="p-2">{formatSalary(interview.salary)}</td>
+                <td className="p-2">{formatSalary(interview.salary, interview.currency)}</td>
                 <td className="p-2 text-muted-foreground">{formatDate(interview.updatedAt)}</td>
                 <td className="p-2">
                   <div className="flex justify-end gap-1">

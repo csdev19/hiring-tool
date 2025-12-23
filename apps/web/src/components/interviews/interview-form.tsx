@@ -4,8 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { CreateInterviewInput, InterviewStatus, Currency } from "@/hooks/use-interviews";
+import type { CreateInterviewInput } from "@/hooks/use-interviews";
 import type { CreateCompanyDetailsInput } from "@/hooks/use-company-details";
+import {
+  INTERVIEW_STATUSES,
+  CURRENCIES,
+  CURRENCY_INFO,
+  type InterviewStatus,
+  type Currency,
+} from "@interviews-tool/domain/constants";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface InterviewFormProps {
@@ -25,15 +32,23 @@ const contactedViaOptions = [
 ];
 
 const statusOptions: { value: InterviewStatus; label: string }[] = [
-  { value: "ongoing", label: "Ongoing" },
-  { value: "rejected", label: "Rejected" },
-  { value: "dropped-out", label: "Dropped Out" },
-  { value: "hired", label: "Hired" },
+  { value: INTERVIEW_STATUSES.ONGOING, label: "Ongoing" },
+  { value: INTERVIEW_STATUSES.REJECTED, label: "Rejected" },
+  { value: INTERVIEW_STATUSES.DROPPED_OUT, label: "Dropped Out" },
+  { value: INTERVIEW_STATUSES.HIRED, label: "Hired" },
 ];
 
 const currencyOptions: { value: Currency; label: string; symbol: string }[] = [
-  { value: "USD", label: "US Dollar", symbol: "$" },
-  { value: "PEN", label: "Peruvian Sol", symbol: "S/" },
+  {
+    value: CURRENCIES.USD,
+    label: CURRENCY_INFO[CURRENCIES.USD].label,
+    symbol: CURRENCY_INFO[CURRENCIES.USD].symbol,
+  },
+  {
+    value: CURRENCIES.PEN,
+    label: CURRENCY_INFO[CURRENCIES.PEN].label,
+    symbol: CURRENCY_INFO[CURRENCIES.PEN].symbol,
+  },
 ];
 
 export function InterviewForm({
@@ -50,11 +65,16 @@ export function InterviewForm({
   const defaultValues = useMemo(
     () => ({
       companyName: initialValues?.companyName || "",
-      status: initialValues?.status || "ongoing",
+      status: initialValues?.status || INTERVIEW_STATUSES.ONGOING,
       salary: initialValues?.salary,
-      currency: initialValues?.currency || "USD",
+      currency: initialValues?.currency || CURRENCIES.USD,
     }),
-    [initialValues?.companyName, initialValues?.status, initialValues?.salary, initialValues?.currency],
+    [
+      initialValues?.companyName,
+      initialValues?.status,
+      initialValues?.salary,
+      initialValues?.currency,
+    ],
   );
 
   const defaultCompanyDetailsValues = useMemo(
@@ -105,14 +125,19 @@ export function InterviewForm({
   useEffect(() => {
     if (initialValues) {
       form.setFieldValue("companyName", initialValues.companyName || "");
-      form.setFieldValue("status", initialValues.status || "ongoing");
-      form.setFieldValue("currency", initialValues.currency || "USD");
+      form.setFieldValue("status", initialValues.status || INTERVIEW_STATUSES.ONGOING);
+      form.setFieldValue("currency", initialValues.currency || CURRENCIES.USD);
       if (initialValues.salary !== undefined) {
         form.setFieldValue("salary", initialValues.salary);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialValues?.companyName, initialValues?.status, initialValues?.salary, initialValues?.currency]);
+  }, [
+    initialValues?.companyName,
+    initialValues?.status,
+    initialValues?.salary,
+    initialValues?.currency,
+  ]);
 
   // Update company details form values when initialCompanyDetails change
   useEffect(() => {
@@ -122,10 +147,7 @@ export function InterviewForm({
       companyDetailsForm.setFieldValue("benefits", initialCompanyDetails.benefits || "");
       companyDetailsForm.setFieldValue("contactedVia", initialCompanyDetails.contactedVia || "");
       companyDetailsForm.setFieldValue("contactPerson", initialCompanyDetails.contactPerson || "");
-      companyDetailsForm.setFieldValue(
-        "interviewSteps",
-        initialCompanyDetails.interviewSteps || 0,
-      );
+      companyDetailsForm.setFieldValue("interviewSteps", initialCompanyDetails.interviewSteps || 0);
       if (initialCompanyDetails.website || initialCompanyDetails.location) {
         setShowCompanyDetails(true);
       }
@@ -368,7 +390,7 @@ export function InterviewForm({
                     id="interviewSteps"
                     type="number"
                     min="0"
-                    value={field.state.value || ''}
+                    value={field.state.value || ""}
                     onChange={(e) => field.handleChange(Number(e.target.value))}
                     placeholder="0"
                     disabled={isSubmitting}
