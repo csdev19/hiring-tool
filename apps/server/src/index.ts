@@ -3,6 +3,7 @@ import { cors } from "@elysiajs/cors";
 import { auth } from "@interviews-tool/auth";
 import { Elysia, t } from "elysia";
 import { interviewRoutes } from "./routes/interviews";
+import { companyDetailsRoutes } from "./routes/company-details";
 
 const app = new Elysia()
   .use(
@@ -21,6 +22,7 @@ const app = new Elysia()
     return status(405);
   })
   .use(interviewRoutes)
+  .use(companyDetailsRoutes)
   .get("/", () => "OK")
   .get("/hi", () => "Hi from Elysia")
   .get("/id/:id", ({ params: { id } }) => id)

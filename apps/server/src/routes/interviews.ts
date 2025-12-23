@@ -1,8 +1,9 @@
 import { Elysia, t } from "elysia";
 import { db } from "@interviews-tool/db";
-import { interview, type Interview, type NewInterview } from "@interviews-tool/db/schema/interview";
+import { interview, type NewInterview } from "@interviews-tool/db/schema/interview";
 import { eq, and, desc } from "drizzle-orm";
 import { auth } from "@interviews-tool/auth";
+import { UnauthorizedError, NotFoundError } from "../utils/errors";
 
 // Helper to get user from session
 async function getUserFromRequest(request: Request): Promise<{ id: string } | null> {
@@ -13,15 +14,37 @@ async function getUserFromRequest(request: Request): Promise<{ id: string } | nu
   return { id: session.user.id };
 }
 
-// Interview status enum
-const interviewStatuses = ["ongoing", "rejected", "dropped-out", "hired"] as const;
-
 export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
+  .error({
+    UnauthorizedError,
+    NotFoundError,
+  })
+  .onError(({ code, error, set }) => {
+    // Handle custom errors with proper status codes
+    if (code === "UnauthorizedError" || code === "NotFoundError") {
+      set.status = error.status;
+      return {
+        message: error.message,
+      };
+    }
+    // Handle validation errors
+    if (code === "VALIDATION") {
+      set.status = 400;
+      return {
+        message: error.message,
+      };
+    }
+    // Handle unknown errors
+    set.status = 500;
+    return {
+      message: "Internal server error",
+    };
+  })
   // List all interviews for authenticated user
-  .get("/", async ({ request, error }) => {
+  .get("/", async ({ request }) => {
     const user = await getUserFromRequest(request);
     if (!user) {
-      return error(401, { message: "Unauthorized" });
+      throw new UnauthorizedError();
     }
 
     const interviews = await db
@@ -35,10 +58,10 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
   // Get single interview
   .get(
     "/:id",
-    async ({ request, params, error }) => {
+    async ({ request, params }) => {
       const user = await getUserFromRequest(request);
       if (!user) {
-        return error(401, { message: "Unauthorized" });
+        throw new UnauthorizedError();
       }
 
       const [result] = await db
@@ -47,7 +70,7 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
         .where(and(eq(interview.id, params.id), eq(interview.userId, user.id)));
 
       if (!result) {
-        return error(404, { message: "Interview not found" });
+        throw new NotFoundError("Interview");
       }
 
       return { data: result };
@@ -61,10 +84,10 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
   // Create new interview
   .post(
     "/",
-    async ({ request, body, error }) => {
+    async ({ request, body }) => {
       const user = await getUserFromRequest(request);
       if (!user) {
-        return error(401, { message: "Unauthorized" });
+        throw new UnauthorizedError();
       }
 
       // Generate UUID for new interview
@@ -75,6 +98,7 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
         companyName: body.companyName,
         status: body.status,
         salary: body.salary,
+        currency: body.currency || "USD",
         userId: user.id,
       };
 
@@ -92,16 +116,22 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
           t.Literal("hired"),
         ]),
         salary: t.Optional(t.Number({ minimum: 0 })),
+        currency: t.Optional(
+          t.Union([
+            t.Literal("USD"),
+            t.Literal("PEN"),
+          ]),
+        ),
       }),
     },
   )
   // Update interview
   .put(
     "/:id",
-    async ({ request, params, body, error }) => {
+    async ({ request, params, body }) => {
       const user = await getUserFromRequest(request);
       if (!user) {
-        return error(401, { message: "Unauthorized" });
+        throw new UnauthorizedError();
       }
 
       // Check if interview exists and belongs to user
@@ -111,7 +141,7 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
         .where(and(eq(interview.id, params.id), eq(interview.userId, user.id)));
 
       if (!existing) {
-        return error(404, { message: "Interview not found" });
+        throw new NotFoundError("Interview");
       }
 
       const [updated] = await db
@@ -120,6 +150,7 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
           companyName: body.companyName,
           status: body.status,
           salary: body.salary,
+          currency: body.currency || existing.currency || "USD",
           updatedAt: new Date(),
         })
         .where(eq(interview.id, params.id))
@@ -140,16 +171,22 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
           t.Literal("hired"),
         ]),
         salary: t.Optional(t.Number({ minimum: 0 })),
+        currency: t.Optional(
+          t.Union([
+            t.Literal("USD"),
+            t.Literal("PEN"),
+          ]),
+        ),
       }),
     },
   )
   // Delete interview
   .delete(
     "/:id",
-    async ({ request, params, error }) => {
+    async ({ request, params }) => {
       const user = await getUserFromRequest(request);
       if (!user) {
-        return error(401, { message: "Unauthorized" });
+        throw new UnauthorizedError();
       }
 
       // Check if interview exists and belongs to user
@@ -159,7 +196,7 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
         .where(and(eq(interview.id, params.id), eq(interview.userId, user.id)));
 
       if (!existing) {
-        return error(404, { message: "Interview not found" });
+        throw new NotFoundError("Interview");
       }
 
       await db.delete(interview).where(eq(interview.id, params.id));
