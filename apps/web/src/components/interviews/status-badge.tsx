@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { InterviewStatus } from "@/hooks/use-interviews";
+import type { InterviewStatus } from "@interviews-tool/domain/constants";
 
 interface StatusBadgeProps {
   status: InterviewStatus;

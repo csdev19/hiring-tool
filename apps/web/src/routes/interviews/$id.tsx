@@ -5,7 +5,17 @@ import { StatusBadge } from "@/components/interviews/status-badge";
 import { DeleteConfirmDialog } from "@/components/interviews/delete-confirm-dialog";
 import { useInterview, useDeleteInterview } from "@/hooks/use-interviews";
 import { useCompanyDetails } from "@/hooks/use-company-details";
-import { Pencil, Trash2, ArrowLeft, ExternalLink, MapPin, Building2, User, MessageSquare } from "lucide-react";
+import type { Currency } from "@interviews-tool/domain/constants";
+import {
+  Pencil,
+  Trash2,
+  ArrowLeft,
+  ExternalLink,
+  MapPin,
+  Building2,
+  User,
+  MessageSquare,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { getUser } from "@/functions/get-user";
@@ -234,14 +244,15 @@ function InterviewDetailPage() {
                       </div>
                     )}
 
-                    {companyDetails.interviewSteps !== null && companyDetails.interviewSteps !== undefined && (
-                      <div>
-                        <h4 className="text-xs font-medium text-muted-foreground mb-1">
-                          Interview Steps
-                        </h4>
-                        <p className="text-sm">{companyDetails.interviewSteps}</p>
-                      </div>
-                    )}
+                    {companyDetails.interviewSteps !== null &&
+                      companyDetails.interviewSteps !== undefined && (
+                        <div>
+                          <h4 className="text-xs font-medium text-muted-foreground mb-1">
+                            Interview Steps
+                          </h4>
+                          <p className="text-sm">{companyDetails.interviewSteps}</p>
+                        </div>
+                      )}
                   </div>
 
                   {companyDetails.benefits && (

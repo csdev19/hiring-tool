@@ -1,6 +1,7 @@
 import { Elysia, t } from "elysia";
 import { db } from "@interviews-tool/db";
 import { interview, type NewInterview } from "@interviews-tool/db/schema/interview";
+import { INTERVIEW_STATUSES, CURRENCIES } from "@interviews-tool/domain/constants";
 import { eq, and, desc } from "drizzle-orm";
 import { auth } from "@interviews-tool/auth";
 import { UnauthorizedError, NotFoundError } from "../utils/errors";
@@ -98,7 +99,7 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
         companyName: body.companyName,
         status: body.status,
         salary: body.salary,
-        currency: body.currency || "USD",
+        currency: body.currency || CURRENCIES.USD,
         userId: user.id,
       };
 
@@ -110,18 +111,13 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
       body: t.Object({
         companyName: t.String({ minLength: 1 }),
         status: t.Union([
-          t.Literal("ongoing"),
-          t.Literal("rejected"),
-          t.Literal("dropped-out"),
-          t.Literal("hired"),
+          t.Literal(INTERVIEW_STATUSES.ONGOING),
+          t.Literal(INTERVIEW_STATUSES.REJECTED),
+          t.Literal(INTERVIEW_STATUSES.DROPPED_OUT),
+          t.Literal(INTERVIEW_STATUSES.HIRED),
         ]),
         salary: t.Optional(t.Number({ minimum: 0 })),
-        currency: t.Optional(
-          t.Union([
-            t.Literal("USD"),
-            t.Literal("PEN"),
-          ]),
-        ),
+        currency: t.Optional(t.Union([t.Literal(CURRENCIES.USD), t.Literal(CURRENCIES.PEN)])),
       }),
     },
   )
@@ -150,7 +146,7 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
           companyName: body.companyName,
           status: body.status,
           salary: body.salary,
-          currency: body.currency || existing.currency || "USD",
+          currency: body.currency || existing.currency || CURRENCIES.USD,
           updatedAt: new Date(),
         })
         .where(eq(interview.id, params.id))
@@ -165,18 +161,13 @@ export const interviewRoutes = new Elysia({ prefix: "/api/interviews" })
       body: t.Object({
         companyName: t.String({ minLength: 1 }),
         status: t.Union([
-          t.Literal("ongoing"),
-          t.Literal("rejected"),
-          t.Literal("dropped-out"),
-          t.Literal("hired"),
+          t.Literal(INTERVIEW_STATUSES.ONGOING),
+          t.Literal(INTERVIEW_STATUSES.REJECTED),
+          t.Literal(INTERVIEW_STATUSES.DROPPED_OUT),
+          t.Literal(INTERVIEW_STATUSES.HIRED),
         ]),
         salary: t.Optional(t.Number({ minimum: 0 })),
-        currency: t.Optional(
-          t.Union([
-            t.Literal("USD"),
-            t.Literal("PEN"),
-          ]),
-        ),
+        currency: t.Optional(t.Union([t.Literal(CURRENCIES.USD), t.Literal(CURRENCIES.PEN)])),
       }),
     },
   )

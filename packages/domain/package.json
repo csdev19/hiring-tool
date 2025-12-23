@@ -1,0 +1,48 @@
+{
+  "name": "@interviews-tool/domain",
+  "version": "1.0.0",
+  "description": "Domain constants, types, and utilities for interviews-tool",
+  "keywords": [
+    "constants",
+    "domain",
+    "types",
+    "typescript"
+  ],
+  "license": "ISC",
+  "author": "",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/constants.d.mts",
+  "exports": {
+    "./constants": {
+      "types": "./dist/constants.d.mts",
+      "import": "./dist/constants.mjs",
+      "default": "./dist/constants.mjs"
+    },
+    "./types": {
+      "types": "./dist/types.d.mts",
+      "import": "./dist/types.mjs",
+      "default": "./dist/types.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev:watch": "tsdown --watch",
+    "clean": "rm -rf dist",
+    "check-types": "tsc --noEmit",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint --fix src"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "tsdown": "^0.18.2",
+    "typescript": "^5"
+  },
+  "packageManager": "bun@1.3.4"
+}

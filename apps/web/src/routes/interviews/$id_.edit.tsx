@@ -125,7 +125,7 @@ function EditInterviewPage() {
               companyName: interview.companyName,
               status: interview.status,
               salary: interview.salary || undefined,
-              currency: interview.currency || "USD",
+              currency: interview.currency,
             }}
             initialCompanyDetails={
               companyDetailsData?.data
