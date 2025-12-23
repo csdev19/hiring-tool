@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InterviewForm } from "@/components/interviews/interview-form";
 import { useCreateInterview } from "@/hooks/use-interviews";
+import { useCreateCompanyDetails } from "@/hooks/use-company-details";
 import { toast } from "sonner";
 import { getUser } from "@/functions/get-user";
 
@@ -21,10 +22,29 @@ export const Route = createFileRoute("/interviews/new")({
 function NewInterviewPage() {
   const navigate = useNavigate();
   const createMutation = useCreateInterview();
+  const createCompanyDetailsMutation = useCreateCompanyDetails();
 
-  const handleSubmit = async (data: Parameters<typeof createMutation.mutateAsync>[0]) => {
+  const handleSubmit = async (
+    data: Parameters<typeof createMutation.mutateAsync>[0],
+    companyDetails?: Parameters<typeof createCompanyDetailsMutation.mutateAsync>[0]["data"],
+  ) => {
     try {
-      await createMutation.mutateAsync(data);
+      const interview = await createMutation.mutateAsync(data);
+      const interviewId = interview.id;
+
+      // Create company details if provided
+      if (companyDetails) {
+        try {
+          await createCompanyDetailsMutation.mutateAsync({
+            interviewId,
+            data: companyDetails,
+          });
+        } catch (error) {
+          console.error("Failed to create company details:", error);
+          // Don't fail the whole operation if company details fail
+        }
+      }
+
       toast.success("Interview created successfully");
       navigate({ to: "/interviews" });
     } catch (error) {
@@ -52,7 +72,7 @@ function NewInterviewPage() {
           <InterviewForm
             onSubmit={handleSubmit}
             onCancel={handleCancel}
-            isSubmitting={createMutation.isPending}
+            isSubmitting={createMutation.isPending || createCompanyDetailsMutation.isPending}
             submitLabel="Create Interview"
           />
         </CardContent>

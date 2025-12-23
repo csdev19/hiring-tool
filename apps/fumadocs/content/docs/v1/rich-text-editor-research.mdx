@@ -1,0 +1,406 @@
+---
+title: Rich Text Editor Research
+description: Research document on rich text editors for title and description fields with Markdown support
+date: 2025-12-22
+tags:
+  - research
+  - ui-components
+  - markdown
+  - rich-text-editor
+---
+
+# Rich Text Editor Research
+
+**Research Date:** December 22, 2025  
+**Purpose:** Find the best rich text editor solution for implementing a title (plain text) and description (rich text with Markdown) field in the interview tracking application.
+
+## Requirements
+
+### Core Requirements
+- **Title Field:** Plain text input (no formatting)
+- **Description Field:** Rich text editor with Markdown support
+- **Required Markdown Features:**
+  - Lists (ordered and unordered)
+  - Bold text (`**bold**` or `__bold__`)
+  - Code blocks with syntax highlighting (```ts```, ```js```, etc.)
+  - Inline code (`` `code` ``)
+
+### Additional Considerations
+- React/TypeScript compatibility
+- Integration with shadcn/ui components
+- TailwindCSS styling support
+- Type-safe implementation
+- Good developer experience
+- Active maintenance and community support
+
+---
+
+## How Discord Implements Rich Text
+
+### Discord's Approach
+
+Discord uses a **simplified subset of Markdown** for message formatting. This approach balances functionality with simplicity.
+
+**Supported Features:**
+- **Bold:** `**text**` or `__text__`
+- **Italic:** `*text*` or `_text_`
+- **Underline:** `__text__` (when combined with bold)
+- **Strikethrough:** `~~text~~`
+- **Inline Code:** `` `code` ``
+- **Code Blocks:** ` ```language\ncode\n``` `
+- **Blockquotes:** `> text`
+- **Lists:** Ordered (`1.`) and unordered (`-` or `*`)
+
+**Intentionally Excluded:**
+- Tables
+- Images (handled separately)
+- Footnotes
+- Complex formatting
+
+**Technical Implementation:**
+- Discord uses the **`simple-markdown`** library for parsing
+- Raw text is parsed into an Abstract Syntax Tree (AST)
+- AST is then rendered into formatted output
+- This approach provides:
+  - Extensibility
+  - Structure
+  - Performance
+  - Maintainability
+
+**Key Insight:** Discord prioritizes simplicity and performance over feature completeness. They parse Markdown on the client side and render it efficiently.
+
+---
+
+## Editor Options Comparison
+
+### 1. TipTap (Recommended)
+
+**Built on:** ProseMirror  
+**Framework:** Framework-agnostic (works with React, Vue, Svelte)  
+**License:** MIT
+
+#### Pros
+- ✅ **Headless and customizable** - Full control over UI
+- ✅ **Excellent React integration** - Official React package
+- ✅ **Markdown support** - Built-in Markdown extension
+- ✅ **Code blocks with syntax highlighting** - Via extensions
+- ✅ **TypeScript support** - Full type safety
+- ✅ **Active community** - Well-maintained, regular updates
+- ✅ **shadcn/ui integration** - Official shadcn editor component uses TipTap
+- ✅ **Extensible** - Plugin-based architecture
+- ✅ **Collaborative editing** - Optional Y.js integration
+- ✅ **Good documentation** - Comprehensive guides
+
+#### Cons
+- ⚠️ **Learning curve** - ProseMirror concepts can be complex
+- ⚠️ **Bundle size** - Can be larger than simpler solutions
+- ⚠️ **Configuration required** - Needs setup for optimal experience
+
+#### Key Features
+- Slash commands (`/` for quick actions)
+- Floating menus
+- Markdown import/export
+- Syntax highlighting for code blocks
+- List support (ordered/unordered)
+- Bold, italic, underline, strikethrough
+- Blockquotes
+- Links
+- Tables (optional)
+- Images (optional)
+
+#### shadcn/ui Integration
+shadcn/ui provides an official editor component built with TipTap:
+- Pre-styled with TailwindCSS
+- TypeScript ready
+- Easy to customize
+- Follows shadcn design patterns
+
+**Installation:**
+```bash
+npx shadcn@latest add editor
+```
+
+**Best For:** Production applications requiring full control and customization.
+
+---
+
+### 2. Lexical (Facebook/Meta)
+
+**Built by:** Facebook/Meta  
+**Framework:** Framework-agnostic (React-first)  
+**License:** MIT
+
+#### Pros
+- ✅ **Modern architecture** - Built from scratch (2022+)
+- ✅ **Performance** - Optimized for large documents
+- ✅ **React-first** - Designed for React applications
+- ✅ **TypeScript** - Full TypeScript support
+- ✅ **Extensible** - Plugin system
+- ✅ **Active development** - Backed by Meta
+- ✅ **Good documentation** - Comprehensive guides
+
+#### Cons
+- ⚠️ **Newer ecosystem** - Fewer third-party plugins than TipTap
+- ⚠️ **Markdown support** - Requires additional setup/plugins
+- ⚠️ **Learning curve** - Different mental model than ProseMirror
+- ⚠️ **Less community examples** - Smaller community than TipTap
+
+#### Key Features
+- Rich text formatting
+- Lists, tables, links
+- Code blocks (with plugins)
+- Markdown support (via plugins)
+- Collaborative editing (optional)
+- Custom nodes and decorators
+
+**Best For:** Applications requiring maximum performance and modern architecture.
+
+---
+
+### 3. Plate
+
+**Built on:** Lexical (or Slate)  
+**Framework:** React  
+**License:** MIT
+
+#### Pros
+- ✅ **React-focused** - Built specifically for React
+- ✅ **Plugin ecosystem** - Many pre-built plugins
+- ✅ **AI integration** - Built-in AI features
+- ✅ **TypeScript** - Full type safety
+- ✅ **TailwindCSS** - Styled with Tailwind
+- ✅ **Good documentation** - Well-documented
+
+#### Cons
+- ⚠️ **Abstraction layer** - Less control than raw Lexical
+- ⚠️ **Bundle size** - Can be large with many plugins
+- ⚠️ **Learning curve** - Plate-specific concepts
+
+#### Key Features
+- Markdown support
+- Code blocks
+- Lists, tables, images
+- Slash commands
+- AI features
+- Collaborative editing
+
+**Best For:** Applications wanting a feature-rich solution with minimal setup.
+
+---
+
+### 4. MDXEditor
+
+**Framework:** React  
+**License:** MIT
+
+#### Pros
+- ✅ **WYSIWYG experience** - Google Docs/Notion-like
+- ✅ **Markdown-first** - Native Markdown support
+- ✅ **Code blocks** - Built-in syntax highlighting
+- ✅ **TypeScript** - Type-safe
+
+#### Cons
+- ⚠️ **Less customizable** - More opinionated UI
+- ⚠️ **Heavier** - Larger bundle size
+- ⚠️ **Less flexible** - Harder to customize appearance
+
+**Best For:** Applications needing a Notion-like editing experience.
+
+---
+
+### 5. React Markdown Editor (uiwjs)
+
+**Framework:** React  
+**License:** MIT
+
+#### Pros
+- ✅ **Simple** - Easy to integrate
+- ✅ **Markdown preview** - Split view
+- ✅ **Lightweight** - Smaller bundle
+- ✅ **TypeScript** - Type definitions available
+
+#### Cons
+- ⚠️ **Basic features** - Limited customization
+- ⚠️ **Less modern** - Older architecture
+- ⚠️ **Limited styling** - Harder to match design system
+
+**Best For:** Simple applications with basic Markdown needs.
+
+---
+
+## Recommendation: TipTap
+
+### Why TipTap?
+
+1. **shadcn/ui Integration**
+   - Official shadcn editor component uses TipTap
+   - Pre-styled and ready to use
+   - Matches our existing design system
+
+2. **Feature Completeness**
+   - All required features out of the box
+   - Markdown import/export
+   - Code blocks with syntax highlighting
+   - Lists, bold, and all required formatting
+
+3. **Developer Experience**
+   - Excellent TypeScript support
+   - Good documentation
+   - Active community
+   - Regular updates
+
+4. **Flexibility**
+   - Headless architecture allows full customization
+   - Plugin system for extensibility
+   - Can start simple and add features later
+
+5. **Production Ready**
+   - Used by many companies
+   - Stable and well-tested
+   - Good performance
+
+### Implementation Approach
+
+**Option A: shadcn/ui Editor Component (Recommended)**
+- Use the official shadcn editor component
+- Pre-configured with TipTap
+- Matches design system
+- Quick to implement
+
+**Option B: Custom TipTap Setup**
+- More control over configuration
+- Can optimize bundle size
+- More setup required
+
+---
+
+## Implementation Plan
+
+### Phase 1: Basic Setup
+1. Install shadcn editor component
+2. Configure TipTap with required extensions:
+   - Markdown
+   - Code blocks with syntax highlighting
+   - Lists (ordered/unordered)
+   - Bold, italic
+   - Basic formatting
+
+### Phase 2: Integration
+1. Add title field (plain text input)
+2. Add description field (TipTap editor)
+3. Integrate with form handling (TanStack Form)
+4. Save Markdown content to database
+
+### Phase 3: Enhancement
+1. Add preview mode (optional)
+2. Add toolbar customization
+3. Add keyboard shortcuts
+4. Optimize bundle size
+
+---
+
+## Technical Considerations
+
+### Data Storage
+- Store description as **Markdown string** in database
+- Parse and render Markdown on display
+- Use libraries like `react-markdown` or TipTap's renderer
+
+### Performance
+- Lazy load editor component
+- Code splitting for syntax highlighting
+- Optimize bundle size by importing only needed extensions
+
+### Accessibility
+- Ensure keyboard navigation works
+- Screen reader compatibility
+- ARIA labels for toolbar buttons
+
+### Mobile Support
+- Touch-friendly toolbar
+- Responsive design
+- Mobile-optimized UI
+
+---
+
+## Code Example (shadcn Editor)
+
+```tsx
+import { Editor } from "@/components/ui/editor";
+
+function InterviewForm() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  return (
+    <form>
+      <Input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Interview title"
+      />
+      
+      <Editor
+        value={description}
+        onChange={setDescription}
+        placeholder="Add description with Markdown..."
+      />
+    </form>
+  );
+}
+```
+
+---
+
+## Resources
+
+### Documentation
+- [TipTap Documentation](https://tiptap.dev/)
+- [shadcn/ui Editor Component](https://ui.shadcn.com/docs/components/editor)
+- [ProseMirror Guide](https://prosemirror.net/docs/guide/)
+
+### Libraries
+- **TipTap:** `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-code-block-lowlight`
+- **Syntax Highlighting:** `lowlight` or `highlight.js`
+- **Markdown:** `@tiptap/extension-markdown`
+
+### Examples
+- [TipTap Examples](https://tiptap.dev/examples)
+- [shadcn Editor Example](https://ui.shadcn.com/examples/editor)
+
+---
+
+## Conclusion
+
+**Recommended Solution:** TipTap via shadcn/ui editor component
+
+**Rationale:**
+- Best balance of features, ease of use, and customization
+- Official shadcn integration matches our design system
+- All required features supported
+- Active maintenance and community
+- Production-ready and well-tested
+
+**Next Steps:**
+1. Install shadcn editor component
+2. Configure required TipTap extensions
+3. Integrate with interview form
+4. Test Markdown rendering
+5. Optimize and enhance as needed
+
+---
+
+## References
+
+1. [Discord Blog: How Discord Renders Rich Messages](https://discord.com/blog/how-discord-renders-rich-messages-on-the-android-app)
+2. [Discord Markdown Support](https://support.discord.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline)
+3. [TipTap Documentation](https://tiptap.dev/)
+4. [shadcn/ui Editor](https://ui.shadcn.com/docs/components/editor)
+5. [Lexical Documentation](https://lexical.dev/)
+6. [Plate Documentation](https://platejs.org/)
+
+---
+
+**Document Status:** Research Complete  
+**Next Action:** Implement TipTap editor via shadcn/ui component
+

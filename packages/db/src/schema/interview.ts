@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import { pgTable, text, timestamp, integer, index } from "drizzle-orm/pg-core";
 import { user } from "./auth";
+import { companyDetails } from "./company-details";
 
 export const interview = pgTable(
   "interview",
@@ -8,7 +9,8 @@ export const interview = pgTable(
     id: text("id").primaryKey(),
     companyName: text("company_name").notNull(),
     status: text("status").notNull(), // ongoing, rejected, dropped-out, hired
-    salary: integer("salary"), // Optional, in USD
+    salary: integer("salary"), // Optional salary amount
+    currency: text("currency").default("USD").notNull(), // Currency code (ISO 4217): USD, PEN, etc.
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -28,6 +30,10 @@ export const interviewRelations = relations(interview, ({ one }) => ({
   user: one(user, {
     fields: [interview.userId],
     references: [user.id],
+  }),
+  companyDetails: one(companyDetails, {
+    fields: [interview.id],
+    references: [companyDetails.interviewId],
   }),
 }));
 

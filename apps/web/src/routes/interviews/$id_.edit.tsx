@@ -2,6 +2,11 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InterviewForm } from "@/components/interviews/interview-form";
 import { useInterview, useUpdateInterview } from "@/hooks/use-interviews";
+import {
+  useCompanyDetails,
+  useCreateCompanyDetails,
+  useUpdateCompanyDetails,
+} from "@/hooks/use-company-details";
 import { toast } from "sonner";
 import { getUser } from "@/functions/get-user";
 
@@ -22,13 +27,35 @@ function EditInterviewPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { data, isLoading, error } = useInterview(id);
+  const { data: companyDetailsData, isLoading: isLoadingCompanyDetails } = useCompanyDetails(id);
   const updateMutation = useUpdateInterview();
+  const createCompanyDetailsMutation = useCreateCompanyDetails();
+  const updateCompanyDetailsMutation = useUpdateCompanyDetails();
 
   const handleSubmit = async (
     formData: Parameters<typeof updateMutation.mutateAsync>[0]["data"],
+    companyDetails?: Parameters<typeof updateCompanyDetailsMutation.mutateAsync>[0]["data"],
   ) => {
     try {
       await updateMutation.mutateAsync({ id, data: formData });
+
+      // Handle company details
+      if (companyDetails) {
+        if (companyDetailsData?.data) {
+          // Update existing company details
+          await updateCompanyDetailsMutation.mutateAsync({
+            interviewId: id,
+            data: companyDetails,
+          });
+        } else {
+          // Create new company details
+          await createCompanyDetailsMutation.mutateAsync({
+            interviewId: id,
+            data: companyDetails,
+          });
+        }
+      }
+
       toast.success("Interview updated successfully");
       navigate({ to: "/interviews/$id", params: { id } });
     } catch (error) {
@@ -53,7 +80,7 @@ function EditInterviewPage() {
     );
   }
 
-  if (isLoading) {
+  if (isLoading || isLoadingCompanyDetails) {
     return (
       <div className="container mx-auto max-w-2xl px-4 py-8">
         <Card>
@@ -98,10 +125,27 @@ function EditInterviewPage() {
               companyName: interview.companyName,
               status: interview.status,
               salary: interview.salary || undefined,
+              currency: interview.currency || "USD",
             }}
+            initialCompanyDetails={
+              companyDetailsData?.data
+                ? {
+                    website: companyDetailsData.data.website || undefined,
+                    location: companyDetailsData.data.location || undefined,
+                    benefits: companyDetailsData.data.benefits || undefined,
+                    contactedVia: companyDetailsData.data.contactedVia || undefined,
+                    contactPerson: companyDetailsData.data.contactPerson || undefined,
+                    interviewSteps: companyDetailsData.data.interviewSteps || undefined,
+                  }
+                : undefined
+            }
             onSubmit={handleSubmit}
             onCancel={handleCancel}
-            isSubmitting={updateMutation.isPending}
+            isSubmitting={
+              updateMutation.isPending ||
+              updateCompanyDetailsMutation.isPending ||
+              createCompanyDetailsMutation.isPending
+            }
             submitLabel="Update Interview"
           />
         </CardContent>
