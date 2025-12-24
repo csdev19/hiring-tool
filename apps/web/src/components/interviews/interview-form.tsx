@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { CreateInterviewInput } from "@/hooks/use-interviews";
+import type { CreateHiringProcessInput } from "@/hooks/use-hiring-processes";
 import type { CreateCompanyDetailsInput } from "@/hooks/use-company-details";
 import {
   INTERVIEW_STATUSES,
@@ -16,9 +16,9 @@ import {
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface InterviewFormProps {
-  initialValues?: Partial<CreateInterviewInput>;
+  initialValues?: Partial<CreateHiringProcessInput>;
   initialCompanyDetails?: Partial<CreateCompanyDetailsInput>;
-  onSubmit: (data: CreateInterviewInput, companyDetails?: CreateCompanyDetailsInput) => void;
+  onSubmit: (data: CreateHiringProcessInput, companyDetails?: CreateCompanyDetailsInput) => void;
   onCancel?: () => void;
   isSubmitting?: boolean;
   submitLabel?: string;

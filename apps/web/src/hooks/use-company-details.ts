@@ -4,7 +4,7 @@ import { clientTreaty } from "@/lib/client-treaty";
 // Type definitions
 export interface CompanyDetails {
   id: string;
-  interviewId: string;
+  hiringProcessId: string;
   website: string | null;
   location: string | null;
   benefits: string | null;
@@ -39,7 +39,7 @@ const companyDetailsKeys = {
   lists: () => [...companyDetailsKeys.all, "list"] as const,
   list: () => [...companyDetailsKeys.lists()] as const,
   details: () => [...companyDetailsKeys.all, "detail"] as const,
-  detail: (interviewId: string) => [...companyDetailsKeys.details(), interviewId] as const,
+  detail: (hiringProcessId: string) => [...companyDetailsKeys.details(), hiringProcessId] as const,
 };
 
 // Helper to extract error message from Eden Treaty error response
@@ -62,19 +62,21 @@ function getErrorMessage(error: unknown): string {
   return "An error occurred";
 }
 
-// Fetch company details for interview
-export function useCompanyDetails(interviewId: string) {
+// Fetch company details for hiring process
+export function useCompanyDetails(hiringProcessId: string) {
   return useQuery<{ data: CompanyDetails | null }>({
-    queryKey: companyDetailsKeys.detail(interviewId),
+    queryKey: companyDetailsKeys.detail(hiringProcessId),
     queryFn: async () => {
-      const result = await clientTreaty.api.interviews({ id: interviewId })["company-details"].get();
+      const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })[
+        "company-details"
+      ].get();
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
       // Backend returns { data: CompanyDetails | null }
       return result.data as { data: CompanyDetails | null };
     },
-    enabled: !!interviewId,
+    enabled: !!hiringProcessId,
   });
 }
 
@@ -84,24 +86,24 @@ export function useCreateCompanyDetails() {
 
   return useMutation({
     mutationFn: async ({
-      interviewId,
+      hiringProcessId,
       data,
     }: {
-      interviewId: string;
+      hiringProcessId: string;
       data: CreateCompanyDetailsInput;
     }) => {
-      const result = await clientTreaty.api.interviews({ id: interviewId })["company-details"].post(
-        data,
-      );
+      const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })[
+        "company-details"
+      ].post(data);
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
       return result.data;
     },
     onSuccess: (_, variables) => {
-      // Invalidate company details for this interview
+      // Invalidate company details for this hiring process
       queryClient.invalidateQueries({
-        queryKey: companyDetailsKeys.detail(variables.interviewId),
+        queryKey: companyDetailsKeys.detail(variables.hiringProcessId),
       });
     },
   });
@@ -113,24 +115,24 @@ export function useUpdateCompanyDetails() {
 
   return useMutation({
     mutationFn: async ({
-      interviewId,
+      hiringProcessId,
       data,
     }: {
-      interviewId: string;
+      hiringProcessId: string;
       data: UpdateCompanyDetailsInput;
     }) => {
-      const result = await clientTreaty.api.interviews({ id: interviewId })["company-details"].put(
-        data,
-      );
+      const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })[
+        "company-details"
+      ].put(data);
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
       return result.data;
     },
     onSuccess: (_, variables) => {
-      // Invalidate company details for this interview
+      // Invalidate company details for this hiring process
       queryClient.invalidateQueries({
-        queryKey: companyDetailsKeys.detail(variables.interviewId),
+        queryKey: companyDetailsKeys.detail(variables.hiringProcessId),
       });
     },
   });
@@ -141,19 +143,20 @@ export function useDeleteCompanyDetails() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (interviewId: string) => {
-      const result = await clientTreaty.api.interviews({ id: interviewId })["company-details"].delete();
+    mutationFn: async (hiringProcessId: string) => {
+      const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })[
+        "company-details"
+      ].delete();
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
       return result.data;
     },
-    onSuccess: (_, interviewId) => {
-      // Invalidate company details for this interview
+    onSuccess: (_, hiringProcessId) => {
+      // Invalidate company details for this hiring process
       queryClient.invalidateQueries({
-        queryKey: companyDetailsKeys.detail(interviewId),
+        queryKey: companyDetailsKeys.detail(hiringProcessId),
       });
     },
   });
 }
-

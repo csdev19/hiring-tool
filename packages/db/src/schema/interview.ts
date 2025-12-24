@@ -1,39 +1,36 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, integer, index } from "drizzle-orm/pg-core";
-import { user } from "./auth";
-import { companyDetails } from "./company-details";
+import { text, timestamp, index } from "drizzle-orm/pg-core";
+import { createTable } from "../utils/table-creator";
+import { hiringProcess } from "./hiring-process";
 
-export const interview = pgTable(
+/**
+ * Interview entity for individual interview sessions within a hiring process.
+ * This is prepared for future implementation and is not currently used in the application.
+ */
+export const interview = createTable(
   "interview",
   {
     id: text("id").primaryKey(),
-    companyName: text("company_name").notNull(),
-    status: text("status").notNull(), // ongoing, rejected, dropped-out, hired
-    salary: integer("salary"), // Optional salary amount
-    currency: text("currency").default("USD").notNull(), // Currency code (ISO 4217): USD, PEN, etc.
+    hiringProcessId: text("hiring_process_id")
+      .notNull()
+      .references(() => hiringProcess.id, { onDelete: "cascade" }),
+    type: text("type"), // e.g., "phone", "technical", "final", "hr", etc.
+    scheduledAt: timestamp("scheduled_at"),
+    status: text("status"), // e.g., "scheduled", "completed", "cancelled", "no-show"
+    notes: text("notes"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
-    userId: text("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
   },
-  (table) => [
-    index("interview_userId_idx").on(table.userId),
-    index("interview_status_idx").on(table.status),
-  ],
+  (table) => [index("interview_hiringProcessId_idx").on(table.hiringProcessId)],
 );
 
 export const interviewRelations = relations(interview, ({ one }) => ({
-  user: one(user, {
-    fields: [interview.userId],
-    references: [user.id],
-  }),
-  companyDetails: one(companyDetails, {
-    fields: [interview.id],
-    references: [companyDetails.interviewId],
+  hiringProcess: one(hiringProcess, {
+    fields: [interview.hiringProcessId],
+    references: [hiringProcess.id],
   }),
 }));
 

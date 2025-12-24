@@ -1,0 +1,71 @@
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InterviewTable } from "@/components/interviews/interview-table";
+import { useHiringProcesses, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";
+import { getUser } from "@/functions/get-user";
+import { Plus } from "lucide-react";
+
+export const Route = createFileRoute("/hiring-processes/")({
+  component: HiringProcessesComponent,
+  beforeLoad: async () => {
+    const session = await getUser();
+    if (!session) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+    return { session };
+  },
+});
+
+function HiringProcessesComponent() {
+  const { data: hiringProcessesData, isLoading, error } = useHiringProcesses();
+  const deleteHiringProcess = useDeleteHiringProcess();
+
+  const handleDelete = async (id: string) => {
+    await deleteHiringProcess.mutateAsync(id);
+  };
+
+  const hiringProcesses = hiringProcessesData?.data || [];
+
+  return (
+    <div className="container mx-auto max-w-6xl px-4 py-8">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Hiring Processes</h1>
+          <p className="text-muted-foreground mt-1">Manage your job application processes</p>
+        </div>
+        <Link to="/hiring-processes/new">
+          <Button>
+            <Plus className="mr-2 size-4" />
+            Create Hiring Process
+          </Button>
+        </Link>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>All Hiring Processes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <p>Loading hiring processes...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12 text-destructive">
+              <p>Error loading hiring processes: {error.message}</p>
+            </div>
+          ) : (
+            <InterviewTable
+              interviews={hiringProcesses}
+              onDelete={handleDelete}
+              isDeleting={deleteHiringProcess.isPending}
+            />
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

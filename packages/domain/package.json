@@ -29,6 +29,11 @@
       "import": "./dist/types.mjs",
       "default": "./dist/types.mjs"
     },
+    "./config": {
+      "types": "./dist/config.d.mts",
+      "import": "./dist/config.mjs",
+      "default": "./dist/config.mjs"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {

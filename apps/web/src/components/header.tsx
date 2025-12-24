@@ -7,7 +7,7 @@ export default function Header() {
     <div>
       <div className="flex flex-row items-center justify-between px-2 py-1">
         <nav className="flex gap-4 text-lg">
-          <Link to="/interviews">Interviews</Link>
+          <Link to="/hiring-processes">Hiring Processes</Link>
         </nav>
         <div className="flex items-center gap-2">
           <UserMenu />

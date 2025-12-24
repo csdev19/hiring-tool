@@ -23,17 +23,18 @@ tags:
 
 ### Purpose
 
-The goal is to build a web application that enables users to create and manage job interviews throughout the hiring process.
+The goal is to build a web application that enables users to create and manage hiring processes, with the ability to track multiple interview sessions within each process.
 
 ### Core Features
 
-**Interview Management:**
+**Hiring Process Management:**
 
-- Define and track job interview processes with various statuses (e.g., call-with-HR, in-progress, dropped-out, hired, technical-challenge, rejected, etc.)
+- Define and track hiring processes (job applications) with various statuses (e.g., ongoing, rejected, dropped-out, hired, etc.)
+- Each hiring process can contain multiple interview sessions (prepared for future implementation)
 - Store comprehensive company information including: salary, benefits, location, name, website, and contact details
 
 **Interaction Tracking:**
-With that information, we want to be able to create a list of meetings related to those interviews, or to be precise, a list of steps related to the hiring process. For example:
+With that information, we want to be able to create a list of meetings related to those hiring processes, or to be precise, a list of steps related to the hiring process. For example:
 
 - If we were contacted from LinkedIn, Gmail, Facebook, etc.
 - If we had a call with HR (RRHH - Recursos Humanos)
@@ -49,7 +50,7 @@ With that information, we want to be able to create a list of meetings related t
 
 ### Success Metrics
 
-- User can create and track multiple interview processes
+- User can create and track multiple hiring processes
 - All company information is stored in one centralized location
 - Users can quickly access historical interactions with companies
 - Reduced time spent managing job applications by 50%
@@ -58,18 +59,19 @@ With that information, we want to be able to create a list of meetings related t
 
 ## User Stories
 
-### Epic 1: Interview Management
+### Epic 1: Hiring Process Management
 
 **As a** job seeker,  
-**I want to** create and manage multiple interview processes,  
+**I want to** create and manage multiple hiring processes,  
 **So that** I can keep track of all my job applications in one place.
 
 **Acceptance Criteria:**
 
-- User can create a new interview entry with company name and status
-- User can view all interviews in a table format
-- User can filter and sort interviews by status, salary, or date
-- User can edit or delete interview entries
+- User can create a new hiring process entry with company name and status
+- User can view all hiring processes in a table format
+- User can filter and sort hiring processes by status, salary, or date
+- User can edit or delete hiring process entries
+- Each hiring process can contain multiple interview sessions (future feature)
 
 ### Epic 2: Interaction Tracking
 
@@ -103,47 +105,62 @@ With that information, we want to be able to create a list of meetings related t
 
 ### Entities
 
-#### Interview Process
+#### Hiring Process
 
 | Field       | Type     | Required | Description                                           |
 | ----------- | -------- | -------- | ----------------------------------------------------- |
 | id          | UUID     | Yes      | Unique identifier                                     |
 | companyName | String   | Yes      | Name of the company                                   |
 | status      | Enum     | Yes      | Current status (Ongoing, Rejected, Dropped out, etc.) |
-| salary      | Number   | No       | Offered/expected salary in USD                        |
+| salary      | Number   | No       | Offered/expected salary amount                        |
+| currency    | String   | Yes      | Currency code (USD, PEN, etc.)                        |
 | createdAt   | DateTime | Yes      | Creation timestamp                                    |
 | updatedAt   | DateTime | Yes      | Last update timestamp                                 |
 | userId      | UUID     | Yes      | Foreign key to User                                   |
 
+#### Interview (Future)
+
+| Field           | Type     | Required | Description                                       |
+| --------------- | -------- | -------- | ------------------------------------------------- |
+| id              | UUID     | Yes      | Unique identifier                                 |
+| hiringProcessId | UUID     | Yes      | Foreign key to Hiring Process                     |
+| type            | String   | No       | Type of interview (phone, technical, final, etc.) |
+| scheduledAt     | DateTime | No       | Scheduled date and time                           |
+| status          | String   | No       | Status (scheduled, completed, cancelled, etc.)    |
+| notes           | Text     | No       | Interview notes                                   |
+| createdAt       | DateTime | Yes      | Creation timestamp                                |
+| updatedAt       | DateTime | Yes      | Last update timestamp                             |
+
 #### Company Details
 
-| Field          | Type   | Required | Description                               |
-| -------------- | ------ | -------- | ----------------------------------------- |
-| id             | UUID   | Yes      | Unique identifier                         |
-| interviewId    | UUID   | Yes      | Foreign key to Interview Process          |
-| website        | String | No       | Company website URL                       |
-| location       | String | No       | Company location                          |
-| benefits       | Text   | No       | Company benefits description              |
-| contactedVia   | String | No       | Platform where contacted (LinkedIn, etc.) |
-| contactPerson  | String | No       | Name/handle of contact person             |
-| interviewSteps | Number | No       | Total number of interview steps           |
+| Field           | Type   | Required | Description                               |
+| --------------- | ------ | -------- | ----------------------------------------- |
+| id              | UUID   | Yes      | Unique identifier                         |
+| hiringProcessId | UUID   | Yes      | Foreign key to Hiring Process             |
+| website         | String | No       | Company website URL                       |
+| location        | String | No       | Company location                          |
+| benefits        | Text   | No       | Company benefits description              |
+| contactedVia    | String | No       | Platform where contacted (LinkedIn, etc.) |
+| contactPerson   | String | No       | Name/handle of contact person             |
+| interviewSteps  | Number | No       | Total number of interview steps           |
 
 #### Interaction
 
-| Field       | Type     | Required | Description                       |
-| ----------- | -------- | -------- | --------------------------------- |
-| id          | UUID     | Yes      | Unique identifier                 |
-| interviewId | UUID     | Yes      | Foreign key to Interview Process  |
-| title       | String   | No       | Title of the interaction          |
-| content     | Text     | Yes      | Markdown-formatted content        |
-| type        | Enum     | No       | Type (Email, Call, Meeting, etc.) |
-| createdAt   | DateTime | Yes      | Creation timestamp                |
+| Field           | Type     | Required | Description                       |
+| --------------- | -------- | -------- | --------------------------------- |
+| id              | UUID     | Yes      | Unique identifier                 |
+| hiringProcessId | UUID     | Yes      | Foreign key to Hiring Process     |
+| title           | String   | No       | Title of the interaction          |
+| content         | Text     | Yes      | Markdown-formatted content        |
+| type            | Enum     | No       | Type (Email, Call, Meeting, etc.) |
+| createdAt       | DateTime | Yes      | Creation timestamp                |
 
 ### Relationships
 
-- One Interview Process has one Company Details (1:1)
-- One Interview Process has many Interactions (1:N)
-- One User has many Interview Processes (1:N)
+- One Hiring Process has one Company Details (1:1)
+- One Hiring Process has many Interviews (1:N) - Future feature
+- One Hiring Process has many Interactions (1:N) - Future feature
+- One User has many Hiring Processes (1:N)
 
 ---
 
@@ -503,16 +520,16 @@ Located at the bottom of the screen:
 ### API Endpoints (Proposed)
 
 ```typescript
-// Interviews
-GET    /api/interviews          // List all interviews
-POST   /api/interviews          // Create interview
-GET    /api/interviews/:id      // Get interview details
-PUT    /api/interviews/:id      // Update interview
-DELETE /api/interviews/:id      // Delete interview
+// Hiring Processes
+GET    /api/hiring-processes          // List all hiring processes
+POST   /api/hiring-processes          // Create hiring process
+GET    /api/hiring-processes/:id      // Get hiring process details
+PUT    /api/hiring-processes/:id      // Update hiring process
+DELETE /api/hiring-processes/:id      // Delete hiring process
 
 // Interactions
-GET    /api/interviews/:id/interactions     // List interactions
-POST   /api/interviews/:id/interactions     // Create interaction
+GET    /api/hiring-processes/:id/interactions     // List interactions (future)
+POST   /api/hiring-processes/:id/interactions     // Create interaction (future)
 PUT    /api/interactions/:id                // Update interaction
 DELETE /api/interactions/:id                // Delete interaction
 ```
