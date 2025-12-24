@@ -83,7 +83,14 @@ export function useHiringProcess(id: string) {
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
-      return result.data;
+      if (!result.data) {
+        throw new Error("No data returned from server");
+      }
+      const { error, data } = result.data;
+      if (error) {
+        throw new Error(error?.message || "An error occurred");
+      }
+      return data;
     },
     enabled: !!id,
   });
@@ -134,13 +141,13 @@ export function useUpdateHiringProcess() {
 export function useDeleteHiringProcess() {
   const queryClient = useQueryClient();
 
-  return useMutation<{ message: string }, Error, string>({
+  return useMutation<void, Error, string>({
     mutationFn: async (id: string) => {
       const result = await clientTreaty.api["hiring-processes"]({ id }).delete();
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
-      return result.data;
+      return;
     },
     onSuccess: () => {
       // Invalidate hiring processes list

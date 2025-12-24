@@ -15,7 +15,7 @@ import {
 } from "@interviews-tool/domain/constants";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-interface InterviewFormProps {
+interface HiringProcessFormProps {
   initialValues?: Partial<CreateHiringProcessInput>;
   initialCompanyDetails?: Partial<CreateCompanyDetailsInput>;
   onSubmit: (data: CreateHiringProcessInput, companyDetails?: CreateCompanyDetailsInput) => void;
@@ -51,14 +51,14 @@ const currencyOptions: { value: Currency; label: string; symbol: string }[] = [
   },
 ];
 
-export function InterviewForm({
+export function HiringProcessForm({
   initialValues,
   initialCompanyDetails,
   onSubmit,
   onCancel,
   isSubmitting = false,
   submitLabel = "Save",
-}: InterviewFormProps) {
+}: HiringProcessFormProps) {
   const [showCompanyDetails, setShowCompanyDetails] = useState(false);
 
   // Memoize default values to avoid recreating form on every render
@@ -84,7 +84,7 @@ export function InterviewForm({
       benefits: initialCompanyDetails?.benefits || "",
       contactedVia: initialCompanyDetails?.contactedVia || "",
       contactPerson: initialCompanyDetails?.contactPerson || "",
-      interviewSteps: initialCompanyDetails?.interviewSteps || 0,
+      hiringProcessSteps: initialCompanyDetails?.interviewSteps || 0,
     }),
     [
       initialCompanyDetails?.website,
@@ -105,7 +105,7 @@ export function InterviewForm({
         benefits: companyDetailsForm.state.values.benefits || undefined,
         contactedVia: companyDetailsForm.state.values.contactedVia || undefined,
         contactPerson: companyDetailsForm.state.values.contactPerson || undefined,
-        interviewSteps: companyDetailsForm.state.values.interviewSteps || undefined,
+        interviewSteps: companyDetailsForm.state.values.hiringProcessSteps || undefined,
       };
 
       // Only include company details if at least one field is filled
@@ -147,7 +147,10 @@ export function InterviewForm({
       companyDetailsForm.setFieldValue("benefits", initialCompanyDetails.benefits || "");
       companyDetailsForm.setFieldValue("contactedVia", initialCompanyDetails.contactedVia || "");
       companyDetailsForm.setFieldValue("contactPerson", initialCompanyDetails.contactPerson || "");
-      companyDetailsForm.setFieldValue("interviewSteps", initialCompanyDetails.interviewSteps || 0);
+      companyDetailsForm.setFieldValue(
+        "hiringProcessSteps",
+        initialCompanyDetails.interviewSteps || 0,
+      );
       if (initialCompanyDetails.website || initialCompanyDetails.location) {
         setShowCompanyDetails(true);
       }
@@ -238,7 +241,7 @@ export function InterviewForm({
                         id="salary"
                         type="number"
                         min="0"
-                        max="50000"
+                        max="25000"
                         step="100"
                         value={salaryField.state.value || ""}
                         onChange={(e) => {
@@ -266,7 +269,7 @@ export function InterviewForm({
                   <input
                     type="range"
                     min="0"
-                    max="50000"
+                    max="25000"
                     step="100"
                     value={salaryField.state.value || 0}
                     onChange={(e) => salaryField.handleChange(Number(e.target.value))}
@@ -382,12 +385,12 @@ export function InterviewForm({
               )}
             </companyDetailsForm.Field>
 
-            <companyDetailsForm.Field name="interviewSteps">
+            <companyDetailsForm.Field name="hiringProcessSteps">
               {(field) => (
                 <div className="space-y-1.5">
-                  <Label htmlFor="interviewSteps">Interview Steps</Label>
+                  <Label htmlFor="hiringProcessSteps">Hiring Process Steps</Label>
                   <Input
-                    id="interviewSteps"
+                    id="hiringProcessSteps"
                     type="number"
                     min="0"
                     value={field.state.value || ""}

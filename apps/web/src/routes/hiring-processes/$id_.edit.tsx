@@ -1,7 +1,12 @@
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { InterviewForm } from "@/components/interviews/interview-form";
-import { useHiringProcess, useUpdateHiringProcess } from "@/hooks/use-hiring-processes";
+import { HiringProcessForm } from "@/components/hiring-process/hiring-process-form";
+import {
+  useHiringProcess,
+  useUpdateHiringProcess,
+  type Currency,
+  type InterviewStatus,
+} from "@/hooks/use-hiring-processes";
 import {
   useCompanyDetails,
   useCreateCompanyDetails,
@@ -27,6 +32,7 @@ function EditHiringProcessPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { data, isLoading, error } = useHiringProcess(id);
+  console.log("data", { data, isLoading, error });
   const { data: companyDetailsData, isLoading: isLoadingCompanyDetails } = useCompanyDetails(id);
   const updateMutation = useUpdateHiringProcess();
   const createCompanyDetailsMutation = useCreateCompanyDetails();
@@ -92,7 +98,7 @@ function EditHiringProcessPage() {
     );
   }
 
-  const hiringProcess = data?.data;
+  const hiringProcess = data;
 
   if (!hiringProcess) {
     return (
@@ -120,7 +126,7 @@ function EditHiringProcessPage() {
           <CardTitle>Hiring Process Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <InterviewForm
+          <HiringProcessForm
             initialValues={{
               companyName: hiringProcess.companyName,
               status: hiringProcess.status,

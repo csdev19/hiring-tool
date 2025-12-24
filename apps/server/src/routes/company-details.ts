@@ -5,6 +5,7 @@ import { hiringProcess } from "@interviews-tool/db/schema/hiring-process";
 import { eq, and } from "drizzle-orm";
 import { auth } from "@interviews-tool/auth";
 import { UnauthorizedError, NotFoundError, ConflictError } from "../utils/errors";
+import { successBody, createdBody, errorBody } from "../utils/response-helpers";
 
 // Helper to get user from session
 async function getUserFromRequest(request: Request): Promise<{ id: string } | null> {
@@ -25,24 +26,22 @@ export const companyDetailsRoutes = new Elysia({
   })
   .onError(({ code, error, set }) => {
     // Handle custom errors with proper status codes
-    if (code === "UnauthorizedError" || code === "NotFoundError" || code === "ConflictError") {
+    if (code === "UnauthorizedError") {
+      set.status = 401;
+      return errorBody(error.message);
+    }
+    if (code === "NotFoundError" || code === "ConflictError") {
       set.status = error.status;
-      return {
-        message: error.message,
-      };
+      return errorBody(error.message);
     }
     // Handle validation errors
     if (code === "VALIDATION") {
       set.status = 400;
-      return {
-        message: error.message,
-      };
+      return errorBody(error.message);
     }
     // Handle unknown errors
     set.status = 500;
-    return {
-      message: "Internal server error",
-    };
+    return errorBody("Internal server error");
   })
   // Get company details for interview
   .get(
@@ -71,10 +70,10 @@ export const companyDetailsRoutes = new Elysia({
 
       // Return null if company details don't exist (they're optional)
       if (!result) {
-        return { data: null };
+        return successBody(null);
       }
 
-      return { data: result };
+      return successBody(result);
     },
     {
       params: t.Object({
@@ -85,7 +84,7 @@ export const companyDetailsRoutes = new Elysia({
   // Create company details
   .post(
     "/",
-    async ({ request, params, body }) => {
+    async ({ request, params, body, status }) => {
       const user = await getUserFromRequest(request);
       if (!user) {
         throw new UnauthorizedError();
@@ -125,9 +124,12 @@ export const companyDetailsRoutes = new Elysia({
         interviewSteps: body.interviewSteps ?? 0,
       };
 
-      const [created] = await db.insert(companyDetails).values(newCompanyDetails).returning();
+      const [createdDetails] = await db
+        .insert(companyDetails)
+        .values(newCompanyDetails)
+        .returning();
 
-      return { data: created };
+      return status(201, createdBody(createdDetails));
     },
     {
       params: t.Object({
@@ -152,14 +154,14 @@ export const companyDetailsRoutes = new Elysia({
         throw new UnauthorizedError();
       }
 
-      // Verify interview exists and belongs to user
-      const [interviewRecord] = await db
+      // Verify hiring process exists and belongs to user
+      const [hiringProcessRecord] = await db
         .select()
-        .from(interview)
-        .where(and(eq(interview.id, params.id), eq(interview.userId, user.id)));
+        .from(hiringProcess)
+        .where(and(eq(hiringProcess.id, params.id), eq(hiringProcess.userId, user.id)));
 
-      if (!interviewRecord) {
-        throw new NotFoundError("Interview");
+      if (!hiringProcessRecord) {
+        throw new NotFoundError("Hiring process");
       }
 
       // Check if company details exist
@@ -186,7 +188,7 @@ export const companyDetailsRoutes = new Elysia({
         .where(eq(companyDetails.hiringProcessId, params.id))
         .returning();
 
-      return { data: updated };
+      return successBody(updated);
     },
     {
       params: t.Object({
@@ -205,7 +207,7 @@ export const companyDetailsRoutes = new Elysia({
   // Delete company details
   .delete(
     "/",
-    async ({ request, params }) => {
+    async ({ request, params, set }) => {
       const user = await getUserFromRequest(request);
       if (!user) {
         throw new UnauthorizedError();
@@ -233,7 +235,7 @@ export const companyDetailsRoutes = new Elysia({
 
       await db.delete(companyDetails).where(eq(companyDetails.hiringProcessId, params.id));
 
-      return { message: "Company details deleted successfully" };
+      set.status = 204;
     },
     {
       params: t.Object({

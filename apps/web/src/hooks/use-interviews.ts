@@ -65,7 +65,7 @@ export function useInterviews() {
   return useQuery({
     queryKey: interviewKeys.list(),
     queryFn: async () => {
-      const result = await clientTreaty.api.interviews.get();
+      const result = await clientTreaty.api["hiring-processes"].get();
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
@@ -79,7 +79,7 @@ export function useInterview(id: string) {
   return useQuery({
     queryKey: interviewKeys.detail(id),
     queryFn: async () => {
-      const result = await clientTreaty.api.interviews({ id }).get();
+      const result = await clientTreaty.api["hiring-processes"]({ id }).get();
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
@@ -95,7 +95,7 @@ export function useCreateInterview() {
 
   return useMutation<Interview, Error, CreateInterviewInput>({
     mutationFn: async (data: CreateInterviewInput): Promise<Interview> => {
-      const result = await clientTreaty.api.interviews.post(data);
+      const result = await clientTreaty.api["hiring-processes"].post(data);
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
@@ -115,7 +115,7 @@ export function useUpdateInterview() {
 
   return useMutation<Interview, Error, { id: string; data: UpdateInterviewInput }>({
     mutationFn: async ({ id, data }): Promise<Interview> => {
-      const result = await clientTreaty.api.interviews({ id }).put(data);
+      const result = await clientTreaty.api["hiring-processes"]({ id }).put(data);
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
@@ -135,13 +135,13 @@ export function useUpdateInterview() {
 export function useDeleteInterview() {
   const queryClient = useQueryClient();
 
-  return useMutation<{ message: string }, Error, string>({
+  return useMutation<void, Error, string>({
     mutationFn: async (id: string) => {
-      const result = await clientTreaty.api.interviews({ id }).delete();
+      const result = await clientTreaty.api["hiring-processes"]({ id }).delete();
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
-      return result.data;
+      return;
     },
     onSuccess: () => {
       // Invalidate interviews list

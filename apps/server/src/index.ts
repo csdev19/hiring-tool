@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { cors } from "@elysiajs/cors";
 import { auth } from "@interviews-tool/auth";
-import { Elysia, t } from "elysia";
+import { Elysia } from "elysia";
 import { hiringProcessRoutes } from "./routes/hiring-processes";
 import { companyDetailsRoutes } from "./routes/company-details";
 
@@ -23,15 +23,10 @@ const app = new Elysia()
   })
   .use(hiringProcessRoutes)
   .use(companyDetailsRoutes)
-  .get("/", () => "OK")
-  .get("/hi", () => "Hi from Elysia")
-  .get("/id/:id", ({ params: { id } }) => id)
-  .post("/mirror", ({ body }) => body, {
-    body: t.Object({
-      id: t.Number(),
-      name: t.String(),
-    }),
-  })
+  .get("/health", () => ({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+  }))
   .listen(3000, () => {
     console.log("Server is running on http://localhost:3000");
   });

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { InterviewTable } from "@/components/interviews/interview-table";
+import { InterviewTable } from "@/components/hiring-process/hiring-process-table";
 import { useHiringProcesses, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";
 import { getUser } from "@/functions/get-user";
 import { Plus } from "lucide-react";
