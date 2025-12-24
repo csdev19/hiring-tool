@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { InterviewForm } from "@/components/interviews/interview-form";
+import { HiringProcessForm } from "@/components/hiring-process/hiring-process-form";
 import { useCreateHiringProcess } from "@/hooks/use-hiring-processes";
 import { useCreateCompanyDetails } from "@/hooks/use-company-details";
 import { toast } from "sonner";
@@ -71,7 +71,7 @@ function NewHiringProcessPage() {
           <CardTitle>Hiring Process Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <InterviewForm
+          <HiringProcessForm
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             isSubmitting={createMutation.isPending || createCompanyDetailsMutation.isPending}

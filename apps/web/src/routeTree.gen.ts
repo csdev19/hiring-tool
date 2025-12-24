@@ -11,10 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as InterviewsIndexRouteImport } from './routes/interviews/index'
-import { Route as InterviewsNewRouteImport } from './routes/interviews/new'
-import { Route as InterviewsIdRouteImport } from './routes/interviews/$id'
-import { Route as InterviewsIdEditRouteImport } from './routes/interviews/$id_.edit'
+import { Route as HiringProcessesIndexRouteImport } from './routes/hiring-processes/index'
+import { Route as HiringProcessesNewRouteImport } from './routes/hiring-processes/new'
+import { Route as HiringProcessesIdRouteImport } from './routes/hiring-processes/$id'
+import { Route as HiringProcessesIdEditRouteImport } from './routes/hiring-processes/$id_.edit'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -26,86 +26,86 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InterviewsIndexRoute = InterviewsIndexRouteImport.update({
-  id: '/interviews/',
-  path: '/interviews/',
+const HiringProcessesIndexRoute = HiringProcessesIndexRouteImport.update({
+  id: '/hiring-processes/',
+  path: '/hiring-processes/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InterviewsNewRoute = InterviewsNewRouteImport.update({
-  id: '/interviews/new',
-  path: '/interviews/new',
+const HiringProcessesNewRoute = HiringProcessesNewRouteImport.update({
+  id: '/hiring-processes/new',
+  path: '/hiring-processes/new',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InterviewsIdRoute = InterviewsIdRouteImport.update({
-  id: '/interviews/$id',
-  path: '/interviews/$id',
+const HiringProcessesIdRoute = HiringProcessesIdRouteImport.update({
+  id: '/hiring-processes/$id',
+  path: '/hiring-processes/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InterviewsIdEditRoute = InterviewsIdEditRouteImport.update({
-  id: '/interviews/$id_/edit',
-  path: '/interviews/$id/edit',
+const HiringProcessesIdEditRoute = HiringProcessesIdEditRouteImport.update({
+  id: '/hiring-processes/$id_/edit',
+  path: '/hiring-processes/$id/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/interviews/$id': typeof InterviewsIdRoute
-  '/interviews/new': typeof InterviewsNewRoute
-  '/interviews': typeof InterviewsIndexRoute
-  '/interviews/$id/edit': typeof InterviewsIdEditRoute
+  '/hiring-processes/$id': typeof HiringProcessesIdRoute
+  '/hiring-processes/new': typeof HiringProcessesNewRoute
+  '/hiring-processes': typeof HiringProcessesIndexRoute
+  '/hiring-processes/$id/edit': typeof HiringProcessesIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/interviews/$id': typeof InterviewsIdRoute
-  '/interviews/new': typeof InterviewsNewRoute
-  '/interviews': typeof InterviewsIndexRoute
-  '/interviews/$id/edit': typeof InterviewsIdEditRoute
+  '/hiring-processes/$id': typeof HiringProcessesIdRoute
+  '/hiring-processes/new': typeof HiringProcessesNewRoute
+  '/hiring-processes': typeof HiringProcessesIndexRoute
+  '/hiring-processes/$id/edit': typeof HiringProcessesIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/interviews/$id': typeof InterviewsIdRoute
-  '/interviews/new': typeof InterviewsNewRoute
-  '/interviews/': typeof InterviewsIndexRoute
-  '/interviews/$id_/edit': typeof InterviewsIdEditRoute
+  '/hiring-processes/$id': typeof HiringProcessesIdRoute
+  '/hiring-processes/new': typeof HiringProcessesNewRoute
+  '/hiring-processes/': typeof HiringProcessesIndexRoute
+  '/hiring-processes/$id_/edit': typeof HiringProcessesIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/login'
-    | '/interviews/$id'
-    | '/interviews/new'
-    | '/interviews'
-    | '/interviews/$id/edit'
+    | '/hiring-processes/$id'
+    | '/hiring-processes/new'
+    | '/hiring-processes'
+    | '/hiring-processes/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
-    | '/interviews/$id'
-    | '/interviews/new'
-    | '/interviews'
-    | '/interviews/$id/edit'
+    | '/hiring-processes/$id'
+    | '/hiring-processes/new'
+    | '/hiring-processes'
+    | '/hiring-processes/$id/edit'
   id:
     | '__root__'
     | '/'
     | '/login'
-    | '/interviews/$id'
-    | '/interviews/new'
-    | '/interviews/'
-    | '/interviews/$id_/edit'
+    | '/hiring-processes/$id'
+    | '/hiring-processes/new'
+    | '/hiring-processes/'
+    | '/hiring-processes/$id_/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
-  InterviewsIdRoute: typeof InterviewsIdRoute
-  InterviewsNewRoute: typeof InterviewsNewRoute
-  InterviewsIndexRoute: typeof InterviewsIndexRoute
-  InterviewsIdEditRoute: typeof InterviewsIdEditRoute
+  HiringProcessesIdRoute: typeof HiringProcessesIdRoute
+  HiringProcessesNewRoute: typeof HiringProcessesNewRoute
+  HiringProcessesIndexRoute: typeof HiringProcessesIndexRoute
+  HiringProcessesIdEditRoute: typeof HiringProcessesIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -124,32 +124,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/interviews/': {
-      id: '/interviews/'
-      path: '/interviews'
-      fullPath: '/interviews'
-      preLoaderRoute: typeof InterviewsIndexRouteImport
+    '/hiring-processes/': {
+      id: '/hiring-processes/'
+      path: '/hiring-processes'
+      fullPath: '/hiring-processes'
+      preLoaderRoute: typeof HiringProcessesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/interviews/new': {
-      id: '/interviews/new'
-      path: '/interviews/new'
-      fullPath: '/interviews/new'
-      preLoaderRoute: typeof InterviewsNewRouteImport
+    '/hiring-processes/new': {
+      id: '/hiring-processes/new'
+      path: '/hiring-processes/new'
+      fullPath: '/hiring-processes/new'
+      preLoaderRoute: typeof HiringProcessesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/interviews/$id': {
-      id: '/interviews/$id'
-      path: '/interviews/$id'
-      fullPath: '/interviews/$id'
-      preLoaderRoute: typeof InterviewsIdRouteImport
+    '/hiring-processes/$id': {
+      id: '/hiring-processes/$id'
+      path: '/hiring-processes/$id'
+      fullPath: '/hiring-processes/$id'
+      preLoaderRoute: typeof HiringProcessesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/interviews/$id_/edit': {
-      id: '/interviews/$id_/edit'
-      path: '/interviews/$id/edit'
-      fullPath: '/interviews/$id/edit'
-      preLoaderRoute: typeof InterviewsIdEditRouteImport
+    '/hiring-processes/$id_/edit': {
+      id: '/hiring-processes/$id_/edit'
+      path: '/hiring-processes/$id/edit'
+      fullPath: '/hiring-processes/$id/edit'
+      preLoaderRoute: typeof HiringProcessesIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -158,10 +158,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
-  InterviewsIdRoute: InterviewsIdRoute,
-  InterviewsNewRoute: InterviewsNewRoute,
-  InterviewsIndexRoute: InterviewsIndexRoute,
-  InterviewsIdEditRoute: InterviewsIdEditRoute,
+  HiringProcessesIdRoute: HiringProcessesIdRoute,
+  HiringProcessesNewRoute: HiringProcessesNewRoute,
+  HiringProcessesIndexRoute: HiringProcessesIndexRoute,
+  HiringProcessesIdEditRoute: HiringProcessesIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -32,3 +32,10 @@ export class ForbiddenError extends Error {
   }
 }
 
+export class BadRequestError extends Error {
+  status = 400;
+  constructor(message: string = "Bad request") {
+    super(message);
+    this.name = "BadRequestError";
+  }
+}

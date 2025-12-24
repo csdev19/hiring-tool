@@ -1,10 +1,17 @@
-import { Elysia, t } from "elysia";
+import { Elysia, InternalServerError, t } from "elysia";
 import { db } from "@interviews-tool/db";
 import { hiringProcess, type NewHiringProcess } from "@interviews-tool/db/schema/hiring-process";
 import { INTERVIEW_STATUSES, CURRENCIES } from "@interviews-tool/domain/constants";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { auth } from "@interviews-tool/auth";
-import { UnauthorizedError, NotFoundError } from "../utils/errors";
+import { UnauthorizedError, NotFoundError, BadRequestError, ConflictError } from "../utils/errors";
+import {
+  successBody,
+  createdBody,
+  successWithPaginationBody,
+  errorBody,
+  getPaginationParams,
+} from "../utils/response-helpers";
 
 // Helper to get user from session
 async function getUserFromRequest(request: Request): Promise<{ id: string } | null> {
@@ -19,48 +26,78 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
   .error({
     UnauthorizedError,
     NotFoundError,
+    BadRequestError,
+    ConflictError,
+    InternalServerError,
   })
   .onError(({ code, error, set }) => {
     // Handle custom errors with proper status codes
-    if (code === "UnauthorizedError" || code === "NotFoundError") {
+    if (code === "UnauthorizedError") {
+      set.status = 401;
+      return errorBody(error.message);
+    }
+    if (code === "NotFoundError") {
+      set.status = 404;
+      return errorBody(error.message);
+    }
+    if (code === "BadRequestError" || code === "ConflictError") {
       set.status = error.status;
-      return {
-        message: error.message,
-      };
+      return errorBody(error.message);
+    }
+    if (code === "InternalServerError") {
+      set.status = 500;
+      return errorBody(error.message);
     }
     // Handle validation errors
     if (code === "VALIDATION") {
       set.status = 400;
-      return {
-        message: error.message,
-      };
+      return errorBody(error.message);
     }
     // Handle unknown errors
     set.status = 500;
-    return {
-      message: "Internal server error",
-    };
+    return errorBody("Internal server error");
   })
   // List all hiring processes for authenticated user
-  .get("/", async ({ request }) => {
-    const user = await getUserFromRequest(request);
-    if (!user) {
-      throw new UnauthorizedError();
-    }
+  .get(
+    "/",
+    async ({ request, query, status }) => {
+      const user = await getUserFromRequest(request);
+      if (!user) {
+        throw new UnauthorizedError();
+      }
 
-    const processes = await db
-      .select()
-      .from(hiringProcess)
-      .where(eq(hiringProcess.userId, user.id))
-      .orderBy(desc(hiringProcess.updatedAt));
+      const pagination = getPaginationParams(query);
 
-    return { data: processes };
-  })
+      const processes = await db
+        .select()
+        .from(hiringProcess)
+        .where(eq(hiringProcess.userId, user.id))
+        .orderBy(desc(hiringProcess.updatedAt))
+        .limit(pagination.limit)
+        .offset(pagination.offset);
+
+      const countResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(hiringProcess)
+        .where(eq(hiringProcess.userId, user.id));
+
+      const total = countResult[0] ? Number(countResult[0].count) : 0;
+
+      return status(200, successWithPaginationBody(processes, pagination, total));
+    },
+    {
+      query: t.Object({
+        page: t.Optional(t.Number({ minimum: 1, default: 1 })),
+        limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
+      }),
+    },
+  )
   // Get single hiring process
   .get(
     "/:id",
     async ({ request, params }) => {
       const user = await getUserFromRequest(request);
+
       if (!user) {
         throw new UnauthorizedError();
       }
@@ -74,7 +111,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
         throw new NotFoundError("Hiring process");
       }
 
-      return { data: result };
+      return successBody(result);
     },
     {
       params: t.Object({
@@ -85,7 +122,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
   // Create new hiring process
   .post(
     "/",
-    async ({ request, body }) => {
+    async ({ request, body, status }) => {
       const user = await getUserFromRequest(request);
       if (!user) {
         throw new UnauthorizedError();
@@ -103,9 +140,9 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
         userId: user.id,
       };
 
-      const [created] = await db.insert(hiringProcess).values(newHiringProcess).returning();
+      const [createdProcess] = await db.insert(hiringProcess).values(newHiringProcess).returning();
 
-      return { data: created };
+      return status(201, createdBody(createdProcess));
     },
     {
       body: t.Object({
@@ -152,7 +189,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
         .where(eq(hiringProcess.id, params.id))
         .returning();
 
-      return { data: updated };
+      return successBody(updated);
     },
     {
       params: t.Object({
@@ -174,7 +211,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
   // Delete hiring process
   .delete(
     "/:id",
-    async ({ request, params }) => {
+    async ({ request, params, status }) => {
       const user = await getUserFromRequest(request);
       if (!user) {
         throw new UnauthorizedError();
@@ -192,7 +229,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
 
       await db.delete(hiringProcess).where(eq(hiringProcess.id, params.id));
 
-      return { message: "Hiring process deleted successfully" };
+      return status(204);
     },
     {
       params: t.Object({

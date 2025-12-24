@@ -1,17 +1,24 @@
 import { relations } from "drizzle-orm";
-import { text, timestamp, integer, index } from "drizzle-orm/pg-core";
+import { text, timestamp, integer, index, pgEnum } from "drizzle-orm/pg-core";
 import { createTable } from "../utils/table-creator";
 import { user } from "./auth";
 import { companyDetails } from "./company-details";
+import { INTERVIEW_STATUS_VALUES, CURRENCY_VALUES } from "@interviews-tool/domain/constants";
+
+// Database enum for interview status
+export const interviewStatusEnum = pgEnum("interview_status", INTERVIEW_STATUS_VALUES);
+
+// Database enum for currency
+export const currencyEnum = pgEnum("currency", CURRENCY_VALUES);
 
 export const hiringProcess = createTable(
   "hiring_process",
   {
     id: text("id").primaryKey(),
     companyName: text("company_name").notNull(),
-    status: text("status").notNull(), // ongoing, rejected, dropped-out, hired
+    status: interviewStatusEnum("status").notNull(),
     salary: integer("salary"), // Optional salary amount
-    currency: text("currency").default("USD").notNull(), // Currency code (ISO 4217): USD, PEN, etc.
+    currency: currencyEnum("currency").default("USD").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

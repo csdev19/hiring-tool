@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/interviews/status-badge";
-import { DeleteConfirmDialog } from "@/components/interviews/delete-confirm-dialog";
+import { StatusBadge } from "@/components/hiring-process/status-badge";
+import { DeleteConfirmDialog } from "@/components/hiring-process/delete-confirm-dialog";
 import { useHiringProcess, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";
 import { useCompanyDetails } from "@/hooks/use-company-details";
 import type { Currency } from "@interviews-tool/domain/constants";
@@ -79,7 +79,7 @@ function HiringProcessDetailPage() {
     );
   }
 
-  const hiringProcess = data?.data;
+  const hiringProcess = data;
 
   if (!hiringProcess) {
     return (
