@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
       });
     }
     throw redirect({
-      to: "/interviews",
+      to: "/hiring-processes",
     });
   },
 });

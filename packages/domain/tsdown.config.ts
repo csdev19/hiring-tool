@@ -5,6 +5,7 @@ export default defineConfig({
   entry: {
     constants: "src/constants/index.ts",
     types: "src/types/index.ts",
+    config: "src/config/index.ts",
   },
 
   // Output formats

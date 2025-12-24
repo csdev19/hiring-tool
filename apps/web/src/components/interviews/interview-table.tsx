@@ -3,12 +3,12 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "./status-badge";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
-import type { Interview } from "@/hooks/use-interviews";
+import type { HiringProcess } from "@/hooks/use-hiring-processes";
 import type { Currency } from "@interviews-tool/domain/constants";
 import { Pencil, Trash2, Eye } from "lucide-react";
 
 interface InterviewTableProps {
-  interviews: Interview[];
+  interviews: HiringProcess[];
   onDelete: (id: string) => void;
   isDeleting?: boolean;
 }
@@ -117,7 +117,7 @@ export function InterviewTable({ interviews, onDelete, isDeleting = false }: Int
               <tr key={interview.id} className="border-b border-border hover:bg-muted/50">
                 <td className="p-2">
                   <Link
-                    to="/interviews/$id"
+                    to="/hiring-processes/$id"
                     params={{ id: interview.id }}
                     className="font-medium hover:underline"
                   >
@@ -136,7 +136,7 @@ export function InterviewTable({ interviews, onDelete, isDeleting = false }: Int
                       variant="ghost"
                       title="View"
                       onClick={() =>
-                        navigate({ to: "/interviews/$id", params: { id: interview.id } })
+                        navigate({ to: "/hiring-processes/$id", params: { id: interview.id } })
                       }
                     >
                       <Eye className="size-3.5" />
@@ -146,7 +146,7 @@ export function InterviewTable({ interviews, onDelete, isDeleting = false }: Int
                       variant="ghost"
                       title="Edit"
                       onClick={() =>
-                        navigate({ to: "/interviews/$id/edit", params: { id: interview.id } })
+                        navigate({ to: "/hiring-processes/$id/edit", params: { id: interview.id } })
                       }
                     >
                       <Pencil className="size-3.5" />

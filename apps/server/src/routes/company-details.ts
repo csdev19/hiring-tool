@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
 import { db } from "@interviews-tool/db";
 import { companyDetails, type NewCompanyDetails } from "@interviews-tool/db/schema/company-details";
-import { interview } from "@interviews-tool/db/schema/interview";
+import { hiringProcess } from "@interviews-tool/db/schema/hiring-process";
 import { eq, and } from "drizzle-orm";
 import { auth } from "@interviews-tool/auth";
 import { UnauthorizedError, NotFoundError, ConflictError } from "../utils/errors";
@@ -15,7 +15,9 @@ async function getUserFromRequest(request: Request): Promise<{ id: string } | nu
   return { id: session.user.id };
 }
 
-export const companyDetailsRoutes = new Elysia({ prefix: "/api/interviews/:id/company-details" })
+export const companyDetailsRoutes = new Elysia({
+  prefix: "/api/hiring-processes/:id/company-details",
+})
   .error({
     UnauthorizedError,
     NotFoundError,
@@ -51,21 +53,21 @@ export const companyDetailsRoutes = new Elysia({ prefix: "/api/interviews/:id/co
         throw new UnauthorizedError();
       }
 
-      // Verify interview exists and belongs to user
-      const [interviewRecord] = await db
+      // Verify hiring process exists and belongs to user
+      const [hiringProcessRecord] = await db
         .select()
-        .from(interview)
-        .where(and(eq(interview.id, params.id), eq(interview.userId, user.id)));
+        .from(hiringProcess)
+        .where(and(eq(hiringProcess.id, params.id), eq(hiringProcess.userId, user.id)));
 
-      if (!interviewRecord) {
-        throw new NotFoundError("Interview");
+      if (!hiringProcessRecord) {
+        throw new NotFoundError("Hiring process");
       }
 
       // Get company details (optional - may not exist yet)
       const [result] = await db
         .select()
         .from(companyDetails)
-        .where(eq(companyDetails.interviewId, params.id));
+        .where(eq(companyDetails.hiringProcessId, params.id));
 
       // Return null if company details don't exist (they're optional)
       if (!result) {
@@ -89,24 +91,24 @@ export const companyDetailsRoutes = new Elysia({ prefix: "/api/interviews/:id/co
         throw new UnauthorizedError();
       }
 
-      // Verify interview exists and belongs to user
-      const [interviewRecord] = await db
+      // Verify hiring process exists and belongs to user
+      const [hiringProcessRecord] = await db
         .select()
-        .from(interview)
-        .where(and(eq(interview.id, params.id), eq(interview.userId, user.id)));
+        .from(hiringProcess)
+        .where(and(eq(hiringProcess.id, params.id), eq(hiringProcess.userId, user.id)));
 
-      if (!interviewRecord) {
-        throw new NotFoundError("Interview");
+      if (!hiringProcessRecord) {
+        throw new NotFoundError("Hiring process");
       }
 
       // Check if company details already exist
       const [existing] = await db
         .select()
         .from(companyDetails)
-        .where(eq(companyDetails.interviewId, params.id));
+        .where(eq(companyDetails.hiringProcessId, params.id));
 
       if (existing) {
-        throw new ConflictError("Company details already exist for this interview");
+        throw new ConflictError("Company details already exist for this hiring process");
       }
 
       // Generate UUID for new company details
@@ -114,7 +116,7 @@ export const companyDetailsRoutes = new Elysia({ prefix: "/api/interviews/:id/co
 
       const newCompanyDetails: NewCompanyDetails = {
         id,
-        interviewId: params.id,
+        hiringProcessId: params.id,
         website: body.website,
         location: body.location,
         benefits: body.benefits,
@@ -164,7 +166,7 @@ export const companyDetailsRoutes = new Elysia({ prefix: "/api/interviews/:id/co
       const [existing] = await db
         .select()
         .from(companyDetails)
-        .where(eq(companyDetails.interviewId, params.id));
+        .where(eq(companyDetails.hiringProcessId, params.id));
 
       if (!existing) {
         throw new NotFoundError("Company details");
@@ -181,7 +183,7 @@ export const companyDetailsRoutes = new Elysia({ prefix: "/api/interviews/:id/co
           interviewSteps: body.interviewSteps,
           updatedAt: new Date(),
         })
-        .where(eq(companyDetails.interviewId, params.id))
+        .where(eq(companyDetails.hiringProcessId, params.id))
         .returning();
 
       return { data: updated };
@@ -209,27 +211,27 @@ export const companyDetailsRoutes = new Elysia({ prefix: "/api/interviews/:id/co
         throw new UnauthorizedError();
       }
 
-      // Verify interview exists and belongs to user
-      const [interviewRecord] = await db
+      // Verify hiring process exists and belongs to user
+      const [hiringProcessRecord] = await db
         .select()
-        .from(interview)
-        .where(and(eq(interview.id, params.id), eq(interview.userId, user.id)));
+        .from(hiringProcess)
+        .where(and(eq(hiringProcess.id, params.id), eq(hiringProcess.userId, user.id)));
 
-      if (!interviewRecord) {
-        throw new NotFoundError("Interview");
+      if (!hiringProcessRecord) {
+        throw new NotFoundError("Hiring process");
       }
 
       // Check if company details exist
       const [existing] = await db
         .select()
         .from(companyDetails)
-        .where(eq(companyDetails.interviewId, params.id));
+        .where(eq(companyDetails.hiringProcessId, params.id));
 
       if (!existing) {
         throw new NotFoundError("Company details");
       }
 
-      await db.delete(companyDetails).where(eq(companyDetails.interviewId, params.id));
+      await db.delete(companyDetails).where(eq(companyDetails.hiringProcessId, params.id));
 
       return { message: "Company details deleted successfully" };
     },
@@ -239,4 +241,3 @@ export const companyDetailsRoutes = new Elysia({ prefix: "/api/interviews/:id/co
       }),
     },
   );
-

@@ -157,6 +157,7 @@
       },
       "devDependencies": {
         "@interviews-tool/config": "workspace:*",
+        "@interviews-tool/domain": "workspace:*",
         "@types/ws": "^8.18.1",
         "drizzle-kit": "^0.31.8",
         "typescript": "^5",

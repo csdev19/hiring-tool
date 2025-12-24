@@ -2,7 +2,7 @@ import "dotenv/config";
 import { cors } from "@elysiajs/cors";
 import { auth } from "@interviews-tool/auth";
 import { Elysia, t } from "elysia";
-import { interviewRoutes } from "./routes/interviews";
+import { hiringProcessRoutes } from "./routes/hiring-processes";
 import { companyDetailsRoutes } from "./routes/company-details";
 
 const app = new Elysia()
@@ -21,7 +21,7 @@ const app = new Elysia()
     }
     return status(405);
   })
-  .use(interviewRoutes)
+  .use(hiringProcessRoutes)
   .use(companyDetailsRoutes)
   .get("/", () => "OK")
   .get("/hi", () => "Hi from Elysia")
