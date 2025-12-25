@@ -1,10 +1,10 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@interviews-tool/web-ui";
 import { InterviewTable } from "@/components/hiring-process/hiring-process-table";
 import { useHiringProcesses, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";
 import { getUser } from "@/functions/get-user";
 import { Plus } from "lucide-react";
+import { TestComponent } from "@interviews-tool/web-ui";
 
 export const Route = createFileRoute("/hiring-processes/")({
   component: HiringProcessesComponent,

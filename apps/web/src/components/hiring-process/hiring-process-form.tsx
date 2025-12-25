@@ -1,9 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Button, Input, Label, Textarea } from "@interviews-tool/web-ui";
 import type { CreateHiringProcessInput } from "@/hooks/use-hiring-processes";
 import type { CreateCompanyDetailsInput } from "@/hooks/use-company-details";
 import {
