@@ -33,13 +33,13 @@ function HiringProcessesComponent() {
     <div className="container mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Hiring Processes</h1>
-          <p className="text-muted-foreground mt-1">Manage your job application processes</p>
+          <h1 className="text-3xl font-bold">My Job Applications</h1>
+          <p className="text-muted-foreground mt-1">Manage your job applications</p>
         </div>
         <Link to="/hiring-processes/new">
           <Button>
             <Plus className="mr-2 size-4" />
-            Create Hiring Process
+            Create Job Application
           </Button>
         </Link>
       </div>
