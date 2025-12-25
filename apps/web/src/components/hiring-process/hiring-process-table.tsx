@@ -1,11 +1,46 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  createColumnHelper,
+  type SortingState,
+} from "@tanstack/react-table";
+import { Button } from "@interviews-tool/web-ui";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@interviews-tool/web-ui";
 import { StatusBadge } from "./status-badge";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import type { HiringProcess } from "@/hooks/use-hiring-processes";
 import type { Currency } from "@interviews-tool/domain/constants";
 import { Pencil, Trash2, Eye } from "lucide-react";
+
+const columnHelper = createColumnHelper<HiringProcess>();
+
+const formatDate = (date: Date) => {
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
+const formatSalary = (salary: number | null, currency: Currency = "USD") => {
+  if (!salary) return "-";
+  const formatted = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency,
+    minimumFractionDigits: 0,
+  }).format(salary);
+  return `${formatted} ${currency}`;
+};
 
 interface InterviewTableProps {
   interviews: HiringProcess[];
@@ -16,50 +51,115 @@ interface InterviewTableProps {
 export function InterviewTable({ interviews, onDelete, isDeleting = false }: InterviewTableProps) {
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<"updatedAt" | "companyName" | "salary">("updatedAt");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [sorting, setSorting] = useState<SortingState>([{ id: "updatedAt", desc: true }]);
 
   const interviewToDelete = interviews.find((i) => i.id === deleteId);
 
-  const sortedInterviews = [...interviews].sort((a, b) => {
-    let comparison = 0;
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor("companyName", {
+        header: "Company",
+        cell: (info) => {
+          const interview = info.row.original;
+          return (
+            <Link
+              to="/hiring-processes/$id"
+              params={{ id: interview.id }}
+              className="font-medium hover:underline"
+            >
+              {info.getValue()}
+            </Link>
+          );
+        },
+        enableSorting: true,
+      }),
+      columnHelper.accessor("status", {
+        header: "Status",
+        cell: (info) => <StatusBadge status={info.getValue()} />,
+        enableSorting: false,
+      }),
+      columnHelper.accessor("salary", {
+        header: "Salary",
+        cell: (info) => {
+          const interview = info.row.original;
+          return formatSalary(info.getValue(), interview.currency);
+        },
+        enableSorting: true,
+        sortingFn: (rowA, rowB) => {
+          const salaryA = rowA.original.salary || 0;
+          const salaryB = rowB.original.salary || 0;
+          return salaryA - salaryB;
+        },
+      }),
+      columnHelper.accessor("updatedAt", {
+        header: "Last Update",
+        cell: (info) => (
+          <span className="text-muted-foreground">{formatDate(info.getValue())}</span>
+        ),
+        enableSorting: true,
+        sortingFn: (rowA, rowB) => {
+          const dateA = new Date(rowA.original.updatedAt).getTime();
+          const dateB = new Date(rowB.original.updatedAt).getTime();
+          return dateA - dateB;
+        },
+      }),
+      columnHelper.display({
+        id: "actions",
+        header: () => <div className="text-right">Actions</div>,
+        cell: (info) => {
+          const interview = info.row.original;
+          return (
+            <div className="flex justify-end gap-1">
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                title="View"
+                onClick={() =>
+                  navigate({ to: "/hiring-processes/$id", params: { id: interview.id } })
+                }
+              >
+                <Eye className="size-3.5" />
+              </Button>
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                title="Edit"
+                onClick={() =>
+                  navigate({
+                    to: "/hiring-processes/$id/edit",
+                    params: { id: interview.id },
+                  })
+                }
+              >
+                <Pencil className="size-3.5" />
+              </Button>
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                onClick={() => setDeleteId(interview.id)}
+                title="Delete"
+              >
+                <Trash2 className="size-3.5" />
+              </Button>
+            </div>
+          );
+        },
+        enableSorting: false,
+      }),
+    ],
+    [navigate],
+  );
 
-    if (sortBy === "updatedAt") {
-      comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-    } else if (sortBy === "companyName") {
-      comparison = a.companyName.localeCompare(b.companyName);
-    } else if (sortBy === "salary") {
-      comparison = (a.salary || 0) - (b.salary || 0);
-    }
-
-    return sortOrder === "asc" ? comparison : -comparison;
+  const table = useReactTable({
+    data: interviews,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setSorting,
+    state: {
+      sorting,
+    },
   });
-
-  const handleSort = (column: typeof sortBy) => {
-    if (sortBy === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(column);
-      setSortOrder("desc");
-    }
-  };
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  const formatSalary = (salary: number | null, currency: Currency = "USD") => {
-    if (!salary) return "-";
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency,
-      minimumFractionDigits: 0,
-    }).format(salary);
-  };
 
   if (interviews.length === 0) {
     return (
@@ -71,101 +171,64 @@ export function InterviewTable({ interviews, onDelete, isDeleting = false }: Int
 
   return (
     <>
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="border-b border-border">
-              <th className="text-left p-2 font-medium">
-                <button
-                  onClick={() => handleSort("companyName")}
-                  className="hover:text-foreground flex items-center gap-1"
-                >
-                  Company
-                  {sortBy === "companyName" && (
-                    <span className="text-xs">{sortOrder === "asc" ? "↑" : "↓"}</span>
-                  )}
-                </button>
-              </th>
-              <th className="text-left p-2 font-medium">Status</th>
-              <th className="text-left p-2 font-medium">
-                <button
-                  onClick={() => handleSort("salary")}
-                  className="hover:text-foreground flex items-center gap-1"
-                >
-                  Salary
-                  {sortBy === "salary" && (
-                    <span className="text-xs">{sortOrder === "asc" ? "↑" : "↓"}</span>
-                  )}
-                </button>
-              </th>
-              <th className="text-left p-2 font-medium">
-                <button
-                  onClick={() => handleSort("updatedAt")}
-                  className="hover:text-foreground flex items-center gap-1"
-                >
-                  Last Update
-                  {sortBy === "updatedAt" && (
-                    <span className="text-xs">{sortOrder === "asc" ? "↑" : "↓"}</span>
-                  )}
-                </button>
-              </th>
-              <th className="text-right p-2 font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedInterviews.map((interview) => (
-              <tr key={interview.id} className="border-b border-border hover:bg-muted/50">
-                <td className="p-2">
-                  <Link
-                    to="/hiring-processes/$id"
-                    params={{ id: interview.id }}
-                    className="font-medium hover:underline"
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id} className="border-b border-border">
+              {headerGroup.headers.map((header) => {
+                const canSort = header.column.getCanSort();
+                const isSorted = header.column.getIsSorted();
+                const isActionsColumn = header.column.id === "actions";
+                return (
+                  <TableHead
+                    key={header.id}
+                    className={
+                      isActionsColumn ? "text-right p-2 font-medium" : "text-left p-2 font-medium"
+                    }
                   >
-                    {interview.companyName}
-                  </Link>
-                </td>
-                <td className="p-2">
-                  <StatusBadge status={interview.status} />
-                </td>
-                <td className="p-2">{formatSalary(interview.salary, interview.currency)}</td>
-                <td className="p-2 text-muted-foreground">{formatDate(interview.updatedAt)}</td>
-                <td className="p-2">
-                  <div className="flex justify-end gap-1">
-                    <Button
-                      size="icon-sm"
-                      variant="ghost"
-                      title="View"
-                      onClick={() =>
-                        navigate({ to: "/hiring-processes/$id", params: { id: interview.id } })
-                      }
-                    >
-                      <Eye className="size-3.5" />
-                    </Button>
-                    <Button
-                      size="icon-sm"
-                      variant="ghost"
-                      title="Edit"
-                      onClick={() =>
-                        navigate({ to: "/hiring-processes/$id/edit", params: { id: interview.id } })
-                      }
-                    >
-                      <Pencil className="size-3.5" />
-                    </Button>
-                    <Button
-                      size="icon-sm"
-                      variant="ghost"
-                      onClick={() => setDeleteId(interview.id)}
-                      title="Delete"
-                    >
-                      <Trash2 className="size-3.5" />
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    {canSort ? (
+                      <button
+                        onClick={header.column.getToggleSortingHandler()}
+                        className="hover:text-foreground flex items-center gap-1"
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : typeof header.column.columnDef.header === "function"
+                            ? header.column.columnDef.header(header.getContext())
+                            : header.column.columnDef.header}
+                        {isSorted && (
+                          <span className="text-xs">{isSorted === "asc" ? "↑" : "↓"}</span>
+                        )}
+                      </button>
+                    ) : header.isPlaceholder ? null : typeof header.column.columnDef.header ===
+                      "function" ? (
+                      header.column.columnDef.header(header.getContext())
+                    ) : (
+                      header.column.columnDef.header
+                    )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.map((row) => (
+            <TableRow key={row.id} className="border-b border-border hover:bg-muted/50">
+              {row.getVisibleCells().map((cell) => {
+                const isActionsColumn = cell.column.id === "actions";
+                return (
+                  <TableCell key={cell.id} className={isActionsColumn ? "p-2 text-right" : "p-2"}>
+                    {typeof cell.column.columnDef.cell === "function"
+                      ? cell.column.columnDef.cell(cell.getContext())
+                      : cell.getValue()}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
       {deleteId && interviewToDelete && (
         <DeleteConfirmDialog

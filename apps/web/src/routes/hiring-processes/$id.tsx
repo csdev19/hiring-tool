@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, Button } from "@interviews-tool/web-ui";
 import { StatusBadge } from "@/components/hiring-process/status-badge";
 import { DeleteConfirmDialog } from "@/components/hiring-process/delete-confirm-dialog";
 import { useHiringProcess, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";

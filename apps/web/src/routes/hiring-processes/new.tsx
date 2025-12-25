@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@interviews-tool/web-ui";
 import { HiringProcessForm } from "@/components/hiring-process/hiring-process-form";
 import { useCreateHiringProcess } from "@/hooks/use-hiring-processes";
 import { useCreateCompanyDetails } from "@/hooks/use-company-details";
