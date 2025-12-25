@@ -32,7 +32,6 @@ function EditHiringProcessPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { data, isLoading, error } = useHiringProcess(id);
-  console.log("data", { data, isLoading, error });
   const { data: companyDetailsData, isLoading: isLoadingCompanyDetails } = useCompanyDetails(id);
   const updateMutation = useUpdateHiringProcess();
   const createCompanyDetailsMutation = useCreateCompanyDetails();

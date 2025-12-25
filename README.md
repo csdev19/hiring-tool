@@ -1,83 +1,173 @@
-# interviews-tool
+# Hiring Tool
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Start, Elysia, ORPC, and more.
+A modern web application for tracking job interviews and managing hiring processes. Built to help job seekers organize their applications, track company information, and manage interactions with potential employers.
 
-## Features
+## 🎯 Features
 
-- **TypeScript** - For type safety and improved developer experience
-- **TanStack Start** - SSR framework with TanStack Router
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **shadcn/ui** - Reusable UI components
-- **Elysia** - Type-safe, high-performance framework
-- **oRPC** - End-to-end type-safe APIs with OpenAPI integration
-- **Bun** - Runtime environment
-- **Drizzle** - TypeScript-first ORM
-- **PostgreSQL** - Database engine
-- **Authentication** - Better-Auth
-- **Husky** - Git hooks for code quality
-- **Oxlint** - Oxlint + Oxfmt (linting & formatting)
-- **Turborepo** - Optimized monorepo build system
+- **Hiring Process Management** - Create and track multiple job applications with status tracking (ongoing, rejected, dropped-out, hired)
+- **Company Information** - Store comprehensive company details including salary, benefits, location, website, and contact information
+- **Interview Tracking** - Track interview sessions and interactions with companies (prepared for future implementation)
+- **User Authentication** - Secure authentication with Better-Auth
+- **Responsive Design** - Modern, mobile-friendly interface built with TailwindCSS and shadcn/ui
 
-## Getting Started
+## 🚀 Getting Started
 
-First, install the dependencies:
+### Prerequisites
+
+- [Bun](https://bun.sh) (v1.3.4 or higher)
+- PostgreSQL database
+- Node.js 18+ (if not using Bun)
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd hiring-tool
+```
+
+2. Install dependencies:
 
 ```bash
 bun install
 ```
-## Database Setup
 
-This project uses PostgreSQL with Drizzle ORM.
+3. Set up environment variables:
+   - Copy `.env.example` to `.env` in `apps/server/` (if available)
+   - Configure your PostgreSQL connection string
+   - Set up authentication secrets
 
-1. Make sure you have a PostgreSQL database set up.
-2. Update your `apps/server/.env` file with your PostgreSQL connection details.
+4. Set up the database:
 
-3. Apply the schema to your database:
 ```bash
 bun run db:push
 ```
 
-
-Then, run the development server:
+5. Start the development servers:
 
 ```bash
 bun run dev
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
-The API is running at [http://localhost:3000](http://localhost:3000).
+The application will be available at:
 
+- **Web App**: [http://localhost:3001](http://localhost:3001)
+- **API Server**: [http://localhost:3000](http://localhost:3000)
 
-
-
-
-
-## Deployment (Alchemy)
-- Web dev: cd apps/web && bun run dev
-- Web deploy: cd apps/web && bun run deploy
-- Web destroy: cd apps/web && bun run destroy
-
-
-## Project Structure
+## 📁 Project Structure
 
 ```
-interviews-tool/
+hiring-tool/
 ├── apps/
-│   ├── web/         # Frontend application (React + TanStack Start)
-│   └── server/      # Backend API (Elysia, ORPC)
+│   ├── web/              # Frontend application (React + TanStack Start)
+│   ├── server/            # Backend API (Elysia)
+│   └── fumadocs/         # Documentation site
 ├── packages/
-│   ├── api/         # API layer / business logic
-│   ├── auth/        # Authentication configuration & logic
-│   └── db/          # Database schema & queries
+│   ├── auth/             # Authentication configuration
+│   ├── db/                # Database schema & Drizzle ORM
+│   ├── domain/            # Domain types, constants, and utilities
+│   └── config/            # Shared TypeScript configuration
 ```
 
-## Available Scripts
+## 🛠️ Available Scripts
 
-- `bun run dev`: Start all applications in development mode
-- `bun run build`: Build all applications
-- `bun run dev:web`: Start only the web application
-- `bun run dev:server`: Start only the server
-- `bun run check-types`: Check TypeScript types across all apps
-- `bun run db:push`: Push schema changes to database
-- `bun run db:studio`: Open database studio UI
-- `bun run check`: Run Oxlint and Oxfmt
+### Development
+
+- `bun run dev` - Start all applications in development mode
+- `bun run dev:web` - Start only the web application
+- `bun run dev:server` - Start only the server
+
+### Building
+
+- `bun run build` - Build all applications for production
+
+### Database
+
+- `bun run db:push` - Push schema changes to database
+- `bun run db:studio` - Open Drizzle Studio (database GUI)
+- `bun run db:generate` - Generate migration files
+- `bun run db:migrate` - Run database migrations
+
+### Code Quality
+
+- `bun run check-types` - Check TypeScript types across all apps
+- `bun run check` - Run Oxlint and Oxfmt (linting & formatting)
+
+## 🚢 Deployment
+
+### Alchemy (Cloudflare Workers)
+
+```bash
+# Development
+cd apps/web && bun run dev
+
+# Deploy
+cd apps/web && bun run deploy
+
+# Destroy
+cd apps/web && bun run destroy
+```
+
+## 📚 Documentation
+
+Comprehensive documentation is available in the `apps/fumadocs` directory:
+
+- **Backend Patterns**: API response types, error handling, promise handlers
+- **Frontend Patterns**: Data fetching, hooks, component patterns
+- **Architecture**: System design and decision records
+- **Features**: Implementation details for each feature
+
+## 🏗️ Tech Stack
+
+This project was built using the [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack) template as a foundation.
+
+### Frontend
+
+- **React 19** - UI library
+- **TanStack Start** - SSR framework with file-based routing
+- **TanStack Router** - Type-safe routing
+- **TanStack Query** - Data fetching and caching
+- **TanStack Form** - Form state management
+- **TailwindCSS** - Utility-first CSS framework
+- **shadcn/ui** - Reusable UI components
+- **Eden Treaty** - End-to-end type-safe API client
+
+### Backend
+
+- **Elysia** - Type-safe, high-performance web framework
+- **Bun** - JavaScript runtime and package manager
+- **Drizzle ORM** - TypeScript-first SQL ORM
+- **PostgreSQL** - Relational database
+- **Better-Auth** - Authentication library
+
+### Development Tools
+
+- **TypeScript** - Type safety
+- **Turborepo** - Monorepo build system
+- **Oxlint** - Fast linter
+- **Oxfmt** - Code formatter
+- **Husky** - Git hooks
+- **Drizzle Studio** - Database GUI
+
+### Architecture
+
+- **Monorepo** - Turborepo for managing multiple packages
+- **Domain-Driven Design** - Separated domain, infrastructure, and application layers
+- **Type Safety** - End-to-end type safety from database to frontend
+
+## 🙏 Credits
+
+This project was created using the [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack) template, a modern TypeScript stack that combines React, TanStack Start, Elysia, and more. Special thanks to [AmanVarshney01](https://github.com/AmanVarshney01) for creating this excellent starter template.
+
+## 📝 License
+
+[Add your license here]
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+**Note**: This project is actively under development. Some features may be in progress or planned for future releases.
