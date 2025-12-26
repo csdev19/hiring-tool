@@ -1,38 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { clientTreaty } from "@/lib/client-treaty";
 import { getErrorMessage } from "@/lib/error";
+import type {
+  CompanyDetailsBase,
+  CreateCompanyDetails,
+  UpdateCompanyDetails,
+} from "@interviews-tool/domain/schemas";
 
-// Type definitions
-export interface CompanyDetails {
-  id: string;
-  hiringProcessId: string;
-  website: string | null;
-  location: string | null;
-  benefits: string | null;
-  contactedVia: string | null;
-  contactPerson: string | null;
-  interviewSteps: number | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface CreateCompanyDetailsInput {
-  website?: string;
-  location?: string;
-  benefits?: string;
-  contactedVia?: string;
-  contactPerson?: string;
-  interviewSteps?: number;
-}
-
-export interface UpdateCompanyDetailsInput {
-  website?: string;
-  location?: string;
-  benefits?: string;
-  contactedVia?: string;
-  contactPerson?: string;
-  interviewSteps?: number;
-}
+// Re-export domain types for convenience
+export type CompanyDetails = CompanyDetailsBase;
+export type CreateCompanyDetailsInput = CreateCompanyDetails;
+export type UpdateCompanyDetailsInput = UpdateCompanyDetails;
 
 // Query keys
 const companyDetailsKeys = {

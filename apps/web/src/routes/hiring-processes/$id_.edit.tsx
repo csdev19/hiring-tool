@@ -1,16 +1,12 @@
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@interviews-tool/web-ui";
 import { HiringProcessForm } from "@/components/hiring-process/hiring-process-form";
-import {
-  useHiringProcess,
-  useUpdateHiringProcess,
-  type Currency,
-  type InterviewStatus,
-} from "@/hooks/use-hiring-processes";
+import { useHiringProcess, useUpdateHiringProcess } from "@/hooks/use-hiring-processes";
 import {
   useCompanyDetails,
   useCreateCompanyDetails,
   useUpdateCompanyDetails,
+  type CreateCompanyDetailsInput,
 } from "@/hooks/use-company-details";
 import { toast } from "sonner";
 import { getUser } from "@/functions/get-user";
@@ -39,7 +35,7 @@ function EditHiringProcessPage() {
 
   const handleSubmit = async (
     formData: Parameters<typeof updateMutation.mutateAsync>[0]["data"],
-    companyDetails?: Parameters<typeof updateCompanyDetailsMutation.mutateAsync>[0]["data"],
+    companyDetails?: CreateCompanyDetailsInput,
   ) => {
     try {
       await updateMutation.mutateAsync({ id, data: formData });

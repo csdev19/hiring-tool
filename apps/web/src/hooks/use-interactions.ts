@@ -1,29 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { clientTreaty } from "@/lib/client-treaty";
 import { getErrorMessage } from "@/lib/error";
-import type { InteractionType } from "@interviews-tool/domain/constants";
+import type {
+  InteractionBase,
+  CreateInteraction,
+  UpdateInteraction,
+} from "@interviews-tool/domain/schemas";
 
-export interface Interaction {
-  id: string;
-  hiringProcessId: string;
-  title: string | null;
-  content: string;
-  type: InteractionType | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface CreateInteractionInput {
-  title?: string;
-  content: string;
-  type?: InteractionType;
-}
-
-export interface UpdateInteractionInput {
-  title?: string;
-  content: string;
-  type?: InteractionType;
-}
+// Re-export domain types for convenience
+export type Interaction = InteractionBase;
+export type CreateInteractionInput = CreateInteraction;
+export type UpdateInteractionInput = UpdateInteraction;
 
 const interactionKeys = {
   all: ["interactions"] as const,
@@ -35,10 +22,11 @@ export function useInteractions(hiringProcessId: string) {
   return useQuery<{ data: Interaction[] }>({
     queryKey: interactionKeys.list(hiringProcessId),
     queryFn: async () => {
-      const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })
-        .interactions.get();
+      const result = await clientTreaty.api["hiring-processes"]({
+        id: hiringProcessId,
+      }).interactions.get();
       if (result.error) throw new Error(getErrorMessage(result.error));
-      
+
       // Ensure we always return an array, even if data is null/undefined
       const data = result.data as { data: Interaction[] | null | undefined };
       return { data: data?.data || [] };
@@ -58,8 +46,9 @@ export function useCreateInteraction() {
       hiringProcessId: string;
       data: CreateInteractionInput;
     }) => {
-      const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })
-        .interactions.post(data);
+      const result = await clientTreaty.api["hiring-processes"]({
+        id: hiringProcessId,
+      }).interactions.post(data);
       if (result.error) throw new Error(getErrorMessage(result.error));
       return result.data;
     },
@@ -85,7 +74,8 @@ export function useUpdateInteraction() {
       data: UpdateInteractionInput;
     }) => {
       const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })
-        .interactions({ interactionId }).put(data);
+        .interactions({ interactionId })
+        .put(data);
       if (result.error) throw new Error(getErrorMessage(result.error));
       return result.data;
     },
@@ -109,7 +99,8 @@ export function useDeleteInteraction() {
       interactionId: string;
     }) => {
       const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })
-        .interactions({ interactionId }).delete();
+        .interactions({ interactionId })
+        .delete();
       if (result.error) throw new Error(getErrorMessage(result.error));
       return result.data;
     },
@@ -120,4 +111,3 @@ export function useDeleteInteraction() {
     },
   });
 }
-
