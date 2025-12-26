@@ -9,6 +9,9 @@ export default defineConfig({
     schemas: "src/schemas/index.ts",
   },
 
+  exports: {
+    devExports: true,
+  },
   // Output formats
   format: ["esm"],
 

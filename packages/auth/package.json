@@ -1,23 +1,36 @@
 {
   "name": "@interviews-tool/auth",
   "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    },
-    "./*": {
-      "default": "./src/*.ts"
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./package.json": "./package.json"
     }
   },
-  "scripts": {},
-  "devDependencies": {
-    "typescript": "^5",
-    "@interviews-tool/config": "workspace:*"
+  "scripts": {
+    "build": "tsdown",
+    "dev:watch": "tsdown --watch",
+    "clean": "rm -rf dist",
+    "check-types": "tsc --noEmit",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint --fix src"
   },
   "dependencies": {
+    "@interviews-tool/db": "workspace:*",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
-    "zod": "catalog:",
-    "@interviews-tool/db": "workspace:*"
+    "tsdown": "^0.18.2",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@interviews-tool/config": "workspace:*",
+    "typescript": "^5"
   }
 }
