@@ -33,8 +33,4 @@ export {
 } from "./interaction";
 
 // Pagination schemas
-export {
-  paginationQuerySchema,
-  type PaginationQuery,
-} from "./pagination";
-
+export { paginationQuerySchema, type PaginationQuery } from "./pagination";

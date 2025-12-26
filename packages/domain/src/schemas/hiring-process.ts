@@ -72,4 +72,3 @@ export type CreateHiringProcess = z.infer<typeof createHiringProcessSchema>;
 export type UpdateHiringProcess = z.infer<typeof updateHiringProcessSchema>;
 export type PartialUpdateHiringProcess = z.infer<typeof partialUpdateHiringProcessSchema>;
 export type FilterHiringProcess = z.infer<typeof filterHiringProcessSchema>;
-

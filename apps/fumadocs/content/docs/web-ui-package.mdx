@@ -17,6 +17,7 @@ The `@interviews-tool/web-ui` package is a shared UI component library that prov
 ## Overview
 
 The web-ui package centralizes:
+
 - **UI Components**: shadcn/ui components (Button, Card, Table, etc.)
 - **Styles**: Tailwind CSS configuration and theme variables
 - **Utilities**: Shared utility functions (e.g., `cn` for className merging)
@@ -98,6 +99,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@interviews-tool/web-ui";
 ### Available Components
 
 Current components available in the package:
+
 - Button
 - Card
 - Checkbox
@@ -153,6 +155,7 @@ To add a custom color that can be used with Tailwind classes (e.g., `bg-example`
 The package includes these theme colors:
 
 **Base Colors:**
+
 - `background` / `foreground`
 - `card` / `card-foreground`
 - `popover` / `popover-foreground`
@@ -166,9 +169,11 @@ The package includes these theme colors:
 - `ring`
 
 **Chart Colors:**
+
 - `chart-1` through `chart-5`
 
 **Sidebar Colors:**
+
 - `sidebar` / `sidebar-foreground`
 - `sidebar-primary` / `sidebar-primary-foreground`
 - `sidebar-accent` / `sidebar-accent-foreground`
@@ -209,6 +214,7 @@ The package uses **OKLCH** color format for better color consistency and easier 
 - **Hue**: 0-360 (color wheel position)
 
 Example:
+
 - `oklch(0.5 0.2 250)` = Medium lightness, moderate saturation, blue hue
 
 ## Development Workflow
@@ -288,6 +294,7 @@ Prefer theme colors over hardcoded colors:
 ### Components Not Styled
 
 If components appear unstyled:
+
 1. Verify styles are imported: `@import "@interviews-tool/web-ui/styles.css";`
 2. Check that Tailwind is processing the package's CSS
 3. Ensure the package is built: `bun run build` in `packages/web-ui`
@@ -295,6 +302,7 @@ If components appear unstyled:
 ### Colors Not Working
 
 If custom colors don't work:
+
 1. Verify the variable is in both `:root` and `.dark`
 2. Check it's registered in `@theme inline` block
 3. Rebuild the package if needed
@@ -303,6 +311,7 @@ If custom colors don't work:
 ### shadcn Components Not Found
 
 If shadcn CLI can't find components:
+
 1. Ensure you're in `packages/web-ui` directory or using `--cwd` flag
 2. Check `components.json` exists and is properly configured
 3. Verify path aliases in `tsconfig.json` match `components.json`
@@ -349,4 +358,3 @@ If you're migrating from app-specific components:
 - [Backend API Response Types](/docs/backend/api-response-types)
 - [Constants Pattern](/docs/constants-pattern)
 - [Architecture V1](/docs/v1/architecture)
-

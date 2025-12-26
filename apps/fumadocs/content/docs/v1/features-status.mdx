@@ -27,12 +27,14 @@ This document tracks the implementation status of all features outlined in the V
 ### Status: ✅ Fully Implemented
 
 **From Concept Document:**
+
 - Define and track hiring processes (job applications) with various statuses
 - Store comprehensive company information including: salary, benefits, location, name, website, and contact details
 
 ### ✅ Completed Features
 
 #### Database Schema
+
 - ✅ `hiring_process` table with all required fields
 - ✅ Status enum (ongoing, rejected, dropped-out, hired)
 - ✅ Currency enum support
@@ -40,6 +42,7 @@ This document tracks the implementation status of all features outlined in the V
 - ✅ Timestamps (createdAt, updatedAt)
 
 #### Backend API
+
 - ✅ `GET /api/hiring-processes` - List all user's hiring processes
 - ✅ `GET /api/hiring-processes/:id` - Get single hiring process
 - ✅ `POST /api/hiring-processes` - Create new hiring process
@@ -49,6 +52,7 @@ This document tracks the implementation status of all features outlined in the V
 - ✅ User-specific data isolation
 
 #### Frontend Implementation
+
 - ✅ Dashboard page (`/hiring-processes`) with table view
 - ✅ Create page (`/hiring-processes/new`) with form
 - ✅ Edit page (`/hiring-processes/:id/edit`) with pre-filled form
@@ -60,6 +64,7 @@ This document tracks the implementation status of all features outlined in the V
 - ✅ Navigation and routing
 
 #### UI Components
+
 - ✅ `StatusBadge` component
 - ✅ `DeleteConfirmDialog` component
 - ✅ `InterviewForm` component (shared for create/edit)
@@ -72,6 +77,7 @@ This document tracks the implementation status of all features outlined in the V
 ### Status: ❌ Not Started
 
 **From Concept Document:**
+
 - Create a list of meetings/steps related to hiring processes
 - Track interactions like: LinkedIn contact, HR calls, technical challenges, emails, etc.
 - Store email content and sender information
@@ -81,16 +87,19 @@ This document tracks the implementation status of all features outlined in the V
 ### ❌ Missing Features
 
 #### Database Schema
+
 - ❌ No `interactions` table
 - ❌ No interaction type enum
 - ❌ No relationship between hiring process and interactions
 
 #### Backend API
+
 - ❌ No interaction endpoints
 - ❌ No markdown content handling
 - ❌ No interaction type management
 
 #### Frontend Implementation
+
 - ❌ No interaction list/timeline component
 - ❌ No markdown editor for interactions
 - ❌ No chat-style interface
@@ -101,6 +110,7 @@ This document tracks the implementation status of all features outlined in the V
 #### Required Implementation
 
 **Database Schema Needed:**
+
 ```typescript
 // From concept.mdx lines 147-156
 interactions table:
@@ -113,6 +123,7 @@ interactions table:
 ```
 
 **API Endpoints Needed:**
+
 - `GET /api/hiring-processes/:id/interactions` - List interactions
 - `POST /api/hiring-processes/:id/interactions` - Create interaction
 - `GET /api/interactions/:id` - Get single interaction
@@ -120,6 +131,7 @@ interactions table:
 - `DELETE /api/interactions/:id` - Delete interaction
 
 **Frontend Components Needed:**
+
 - Interaction timeline/list component
 - Markdown editor component
 - Interaction form component
@@ -133,6 +145,7 @@ interactions table:
 ### Status: ⚠️ Backend Complete, Frontend Incomplete
 
 **From Concept Document:**
+
 - Store detailed company information (website, location, benefits, contact person, contacted via, interview steps)
 - Quick access to company details from detail view
 - Edit company information
@@ -140,11 +153,13 @@ interactions table:
 ### ✅ Completed Features
 
 #### Database Schema
+
 - ✅ `company_details` table with all fields
 - ✅ 1:1 relationship with hiring process
 - ✅ All optional fields (website, location, benefits, contactedVia, contactPerson, interviewSteps)
 
 #### Backend API
+
 - ✅ `GET /api/hiring-processes/:id/company-details` - Get company details
 - ✅ `POST /api/hiring-processes/:id/company-details` - Create company details
 - ✅ `PUT /api/hiring-processes/:id/company-details` - Update company details
@@ -152,6 +167,7 @@ interactions table:
 - ✅ Authentication and authorization checks
 
 #### Frontend Implementation (Read-Only)
+
 - ✅ Display company details on detail page
 - ✅ Show website, location, benefits, contact info
 - ✅ Conditional rendering (only shows if data exists)
@@ -159,6 +175,7 @@ interactions table:
 ### ❌ Missing Features
 
 #### Frontend Implementation (Create/Edit)
+
 - ❌ No form to create company details
 - ❌ No form to edit company details
 - ❌ No way to add company details when creating hiring process
@@ -168,12 +185,14 @@ interactions table:
 #### Required Implementation
 
 **Frontend Components Needed:**
+
 - Company details form component
 - Integration with hiring process create/edit pages
 - Edit button/link on detail page for company details
 - Form validation for company details fields
 
 **User Flow Needed:**
+
 - Option to add company details when creating hiring process
 - Option to add/edit company details from detail page
 - Seamless integration between hiring process and company details
@@ -185,6 +204,7 @@ interactions table:
 ### Screen 1: Interview List (Dashboard) ✅ **COMPLETE**
 
 **From Concept Document (lines 169-246):**
+
 - ✅ Table with company name, status, salary, last update, actions
 - ✅ Create button (CTA)
 - ✅ Sortable columns
@@ -199,6 +219,7 @@ interactions table:
 ### Screen 2: Interview Form (Create/Edit) ✅ **COMPLETE**
 
 **From Concept Document (lines 247-365):**
+
 - ✅ Company name field
 - ✅ Status dropdown
 - ✅ Salary input with slider
@@ -217,6 +238,7 @@ interactions table:
 #### ✅ Implemented Sections
 
 **Section 1: Company Information Header** - ⚠️ **PARTIAL**
+
 - ✅ Company name display
 - ✅ Status display
 - ✅ Salary display
@@ -230,6 +252,7 @@ interactions table:
 #### ❌ Missing Sections
 
 **Section 2: Interaction Notes Section** - ❌ **NOT IMPLEMENTED**
+
 - ❌ Chronological list of interactions
 - ❌ Chat-style view
 - ❌ Rounded rectangular containers for each note
@@ -238,6 +261,7 @@ interactions table:
 - ❌ Interaction cards/threads
 
 **Section 3: Chat-style Input and CTA** - ❌ **NOT IMPLEMENTED**
+
 - ❌ Markdown text input field
 - ❌ CTA button to submit new interaction
 - ❌ Ability to create new interaction notes
@@ -276,41 +300,41 @@ interactions table:
 
 ## Feature Comparison Table
 
-| Feature | Concept Document | Implementation Status | Notes |
-|---------|-----------------|----------------------|-------|
+| Feature                               | Concept Document | Implementation Status | Notes                           |
+| ------------------------------------- | ---------------- | --------------------- | ------------------------------- |
 | **Epic 1: Hiring Process Management** |
-| Create hiring process | ✅ Required | ✅ Complete | Full CRUD implemented |
-| List hiring processes | ✅ Required | ✅ Complete | Table with sorting |
-| Edit hiring process | ✅ Required | ✅ Complete | Form with validation |
-| Delete hiring process | ✅ Required | ✅ Complete | With confirmation |
-| Status management | ✅ Required | ✅ Complete | Enum with badges |
-| Salary tracking | ✅ Required | ✅ Complete | With currency support |
-| **Epic 2: Interaction Tracking** |
-| Interaction schema | ✅ Required | ❌ Missing | Need to create |
-| Create interactions | ✅ Required | ❌ Missing | No API or UI |
-| View interaction timeline | ✅ Required | ❌ Missing | No component |
-| Markdown editor | ✅ Required | ❌ Missing | Need to implement |
-| Chat-style interface | ✅ Required | ❌ Missing | No UI |
-| Interaction types | ✅ Required | ❌ Missing | Need enum |
-| **Epic 3: Company Information** |
-| Company details schema | ✅ Required | ✅ Complete | Backend ready |
-| Company details API | ✅ Required | ✅ Complete | Full CRUD |
-| Display company details | ✅ Required | ✅ Complete | Read-only on detail page |
-| Create company details | ✅ Required | ❌ Missing | No form/UI |
-| Edit company details | ✅ Required | ❌ Missing | No form/UI |
-| **Screen 1: Dashboard** |
-| Table view | ✅ Required | ✅ Complete | Matches concept |
-| Create button | ✅ Required | ✅ Complete | CTA button |
-| Sorting | ✅ Required | ✅ Complete | By multiple columns |
-| **Screen 2: Form** |
-| Company name field | ✅ Required | ✅ Complete | Text input |
-| Status dropdown | ✅ Required | ✅ Complete | Enum dropdown |
-| Salary slider | ✅ Required | ✅ Complete | With number input |
-| **Screen 3: Detail View** |
-| Company header | ✅ Required | ⚠️ Partial | Shows info but not exact format |
-| Interaction timeline | ✅ Required | ❌ Missing | Not implemented |
-| Markdown input | ✅ Required | ❌ Missing | Not implemented |
-| Create interaction | ✅ Required | ❌ Missing | Not implemented |
+| Create hiring process                 | ✅ Required      | ✅ Complete           | Full CRUD implemented           |
+| List hiring processes                 | ✅ Required      | ✅ Complete           | Table with sorting              |
+| Edit hiring process                   | ✅ Required      | ✅ Complete           | Form with validation            |
+| Delete hiring process                 | ✅ Required      | ✅ Complete           | With confirmation               |
+| Status management                     | ✅ Required      | ✅ Complete           | Enum with badges                |
+| Salary tracking                       | ✅ Required      | ✅ Complete           | With currency support           |
+| **Epic 2: Interaction Tracking**      |
+| Interaction schema                    | ✅ Required      | ❌ Missing            | Need to create                  |
+| Create interactions                   | ✅ Required      | ❌ Missing            | No API or UI                    |
+| View interaction timeline             | ✅ Required      | ❌ Missing            | No component                    |
+| Markdown editor                       | ✅ Required      | ❌ Missing            | Need to implement               |
+| Chat-style interface                  | ✅ Required      | ❌ Missing            | No UI                           |
+| Interaction types                     | ✅ Required      | ❌ Missing            | Need enum                       |
+| **Epic 3: Company Information**       |
+| Company details schema                | ✅ Required      | ✅ Complete           | Backend ready                   |
+| Company details API                   | ✅ Required      | ✅ Complete           | Full CRUD                       |
+| Display company details               | ✅ Required      | ✅ Complete           | Read-only on detail page        |
+| Create company details                | ✅ Required      | ❌ Missing            | No form/UI                      |
+| Edit company details                  | ✅ Required      | ❌ Missing            | No form/UI                      |
+| **Screen 1: Dashboard**               |
+| Table view                            | ✅ Required      | ✅ Complete           | Matches concept                 |
+| Create button                         | ✅ Required      | ✅ Complete           | CTA button                      |
+| Sorting                               | ✅ Required      | ✅ Complete           | By multiple columns             |
+| **Screen 2: Form**                    |
+| Company name field                    | ✅ Required      | ✅ Complete           | Text input                      |
+| Status dropdown                       | ✅ Required      | ✅ Complete           | Enum dropdown                   |
+| Salary slider                         | ✅ Required      | ✅ Complete           | With number input               |
+| **Screen 3: Detail View**             |
+| Company header                        | ✅ Required      | ⚠️ Partial            | Shows info but not exact format |
+| Interaction timeline                  | ✅ Required      | ❌ Missing            | Not implemented                 |
+| Markdown input                        | ✅ Required      | ❌ Missing            | Not implemented                 |
+| Create interaction                    | ✅ Required      | ❌ Missing            | Not implemented                 |
 
 ---
 
@@ -380,4 +404,3 @@ interactions table:
 - [Implementation Summary](./implementation-summary.mdx) - Epic 1 implementation details
 - [User Stories](./stories.mdx) - User flows and scenarios
 - [Architecture](./architecture.mdx) - Technical architecture decisions
-

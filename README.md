@@ -92,7 +92,10 @@ hiring-tool/
 ### Code Quality
 
 - `bun run check-types` - Check TypeScript types across all apps
-- `bun run check` - Run Oxlint and Oxfmt (linting & formatting)
+- `bun run lint` - Lint all files with oxlint
+- `bun run format` - Format all files with oxfmt
+- `bun run format:tracked` - Format only tracked files (excludes untracked)
+- `bun run check` - Run both lint and format (linting & formatting)
 
 ## 🚢 Deployment
 

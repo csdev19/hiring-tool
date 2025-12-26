@@ -28,7 +28,9 @@ export function InteractionCard({ interaction, onEdit, onDelete }: InteractionCa
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2 flex-wrap">
             <InteractionTypeBadge type={interaction.type} />
-            <span className="text-xs text-muted-foreground">{formatDate(interaction.createdAt)}</span>
+            <span className="text-xs text-muted-foreground">
+              {formatDate(interaction.createdAt)}
+            </span>
           </div>
           <div className="flex gap-1">
             {onEdit && (
@@ -61,12 +63,9 @@ export function InteractionCard({ interaction, onEdit, onDelete }: InteractionCa
         )}
 
         <div className="prose prose-sm dark:prose-invert max-w-none interaction-content">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {interaction.content}
-          </ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{interaction.content}</ReactMarkdown>
         </div>
       </CardContent>
     </Card>
   );
 }
-

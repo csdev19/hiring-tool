@@ -52,6 +52,7 @@ z.string().email()
 ## Schema Organization
 
 Each entity has its own schema file with:
+
 - **Base schema**: Complete domain model
 - **Create schema**: Fields for creation (derived from base)
 - **Update schema**: Fields for updates (derived from base/create)
@@ -138,6 +139,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
 ```
 
 ### Benefits:
+
 - ✅ Automatic validation
 - ✅ Type inference
 - ✅ Consistent validation rules
@@ -151,9 +153,9 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
 // apps/web/src/components/hiring-process/hiring-process-form.tsx
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { 
-  updateHiringProcessSchema, 
-  type UpdateHiringProcess 
+import {
+  updateHiringProcessSchema,
+  type UpdateHiringProcess
 } from "@interviews-tool/domain/schemas";
 
 export function HiringProcessForm() {
@@ -374,7 +376,7 @@ describe("createHiringProcessSchema", () => {
       companyName: "Acme Corp",
       status: "ongoing",
     };
-    
+
     const result = createHiringProcessSchema.safeParse(data);
     expect(result.success).toBe(true);
   });
@@ -384,7 +386,7 @@ describe("createHiringProcessSchema", () => {
       companyName: "",
       status: "ongoing",
     };
-    
+
     const result = createHiringProcessSchema.safeParse(data);
     expect(result.success).toBe(false);
   });
@@ -395,7 +397,7 @@ describe("createHiringProcessSchema", () => {
       status: "ongoing",
       salary: 100000,
     };
-    
+
     const result = createHiringProcessSchema.safeParse(data);
     expect(result.success).toBe(true);
   });
@@ -428,6 +430,7 @@ describe("createHiringProcessSchema", () => {
 ```
 
 ### Benefits of Migration:
+
 - ✅ Shared between frontend and backend
 - ✅ Better error messages
 - ✅ Easier to derive and compose
@@ -441,11 +444,13 @@ describe("createHiringProcessSchema", () => {
 If you get import errors:
 
 1. Build the domain package:
+
 ```bash
 bun run --filter=@interviews-tool/domain build
 ```
 
 2. Check package.json exports:
+
 ```json
 {
   "exports": {
@@ -495,4 +500,3 @@ const validated = schema.parse(data); // throws ZodError
 - Review [Domain Architecture Patterns](/docs/domain-architecture-patterns) for architectural decisions
 - See [Backend Best Practices](/docs/backend) for API patterns
 - Check [Constants Pattern](/docs/constants-pattern) for using constants with schemas
-

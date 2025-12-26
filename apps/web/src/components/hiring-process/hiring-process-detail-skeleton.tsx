@@ -1,15 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Button,
-  Skeleton,
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@interviews-tool/web-ui";
+import { Card, CardContent, CardHeader, Skeleton } from "@interviews-tool/web-ui";
 
 export function HiringProcessDetailSkeleton() {
   return (
@@ -94,4 +83,3 @@ export function HiringProcessDetailSkeleton() {
     </div>
   );
 }
-

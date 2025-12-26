@@ -24,7 +24,10 @@
   "type": "module",
   "scripts": {
     "prepare": "husky",
-    "check": "oxlint && oxfmt --write",
+    "lint": "oxlint",
+    "format": "oxfmt --write .",
+    "format:tracked": "git ls-files | grep -E '\\.(ts|tsx|js|jsx|json|jsonc|md|mdx)$' | xargs oxfmt --write",
+    "check": "bun run lint && bun run format",
     "dev": "turbo dev",
     "build": "turbo build",
     "check-types": "turbo check-types",

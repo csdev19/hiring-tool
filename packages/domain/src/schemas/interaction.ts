@@ -76,4 +76,3 @@ export const updateInteractionSchema = z.object({
 export type InteractionBase = z.infer<typeof interactionBaseSchema>;
 export type CreateInteraction = z.infer<typeof createInteractionSchema>;
 export type UpdateInteraction = z.infer<typeof updateInteractionSchema>;
-
