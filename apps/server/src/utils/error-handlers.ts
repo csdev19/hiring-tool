@@ -1,12 +1,7 @@
 import type { Result } from "@interviews-tool/domain/types";
 import { isFailure } from "@interviews-tool/domain/types";
-import {
-  InternalServerError,
-  NotFoundError,
-  BadRequestError,
-  UnauthorizedError,
-  ConflictError,
-} from "./errors";
+import { InternalServerError } from "elysia";
+import { NotFoundError } from "./errors";
 
 /**
  * Error Handler Utilities
@@ -53,7 +48,12 @@ export function handleDatabaseResult<T>(
     throw new NotFoundError(notFoundMessage);
   }
 
-  return data[0];
+  const item = data[0];
+  if (item === undefined) {
+    throw new NotFoundError(notFoundMessage);
+  }
+
+  return item;
 }
 
 /**
@@ -152,7 +152,12 @@ export function handleMutationResult<T>(
     throw new NotFoundError(notFoundMessage);
   }
 
-  return data[0];
+  const item = data[0];
+  if (item === undefined) {
+    throw new NotFoundError(notFoundMessage);
+  }
+
+  return item;
 }
 
 /**

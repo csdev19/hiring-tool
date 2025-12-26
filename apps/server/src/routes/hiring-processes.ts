@@ -1,17 +1,18 @@
-import { Elysia, InternalServerError, t } from "elysia";
+import { Elysia, t } from "elysia";
 import { db } from "@interviews-tool/db";
 import { hiringProcess, type NewHiringProcess } from "@interviews-tool/db/schema/hiring-process";
-import { INTERVIEW_STATUSES, CURRENCIES } from "@interviews-tool/domain/constants";
+import { CURRENCIES } from "@interviews-tool/domain/constants";
+import { createHiringProcessSchema, updateHiringProcessSchema, paginationQuerySchema } from "@interviews-tool/domain/schemas";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { auth } from "@interviews-tool/auth";
-import { UnauthorizedError, NotFoundError, BadRequestError, ConflictError } from "../utils/errors";
+import { UnauthorizedError, NotFoundError } from "../utils/errors";
 import {
   successBody,
   createdBody,
   successWithPaginationBody,
-  errorBody,
   getPaginationParams,
 } from "../utils/response-helpers";
+import { errorHandlerPlugin } from "../utils/error-handler-plugin";
 
 // Helper to get user from session
 async function getUserFromRequest(request: Request): Promise<{ id: string } | null> {
@@ -23,40 +24,7 @@ async function getUserFromRequest(request: Request): Promise<{ id: string } | nu
 }
 
 export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" })
-  .error({
-    UnauthorizedError,
-    NotFoundError,
-    BadRequestError,
-    ConflictError,
-    InternalServerError,
-  })
-  .onError(({ code, error, set }) => {
-    // Handle custom errors with proper status codes
-    if (code === "UnauthorizedError") {
-      set.status = 401;
-      return errorBody(error.message);
-    }
-    if (code === "NotFoundError") {
-      set.status = 404;
-      return errorBody(error.message);
-    }
-    if (code === "BadRequestError" || code === "ConflictError") {
-      set.status = error.status;
-      return errorBody(error.message);
-    }
-    if (code === "InternalServerError") {
-      set.status = 500;
-      return errorBody(error.message);
-    }
-    // Handle validation errors
-    if (code === "VALIDATION") {
-      set.status = 400;
-      return errorBody(error.message);
-    }
-    // Handle unknown errors
-    set.status = 500;
-    return errorBody("Internal server error");
-  })
+  .use(errorHandlerPlugin)
   // List all hiring processes for authenticated user
   .get(
     "/",
@@ -86,10 +54,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       return status(200, successWithPaginationBody(processes, pagination, total));
     },
     {
-      query: t.Object({
-        page: t.Optional(t.Number({ minimum: 1, default: 1 })),
-        limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
-      }),
+      query: paginationQuerySchema,
     },
   )
   // Get single hiring process
@@ -145,17 +110,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       return status(201, createdBody(createdProcess));
     },
     {
-      body: t.Object({
-        companyName: t.String({ minLength: 1 }),
-        status: t.Union([
-          t.Literal(INTERVIEW_STATUSES.ONGOING),
-          t.Literal(INTERVIEW_STATUSES.REJECTED),
-          t.Literal(INTERVIEW_STATUSES.DROPPED_OUT),
-          t.Literal(INTERVIEW_STATUSES.HIRED),
-        ]),
-        salary: t.Optional(t.Number({ minimum: 0 })),
-        currency: t.Optional(t.Union([t.Literal(CURRENCIES.USD), t.Literal(CURRENCIES.PEN)])),
-      }),
+      body: createHiringProcessSchema,
     },
   )
   // Update hiring process
@@ -195,17 +150,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       params: t.Object({
         id: t.String(),
       }),
-      body: t.Object({
-        companyName: t.String({ minLength: 1 }),
-        status: t.Union([
-          t.Literal(INTERVIEW_STATUSES.ONGOING),
-          t.Literal(INTERVIEW_STATUSES.REJECTED),
-          t.Literal(INTERVIEW_STATUSES.DROPPED_OUT),
-          t.Literal(INTERVIEW_STATUSES.HIRED),
-        ]),
-        salary: t.Optional(t.Number({ minimum: 0 })),
-        currency: t.Optional(t.Union([t.Literal(CURRENCIES.USD), t.Literal(CURRENCIES.PEN)])),
-      }),
+      body: updateHiringProcessSchema,
     },
   )
   // Delete hiring process

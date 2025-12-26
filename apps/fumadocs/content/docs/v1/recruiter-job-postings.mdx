@@ -1,0 +1,616 @@
+---
+title: Recruiter Job Postings Feature
+description: Technical specification for recruiter job posting creation and management feature
+date: 2025-01-01
+version: v1
+status: draft
+tags:
+  - feature
+  - recruiter
+  - job-postings
+  - v1
+---
+
+# Recruiter Job Postings Feature
+
+## Document Information
+
+| Field            | Value             |
+| ---------------- | ----------------- |
+| **Version**      | 1.0.0             |
+| **Date**         | January 1, 2025   |
+| **Status**       | Draft             |
+| **Feature Type** | New Epic          |
+| **Target Users** | Recruiters        |
+
+---
+
+## Overview
+
+This feature enables recruiters to create and manage job postings, providing a separate workflow from the existing job seeker functionality. Recruiters can post job openings and view applications in a dedicated interface.
+
+### Feature Scope
+
+- **Job Posting Creation**: Recruiters can create job postings with relevant information
+- **Job Postings Table**: View all created job postings in a table format
+- **Application Management**: View and manage applications for each job posting (future phase)
+
+### User Persona
+
+**Primary User:** Recruiters/HR professionals who need to:
+- Post job openings
+- Track applications received
+- Manage the hiring process from the recruiter perspective
+
+---
+
+## Feature Requirements
+
+### Core Functionality
+
+1. **Job Posting Creation Form**
+   - Tab/page to create new job postings
+   - Form fields for job posting information
+   - Validation and submission
+
+2. **Job Postings Table**
+   - Display all job postings created by the recruiter
+   - Table with relevant information columns
+   - Actions (view, edit, delete) for each posting
+
+### User Interface
+
+- **Navigation**: New tab/section for "Job Postings" or "Recruiter" view
+- **Create Page**: Form to create new job postings
+- **List Page**: Table showing all job postings
+- **Detail Page**: View individual job posting details (future)
+
+---
+
+## Questions & Clarifications Needed
+
+### 1. User Role & Authentication
+
+**Question:** How should we distinguish between recruiters and job seekers?
+
+**Options:**
+- A. Add a `role` field to the user table (e.g., "recruiter" | "job_seeker" | "both")
+- B. Create separate user types/tables
+- C. Allow all users to be both recruiters and job seekers
+- D. Other approach?
+
+**Recommendation:** Option A - Add role field to user table for flexibility
+
+---
+
+### 2. Job Posting Data Model
+
+**Question:** What information should be stored in a job posting?
+
+**Proposed Fields:**
+- `title` (required) - Job title/position name
+- `companyName` (required) - Company name
+- `description` (optional) - Job description/details
+- `location` (optional) - Job location (city, country, remote, etc.)
+- `salaryMin` (optional) - Minimum salary range
+- `salaryMax` (optional) - Maximum salary range
+- `currency` (optional) - Currency for salary (USD, PEN, etc.)
+- `employmentType` (optional) - Full-time, Part-time, Contract, etc.
+- `status` (required) - Active, Closed, Draft, etc.
+- `applicationDeadline` (optional) - Deadline for applications
+- `requirements` (optional) - Required skills/qualifications
+- `benefits` (optional) - Benefits offered
+- `contactEmail` (optional) - Contact email for applications
+- `createdAt`, `updatedAt` - Timestamps
+- `userId` (required) - Recruiter who created the posting
+
+**Questions:**
+- Are there additional fields needed?
+- Should we support rich text for description/requirements?
+- Do we need categories/tags for job postings?
+- Should we support multiple locations?
+
+---
+
+### 3. Database Schema
+
+**Question:** Should job postings be in a separate table or related to existing schema?
+
+**Proposed Schema:**
+
+```typescript
+// packages/db/src/schema/job-posting.ts
+export const jobPosting = createTable("job_posting", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => user.id),
+  title: text("title").notNull(),
+  companyName: text("company_name").notNull(),
+  description: text("description"), // Could be JSON for rich text
+  location: text("location"),
+  salaryMin: integer("salary_min"),
+  salaryMax: integer("salary_max"),
+  currency: currencyEnum("currency").default("USD"),
+  employmentType: text("employment_type"), // Could be enum
+  status: text("status").notNull(), // "active" | "closed" | "draft"
+  applicationDeadline: timestamp("application_deadline"),
+  requirements: text("requirements"), // Could be JSON array
+  benefits: text("benefits"),
+  contactEmail: text("contact_email"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
+});
+```
+
+**Questions:**
+- Should `description` and `requirements` support rich text (JSON) or plain text?
+- Should `employmentType` be an enum or free text?
+- Should `status` be an enum? What are the valid statuses?
+- Do we need a separate table for applications (linking job seekers to job postings)?
+
+---
+
+### 4. User Interface & Navigation
+
+**Question:** How should recruiters access this feature?
+
+**Options:**
+- A. Separate top-level navigation tab "Job Postings" (visible to all users, but only recruiters can create)
+- B. Role-based navigation (only shows for users with recruiter role)
+- C. Toggle/switch between "Job Seeker" and "Recruiter" views
+- D. Separate application/route entirely
+
+**Recommendation:** Option B or C - Role-based or toggle view
+
+**Questions:**
+- Should the same user be able to switch between job seeker and recruiter views?
+- Should we show both views in the same navigation?
+
+---
+
+### 5. Table Columns & Display
+
+**Question:** What columns should be displayed in the job postings table?
+
+**Proposed Columns:**
+- Job Title
+- Company Name
+- Location
+- Salary Range (if provided)
+- Status (with badge)
+- Created Date
+- Updated Date
+- Actions (View, Edit, Delete)
+
+**Questions:**
+- Should we show application count (number of applications received)?
+- Should we support filtering by status, date, location?
+- Should we support sorting by different columns?
+- Should we support pagination or infinite scroll?
+
+---
+
+### 6. Form Fields & Validation
+
+**Question:** What validation rules should apply?
+
+**Proposed Validation:**
+- `title`: Required, min 3 characters, max 200 characters
+- `companyName`: Required, min 2 characters, max 100 characters
+- `description`: Optional, max 5000 characters
+- `salaryMin/Max`: If provided, must be positive numbers, max must be >= min
+- `applicationDeadline`: If provided, must be a future date
+- `contactEmail`: If provided, must be valid email format
+
+**Questions:**
+- Are there additional validation rules needed?
+- Should we validate salary ranges against industry standards?
+- Should we require certain fields based on status (e.g., active postings need description)?
+
+---
+
+### 7. Permissions & Access Control
+
+**Question:** Who can create and manage job postings?
+
+**Proposed Rules:**
+- Only users with "recruiter" role can create job postings
+- Users can only view/edit/delete their own job postings
+- Job seekers can view active job postings (future - for applying)
+
+**Questions:**
+- Should there be admin users who can manage all job postings?
+- Should recruiters be able to share job postings with other recruiters?
+- Should we support team/organization-based job postings?
+
+---
+
+### 8. Status Management
+
+**Question:** What statuses should job postings have?
+
+**Proposed Statuses:**
+- `draft` - Not yet published
+- `active` - Currently accepting applications
+- `closed` - No longer accepting applications
+- `archived` - Archived for historical reference
+
+**Questions:**
+- Are there additional statuses needed?
+- Should status transitions be restricted (e.g., can't go from closed to active)?
+- Should we track status change history?
+
+---
+
+### 9. Future Features (Out of Scope for Initial Implementation)
+
+**Question:** What features should be planned for future phases?
+
+**Potential Future Features:**
+- Application management (view applications for each posting)
+- Candidate management (track candidates through interview process)
+- Email notifications for new applications
+- Job posting templates
+- Bulk operations (publish multiple, archive multiple)
+- Analytics (views, applications, conversion rates)
+- Integration with job boards
+- Rich text editor for descriptions
+- File attachments (job descriptions, company logos)
+
+**Questions:**
+- Which of these should be prioritized for future phases?
+- Are there other features needed?
+
+---
+
+## Proposed Technical Implementation
+
+### Phase 1: Database Schema
+
+1. **Add role to user table** (if not exists)
+   ```typescript
+   role: text("role").default("job_seeker") // "job_seeker" | "recruiter" | "both"
+   ```
+
+2. **Create job_posting table**
+   - Fields as specified in Question 2
+   - Relations to user table
+   - Indexes on userId, status, createdAt
+
+3. **Create migration**
+   - Generate migration files
+   - Test migration on development database
+
+### Phase 2: Backend API
+
+1. **Create job posting routes** (`apps/server/src/routes/job-postings.ts`)
+   - `GET /api/job-postings` - List user's job postings (with filtering)
+   - `GET /api/job-postings/:id` - Get single job posting
+   - `POST /api/job-postings` - Create new job posting
+   - `PUT /api/job-postings/:id` - Update job posting
+   - `DELETE /api/job-postings/:id` - Delete job posting
+
+2. **Authentication & Authorization**
+   - Check user has recruiter role
+   - Verify ownership on update/delete
+   - Use existing Better-Auth session
+
+3. **Validation**
+   - Use Zod schemas for request validation
+   - Return proper error messages
+   - Follow existing API response patterns
+
+### Phase 3: Frontend Implementation
+
+1. **Create hooks** (`apps/web/src/hooks/use-job-postings.ts`)
+   - `useJobPostings()` - List with filters
+   - `useJobPosting(id)` - Single posting
+   - `useCreateJobPosting()` - Create mutation
+   - `useUpdateJobPosting()` - Update mutation
+   - `useDeleteJobPosting()` - Delete mutation
+
+2. **Create components**
+   - `JobPostingForm` - Shared form for create/edit
+   - `JobPostingTable` - Table with sorting/filtering
+   - `JobPostingStatusBadge` - Status indicator
+   - `CreateJobPostingDialog` (optional) - Modal form
+
+3. **Create pages/routes**
+   - `/job-postings` - List page with table
+   - `/job-postings/new` - Create form page
+   - `/job-postings/:id` - Detail page (future)
+   - `/job-postings/:id/edit` - Edit form page (future)
+
+4. **Update navigation**
+   - Add "Job Postings" link (role-based visibility)
+   - Update header/navigation component
+
+### Phase 4: UI/UX
+
+1. **Form Design**
+   - Use existing form components from web-ui
+   - Follow existing form patterns
+   - Add proper validation messages
+   - Loading states during submission
+
+2. **Table Design**
+   - Use TanStack React Table (like hiring-process-table)
+   - Sortable columns
+   - Status badges
+   - Action buttons
+   - Empty states
+
+3. **Responsive Design**
+   - Mobile-friendly forms
+   - Responsive table (horizontal scroll if needed)
+   - Touch-friendly buttons
+
+---
+
+## Database Schema Proposal
+
+```typescript
+// packages/db/src/schema/job-posting.ts
+import { relations } from "drizzle-orm";
+import { text, timestamp, integer, index } from "drizzle-orm/pg-core";
+import { createTable } from "../utils/table-creator";
+import { user } from "./auth";
+import { currencyEnum } from "./hiring-process";
+
+export const jobPostingStatusEnum = pgEnum("job_posting_status", [
+  "draft",
+  "active",
+  "closed",
+  "archived",
+]);
+
+export const employmentTypeEnum = pgEnum("employment_type", [
+  "full-time",
+  "part-time",
+  "contract",
+  "internship",
+  "freelance",
+]);
+
+export const jobPosting = createTable(
+  "job_posting",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    companyName: text("company_name").notNull(),
+    description: text("description"),
+    location: text("location"),
+    salaryMin: integer("salary_min"),
+    salaryMax: integer("salary_max"),
+    currency: currencyEnum("currency").default("USD").notNull(),
+    employmentType: employmentTypeEnum("employment_type"),
+    status: jobPostingStatusEnum("status").default("draft").notNull(),
+    applicationDeadline: timestamp("application_deadline"),
+    requirements: text("requirements"), // Could be JSON array
+    benefits: text("benefits"),
+    contactEmail: text("contact_email"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("job_posting_userId_idx").on(table.userId),
+    index("job_posting_status_idx").on(table.status),
+    index("job_posting_createdAt_idx").on(table.createdAt),
+  ]
+);
+
+export const jobPostingRelations = relations(jobPosting, ({ one }) => ({
+  user: one(user, {
+    fields: [jobPosting.userId],
+    references: [user.id],
+  }),
+}));
+
+export type JobPosting = typeof jobPosting.$inferSelect;
+export type JobPostingInsert = typeof jobPosting.$inferInsert;
+```
+
+---
+
+## API Endpoints Specification
+
+### GET /api/job-postings
+
+**Query Parameters:**
+- `status` (optional) - Filter by status
+- `page` (optional) - Page number for pagination
+- `limit` (optional) - Items per page
+
+**Response:**
+```typescript
+{
+  data: JobPosting[];
+  meta: {
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+    };
+  };
+  error: null;
+}
+```
+
+### GET /api/job-postings/:id
+
+**Response:**
+```typescript
+{
+  data: JobPosting | null;
+  error: null | { message: string };
+}
+```
+
+### POST /api/job-postings
+
+**Request Body:**
+```typescript
+{
+  title: string;
+  companyName: string;
+  description?: string;
+  location?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  currency?: "USD" | "PEN";
+  employmentType?: "full-time" | "part-time" | "contract" | "internship" | "freelance";
+  status?: "draft" | "active" | "closed" | "archived";
+  applicationDeadline?: string; // ISO date string
+  requirements?: string;
+  benefits?: string;
+  contactEmail?: string;
+}
+```
+
+**Response:**
+```typescript
+{
+  data: JobPosting;
+  error: null;
+}
+```
+
+### PUT /api/job-postings/:id
+
+**Request Body:** Same as POST (all fields optional except those that can't be changed)
+
+**Response:**
+```typescript
+{
+  data: JobPosting;
+  error: null | { message: string };
+}
+```
+
+### DELETE /api/job-postings/:id
+
+**Response:**
+```typescript
+{
+  data: null;
+  error: null | { message: string };
+}
+```
+
+---
+
+## Frontend Component Structure
+
+### JobPostingForm Component
+
+```typescript
+interface JobPostingFormProps {
+  initialData?: JobPosting;
+  onSubmit: (data: CreateJobPostingInput) => Promise<void>;
+  onCancel: () => void;
+  isLoading?: boolean;
+}
+```
+
+**Fields:**
+- Title (text input, required)
+- Company Name (text input, required)
+- Description (textarea, optional)
+- Location (text input, optional)
+- Salary Range (two number inputs, optional)
+- Currency (select, optional, default USD)
+- Employment Type (select, optional)
+- Status (select, required, default "draft")
+- Application Deadline (date picker, optional)
+- Requirements (textarea, optional)
+- Benefits (textarea, optional)
+- Contact Email (email input, optional)
+
+### JobPostingTable Component
+
+Similar structure to `HiringProcessTable`:
+- Sortable columns
+- Status badges
+- Action buttons (View, Edit, Delete)
+- Empty state
+- Loading state
+
+---
+
+## Implementation Checklist
+
+### Database
+- [ ] Add `role` field to user table (if needed)
+- [ ] Create `job_posting` table schema
+- [ ] Create enums for status and employment type
+- [ ] Add indexes
+- [ ] Create migration
+- [ ] Test migration
+
+### Backend
+- [ ] Create job posting routes
+- [ ] Add role-based authorization
+- [ ] Implement validation schemas
+- [ ] Add error handling
+- [ ] Follow API response patterns
+- [ ] Add pagination support
+- [ ] Test all endpoints
+
+### Frontend
+- [ ] Create job posting hooks
+- [ ] Create JobPostingForm component
+- [ ] Create JobPostingTable component
+- [ ] Create list page (`/job-postings`)
+- [ ] Create form page (`/job-postings/new`)
+- [ ] Add navigation link
+- [ ] Add role-based UI visibility
+- [ ] Test all user flows
+
+### Testing
+- [ ] Test create job posting
+- [ ] Test list job postings
+- [ ] Test update job posting
+- [ ] Test delete job posting
+- [ ] Test role-based access
+- [ ] Test validation
+- [ ] Test error handling
+
+---
+
+## Open Questions Summary
+
+Please provide answers to the following questions before implementation:
+
+1. **User Role**: How should we distinguish recruiters from job seekers? (See Question 1)
+2. **Data Model**: Are the proposed job posting fields sufficient? Any additions needed? (See Question 2)
+3. **Schema Design**: Should description/requirements support rich text? (See Question 3)
+4. **Navigation**: How should recruiters access this feature? (See Question 4)
+5. **Table Display**: What columns and features should the table have? (See Question 5)
+6. **Validation**: Are the proposed validation rules sufficient? (See Question 6)
+7. **Permissions**: Who can create/manage job postings? (See Question 7)
+8. **Statuses**: Are the proposed statuses correct? (See Question 8)
+9. **Future Features**: What should be prioritized for future phases? (See Question 9)
+
+---
+
+## Next Steps
+
+1. **Review this document** and answer all questions
+2. **Approve the technical approach** or suggest modifications
+3. **Prioritize features** for initial implementation vs. future phases
+4. **Begin implementation** once all questions are answered
+
+---
+
+## Related Documentation
+
+- [Concept V1](/docs/v1/concept) - Original product concept
+- [Architecture V1](/docs/v1/architecture) - System architecture
+- [Implementation Summary](/docs/v1/implementation-summary) - Previous feature implementation
+- [Web UI Package](/docs/web-ui-package) - UI component library documentation
+

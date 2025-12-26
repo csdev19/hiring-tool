@@ -4,8 +4,10 @@ import { companyDetails, type NewCompanyDetails } from "@interviews-tool/db/sche
 import { hiringProcess } from "@interviews-tool/db/schema/hiring-process";
 import { eq, and } from "drizzle-orm";
 import { auth } from "@interviews-tool/auth";
+import { createCompanyDetailsSchema, updateCompanyDetailsSchema } from "@interviews-tool/domain/schemas";
 import { UnauthorizedError, NotFoundError, ConflictError } from "../utils/errors";
-import { successBody, createdBody, errorBody } from "../utils/response-helpers";
+import { successBody, createdBody } from "../utils/response-helpers";
+import { errorHandlerPlugin } from "../utils/error-handler-plugin";
 
 // Helper to get user from session
 async function getUserFromRequest(request: Request): Promise<{ id: string } | null> {
@@ -19,30 +21,7 @@ async function getUserFromRequest(request: Request): Promise<{ id: string } | nu
 export const companyDetailsRoutes = new Elysia({
   prefix: "/api/hiring-processes/:id/company-details",
 })
-  .error({
-    UnauthorizedError,
-    NotFoundError,
-    ConflictError,
-  })
-  .onError(({ code, error, set }) => {
-    // Handle custom errors with proper status codes
-    if (code === "UnauthorizedError") {
-      set.status = 401;
-      return errorBody(error.message);
-    }
-    if (code === "NotFoundError" || code === "ConflictError") {
-      set.status = error.status;
-      return errorBody(error.message);
-    }
-    // Handle validation errors
-    if (code === "VALIDATION") {
-      set.status = 400;
-      return errorBody(error.message);
-    }
-    // Handle unknown errors
-    set.status = 500;
-    return errorBody("Internal server error");
-  })
+  .use(errorHandlerPlugin)
   // Get company details for interview
   .get(
     "/",
@@ -135,14 +114,7 @@ export const companyDetailsRoutes = new Elysia({
       params: t.Object({
         id: t.String(),
       }),
-      body: t.Object({
-        website: t.Optional(t.String()),
-        location: t.Optional(t.String()),
-        benefits: t.Optional(t.String()),
-        contactedVia: t.Optional(t.String()),
-        contactPerson: t.Optional(t.String()),
-        interviewSteps: t.Optional(t.Number({ minimum: 0 })),
-      }),
+      body: createCompanyDetailsSchema,
     },
   )
   // Update company details
@@ -194,14 +166,7 @@ export const companyDetailsRoutes = new Elysia({
       params: t.Object({
         id: t.String(),
       }),
-      body: t.Object({
-        website: t.Optional(t.String()),
-        location: t.Optional(t.String()),
-        benefits: t.Optional(t.String()),
-        contactedVia: t.Optional(t.String()),
-        contactPerson: t.Optional(t.String()),
-        interviewSteps: t.Optional(t.Number({ minimum: 0 })),
-      }),
+      body: updateCompanyDetailsSchema,
     },
   )
   // Delete company details

@@ -1,10 +1,10 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@interviews-tool/web-ui";
 import { InterviewTable } from "@/components/hiring-process/hiring-process-table";
+import { HiringProcessTableSkeleton } from "@/components/hiring-process/hiring-process-table-skeleton";
 import { useHiringProcesses, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";
 import { getUser } from "@/functions/get-user";
 import { Plus } from "lucide-react";
-import { TestComponent } from "@interviews-tool/web-ui";
 
 export const Route = createFileRoute("/hiring-processes/")({
   component: HiringProcessesComponent,
@@ -50,9 +50,7 @@ function HiringProcessesComponent() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>Loading hiring processes...</p>
-            </div>
+            <HiringProcessTableSkeleton />
           ) : error ? (
             <div className="text-center py-12 text-destructive">
               <p>Error loading hiring processes: {error.message}</p>

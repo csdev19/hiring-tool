@@ -1,26 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { clientTreaty } from "@/lib/client-treaty";
+import { getErrorMessage } from "@/lib/error";
 import type { Currency, InterviewStatus } from "@interviews-tool/domain/constants";
-
-// Helper to extract error message from Eden Treaty error response
-function getErrorMessage(error: unknown): string {
-  if (typeof error === "string") {
-    return error;
-  }
-  if (error && typeof error === "object" && "message" in error) {
-    return String(error.message);
-  }
-  if (error && typeof error === "object" && "value" in error) {
-    const value = (error as { value: unknown }).value;
-    if (typeof value === "string") {
-      return value;
-    }
-    if (value && typeof value === "object" && "message" in value) {
-      return String(value.message);
-    }
-  }
-  return "An error occurred";
-}
 
 // Re-export types from domain package
 export type { Currency, InterviewStatus } from "@interviews-tool/domain/constants";

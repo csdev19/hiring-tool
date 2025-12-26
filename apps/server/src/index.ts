@@ -4,6 +4,7 @@ import { auth } from "@interviews-tool/auth";
 import { Elysia } from "elysia";
 import { hiringProcessRoutes } from "./routes/hiring-processes";
 import { companyDetailsRoutes } from "./routes/company-details";
+import { interactionRoutes } from "./routes/interactions";
 
 const app = new Elysia()
   .use(
@@ -23,6 +24,7 @@ const app = new Elysia()
   })
   .use(hiringProcessRoutes)
   .use(companyDetailsRoutes)
+  .use(interactionRoutes)
   .get("/health", () => ({
     status: "healthy",
     timestamp: new Date().toISOString(),
