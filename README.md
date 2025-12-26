@@ -162,7 +162,16 @@ This project was created using the [Better-T-Stack](https://github.com/AmanVarsh
 
 ## 📝 License
 
-[Add your license here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+The MIT License allows you to:
+
+- ✅ Use the code commercially
+- ✅ Modify the code
+- ✅ Distribute the code
+- ✅ Use privately
+
+**The only requirement is that you include the original copyright notice and license when you use, modify, or distribute the code.**
 
 ## 🤝 Contributing
 
