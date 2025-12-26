@@ -9,15 +9,8 @@
   "orm": "drizzle",
   "backend": "elysia",
   "runtime": "bun",
-  "frontend": [
-    "tanstack-start"
-  ],
-  "addons": [
-    "fumadocs",
-    "husky",
-    "oxlint",
-    "turborepo"
-  ],
+  "frontend": ["tanstack-start"],
+  "addons": ["fumadocs", "husky", "oxlint", "turborepo"],
   "examples": [],
   "auth": "better-auth",
   "payments": "none",
@@ -25,5 +18,5 @@
   "dbSetup": "neon",
   "api": "orpc",
   "webDeploy": "alchemy",
-  "serverDeploy": "none"
+  "serverDeploy": "none",
 }

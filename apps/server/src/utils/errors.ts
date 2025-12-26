@@ -39,3 +39,11 @@ export class BadRequestError extends Error {
     this.name = "BadRequestError";
   }
 }
+
+export class InternalServerError extends Error {
+  status = 500;
+  constructor(message: string = "Internal server error") {
+    super(message);
+    this.name = "InternalServerError";
+  }
+}

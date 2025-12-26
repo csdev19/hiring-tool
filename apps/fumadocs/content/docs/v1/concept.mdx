@@ -37,6 +37,7 @@ The goal is to build a web application that enables users to create and manage h
 A comprehensive system for recording and organizing all communications and activities throughout the hiring process. Users can create chronological interaction notes with markdown formatting, categorize interactions by type (Email, Call, Meeting, Technical Challenge, etc.), and maintain a complete history of all touchpoints with companies.
 
 Key capabilities include:
+
 - Create a chronological timeline of all interactions (meetings, calls, emails, challenges, etc.)
 - Track where initial contact was made (LinkedIn, Gmail, Facebook, etc.)
 - Record HR calls, technical challenges, and interview sessions
@@ -45,7 +46,7 @@ Key capabilities include:
 - Use markdown formatting for rich, detailed notes
 - Chat-style interface for quick note-taking
 
-*For detailed specifications, see the [Interaction Tracking System](#interaction-tracking-system) section.*
+_For detailed specifications, see the [Interaction Tracking System](#interaction-tracking-system) section._
 
 ### Target Audience
 
@@ -196,18 +197,18 @@ The Interaction Tracking system enables users to maintain a comprehensive chrono
 
 The system supports multiple interaction types to categorize different forms of communication:
 
-| Type                | Description                                                                 | Common Use Cases                                    |
-| ------------------- | --------------------------------------------------------------------------- | --------------------------------------------------- |
-| **Email**           | Written correspondence via email                                           | Application submissions, follow-ups, offer letters |
-| **Phone Call**      | Voice conversations over the phone                                          | Initial screenings, HR calls, follow-up calls       |
-| **Video Call**      | Video conference meetings                                                   | Remote interviews, virtual meetings                |
-| **In-Person Meeting** | Face-to-face interactions                                                 | On-site interviews, office visits                    |
-| **Technical Challenge** | Coding tests, take-home assignments, or technical assessments          | Programming challenges, design tasks                |
-| **Application**     | Initial job application submission                                          | Job application sent, resume submitted              |
-| **Offer**           | Job offer received or extended                                             | Offer details, negotiation notes                    |
-| **Rejection**       | Application or interview rejection                                         | Rejection notices, feedback received                |
-| **Follow-up**       | Status checks, thank you notes, or general follow-ups                      | Post-interview thank you, status inquiries          |
-| **Note**            | General notes or reminders (default type)                                   | Personal notes, reminders, research findings        |
+| Type                    | Description                                                   | Common Use Cases                                   |
+| ----------------------- | ------------------------------------------------------------- | -------------------------------------------------- |
+| **Email**               | Written correspondence via email                              | Application submissions, follow-ups, offer letters |
+| **Phone Call**          | Voice conversations over the phone                            | Initial screenings, HR calls, follow-up calls      |
+| **Video Call**          | Video conference meetings                                     | Remote interviews, virtual meetings                |
+| **In-Person Meeting**   | Face-to-face interactions                                     | On-site interviews, office visits                  |
+| **Technical Challenge** | Coding tests, take-home assignments, or technical assessments | Programming challenges, design tasks               |
+| **Application**         | Initial job application submission                            | Job application sent, resume submitted             |
+| **Offer**               | Job offer received or extended                                | Offer details, negotiation notes                   |
+| **Rejection**           | Application or interview rejection                            | Rejection notices, feedback received               |
+| **Follow-up**           | Status checks, thank you notes, or general follow-ups         | Post-interview thank you, status inquiries         |
+| **Note**                | General notes or reminders (default type)                     | Personal notes, reminders, research findings       |
 
 **Type Selection:**
 
@@ -222,15 +223,15 @@ The system supports multiple interaction types to categorize different forms of 
 
 The Interaction entity extends the basic model with additional considerations:
 
-| Field           | Type     | Required | Description                                                                 |
-| --------------- | -------- | -------- | --------------------------------------------------------------------------- |
-| id              | UUID     | Yes      | Unique identifier                                                           |
-| hiringProcessId | UUID     | Yes      | Foreign key to Hiring Process (cascade delete)                              |
-| title           | String   | No       | Short title or subject line (e.g., "Technical Interview Round 2")            |
+| Field           | Type     | Required | Description                                                                |
+| --------------- | -------- | -------- | -------------------------------------------------------------------------- |
+| id              | UUID     | Yes      | Unique identifier                                                          |
+| hiringProcessId | UUID     | Yes      | Foreign key to Hiring Process (cascade delete)                             |
+| title           | String   | No       | Short title or subject line (e.g., "Technical Interview Round 2")          |
 | content         | Text     | Yes      | Markdown-formatted content (supports rich text, lists, links, code blocks) |
 | type            | Enum     | No       | Interaction type (Email, Call, Meeting, etc.) - defaults to "Note"         |
-| createdAt       | DateTime | Yes      | Creation timestamp (used for chronological ordering)                        |
-| updatedAt       | DateTime | No       | Last update timestamp (if editing is supported)                             |
+| createdAt       | DateTime | Yes      | Creation timestamp (used for chronological ordering)                       |
+| updatedAt       | DateTime | No       | Last update timestamp (if editing is supported)                            |
 
 **Content Guidelines:**
 
@@ -323,12 +324,14 @@ The Interaction entity extends the basic model with additional considerations:
 **Scenario:** User applies for a job via LinkedIn
 
 **Interaction Created:**
+
 - **Type:** Application
 - **Title:** "Application Submitted via LinkedIn"
 - **Content:**
+
   ```markdown
   Applied for **Senior Frontend Developer** position at Acme Corp.
-  
+
   - Found job posting on LinkedIn
   - Submitted resume and cover letter
   - Position: Remote, Full-time
@@ -340,24 +343,26 @@ The Interaction entity extends the basic model with additional considerations:
 **Scenario:** User receives and completes a coding challenge
 
 **Interaction Created:**
+
 - **Type:** Technical Challenge
 - **Title:** "React Component Challenge"
 - **Content:**
+
   ```markdown
   Received technical challenge on **2025-12-20**
-  
+
   **Requirements:**
   - Build a responsive data table component
   - Use React and TypeScript
   - Implement sorting and filtering
   - Deadline: 3 days
-  
+
   **My Solution:**
   - Used TanStack Table for data management
   - Implemented custom sorting logic
   - Added responsive design with TailwindCSS
   - Submitted on 2025-12-22
-  
+
   **Notes:**
   - Challenge was well-designed
   - Took approximately 6 hours to complete
@@ -368,20 +373,22 @@ The Interaction entity extends the basic model with additional considerations:
 **Scenario:** User wants to follow up after an interview
 
 **Interaction Created:**
+
 - **Type:** Follow-up
 - **Title:** "Post-Interview Thank You"
 - **Content:**
+
   ```markdown
   Sent thank you email to:
   - **Sarah Johnson** (Hiring Manager) - sarah@acme.com
   - **Mike Chen** (Technical Lead) - mike@acme.com
-  
+
   **Key Points Mentioned:**
   - Thanked them for their time
   - Highlighted my interest in the role
   - Referenced specific discussion points from interview
   - Asked about next steps
-  
+
   **Sent:** 2025-12-23 2:30pm
   ```
 
@@ -390,20 +397,22 @@ The Interaction entity extends the basic model with additional considerations:
 **Scenario:** User receives an offer and negotiates salary
 
 **Interaction Created:**
+
 - **Type:** Offer
 - **Title:** "Initial Offer and Negotiation"
 - **Content:**
+
   ```markdown
   **Initial Offer Received:**
   - Base Salary: $130,000
   - Equity: 0.1%
   - Benefits: Health, Dental, 401k match
-  
+
   **My Counter-Offer:**
   - Base Salary: $145,000
   - Equity: 0.15%
   - Additional: $5,000 signing bonus
-  
+
   **Discussion Notes:**
   - Had call with HR on 2025-12-24
   - They're considering my counter-offer

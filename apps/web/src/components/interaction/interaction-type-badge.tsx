@@ -41,4 +41,3 @@ export function InteractionTypeBadge({ type }: { type: InteractionType | null })
     </Badge>
   );
 }
-

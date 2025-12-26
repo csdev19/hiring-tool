@@ -1,27 +1,22 @@
 import { Elysia, InternalServerError } from "elysia";
-import {
-  UnauthorizedError,
-  NotFoundError,
-  BadRequestError,
-  ConflictError,
-} from "./errors";
+import { UnauthorizedError, NotFoundError, BadRequestError, ConflictError } from "./errors";
 import { errorBody } from "./response-helpers";
 
 /**
  * Centralized error handler plugin for Elysia routes
- * 
+ *
  * This plugin provides consistent error handling across all routes:
  * - Registers common error classes
  * - Maps error codes to HTTP status codes
  * - Returns standardized error responses
- * 
+ *
  * @example
  * ```typescript
  * export const routes = new Elysia({ prefix: "/api/resource" })
  *   .use(errorHandlerPlugin)
  *   .get("/", handler);
  * ```
- * 
+ *
  * Routes can still add route-specific errors after using this plugin:
  * ```typescript
  * export const routes = new Elysia({ prefix: "/api/resource" })
@@ -70,4 +65,3 @@ export const errorHandlerPlugin = new Elysia()
     set.status = 500;
     return errorBody("Internal server error");
   });
-

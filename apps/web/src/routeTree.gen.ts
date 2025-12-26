@@ -8,150 +8,150 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as HiringProcessesIndexRouteImport } from './routes/hiring-processes/index'
-import { Route as HiringProcessesNewRouteImport } from './routes/hiring-processes/new'
-import { Route as HiringProcessesIdRouteImport } from './routes/hiring-processes/$id'
-import { Route as HiringProcessesIdEditRouteImport } from './routes/hiring-processes/$id_.edit'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as LoginRouteImport } from "./routes/login";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as HiringProcessesIndexRouteImport } from "./routes/hiring-processes/index";
+import { Route as HiringProcessesNewRouteImport } from "./routes/hiring-processes/new";
+import { Route as HiringProcessesIdRouteImport } from "./routes/hiring-processes/$id";
+import { Route as HiringProcessesIdEditRouteImport } from "./routes/hiring-processes/$id_.edit";
 
 const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+  id: "/login",
+  path: "/login",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const HiringProcessesIndexRoute = HiringProcessesIndexRouteImport.update({
-  id: '/hiring-processes/',
-  path: '/hiring-processes/',
+  id: "/hiring-processes/",
+  path: "/hiring-processes/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const HiringProcessesNewRoute = HiringProcessesNewRouteImport.update({
-  id: '/hiring-processes/new',
-  path: '/hiring-processes/new',
+  id: "/hiring-processes/new",
+  path: "/hiring-processes/new",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const HiringProcessesIdRoute = HiringProcessesIdRouteImport.update({
-  id: '/hiring-processes/$id',
-  path: '/hiring-processes/$id',
+  id: "/hiring-processes/$id",
+  path: "/hiring-processes/$id",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const HiringProcessesIdEditRoute = HiringProcessesIdEditRouteImport.update({
-  id: '/hiring-processes/$id_/edit',
-  path: '/hiring-processes/$id/edit',
+  id: "/hiring-processes/$id_/edit",
+  path: "/hiring-processes/$id/edit",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/hiring-processes/$id': typeof HiringProcessesIdRoute
-  '/hiring-processes/new': typeof HiringProcessesNewRoute
-  '/hiring-processes': typeof HiringProcessesIndexRoute
-  '/hiring-processes/$id/edit': typeof HiringProcessesIdEditRoute
+  "/": typeof IndexRoute;
+  "/login": typeof LoginRoute;
+  "/hiring-processes/$id": typeof HiringProcessesIdRoute;
+  "/hiring-processes/new": typeof HiringProcessesNewRoute;
+  "/hiring-processes": typeof HiringProcessesIndexRoute;
+  "/hiring-processes/$id/edit": typeof HiringProcessesIdEditRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/hiring-processes/$id': typeof HiringProcessesIdRoute
-  '/hiring-processes/new': typeof HiringProcessesNewRoute
-  '/hiring-processes': typeof HiringProcessesIndexRoute
-  '/hiring-processes/$id/edit': typeof HiringProcessesIdEditRoute
+  "/": typeof IndexRoute;
+  "/login": typeof LoginRoute;
+  "/hiring-processes/$id": typeof HiringProcessesIdRoute;
+  "/hiring-processes/new": typeof HiringProcessesNewRoute;
+  "/hiring-processes": typeof HiringProcessesIndexRoute;
+  "/hiring-processes/$id/edit": typeof HiringProcessesIdEditRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/hiring-processes/$id': typeof HiringProcessesIdRoute
-  '/hiring-processes/new': typeof HiringProcessesNewRoute
-  '/hiring-processes/': typeof HiringProcessesIndexRoute
-  '/hiring-processes/$id_/edit': typeof HiringProcessesIdEditRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/login": typeof LoginRoute;
+  "/hiring-processes/$id": typeof HiringProcessesIdRoute;
+  "/hiring-processes/new": typeof HiringProcessesNewRoute;
+  "/hiring-processes/": typeof HiringProcessesIndexRoute;
+  "/hiring-processes/$id_/edit": typeof HiringProcessesIdEditRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
-    | '/'
-    | '/login'
-    | '/hiring-processes/$id'
-    | '/hiring-processes/new'
-    | '/hiring-processes'
-    | '/hiring-processes/$id/edit'
-  fileRoutesByTo: FileRoutesByTo
+    | "/"
+    | "/login"
+    | "/hiring-processes/$id"
+    | "/hiring-processes/new"
+    | "/hiring-processes"
+    | "/hiring-processes/$id/edit";
+  fileRoutesByTo: FileRoutesByTo;
   to:
-    | '/'
-    | '/login'
-    | '/hiring-processes/$id'
-    | '/hiring-processes/new'
-    | '/hiring-processes'
-    | '/hiring-processes/$id/edit'
+    | "/"
+    | "/login"
+    | "/hiring-processes/$id"
+    | "/hiring-processes/new"
+    | "/hiring-processes"
+    | "/hiring-processes/$id/edit";
   id:
-    | '__root__'
-    | '/'
-    | '/login'
-    | '/hiring-processes/$id'
-    | '/hiring-processes/new'
-    | '/hiring-processes/'
-    | '/hiring-processes/$id_/edit'
-  fileRoutesById: FileRoutesById
+    | "__root__"
+    | "/"
+    | "/login"
+    | "/hiring-processes/$id"
+    | "/hiring-processes/new"
+    | "/hiring-processes/"
+    | "/hiring-processes/$id_/edit";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  LoginRoute: typeof LoginRoute
-  HiringProcessesIdRoute: typeof HiringProcessesIdRoute
-  HiringProcessesNewRoute: typeof HiringProcessesNewRoute
-  HiringProcessesIndexRoute: typeof HiringProcessesIndexRoute
-  HiringProcessesIdEditRoute: typeof HiringProcessesIdEditRoute
+  IndexRoute: typeof IndexRoute;
+  LoginRoute: typeof LoginRoute;
+  HiringProcessesIdRoute: typeof HiringProcessesIdRoute;
+  HiringProcessesNewRoute: typeof HiringProcessesNewRoute;
+  HiringProcessesIndexRoute: typeof HiringProcessesIndexRoute;
+  HiringProcessesIdEditRoute: typeof HiringProcessesIdEditRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hiring-processes/': {
-      id: '/hiring-processes/'
-      path: '/hiring-processes'
-      fullPath: '/hiring-processes'
-      preLoaderRoute: typeof HiringProcessesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hiring-processes/new': {
-      id: '/hiring-processes/new'
-      path: '/hiring-processes/new'
-      fullPath: '/hiring-processes/new'
-      preLoaderRoute: typeof HiringProcessesNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hiring-processes/$id': {
-      id: '/hiring-processes/$id'
-      path: '/hiring-processes/$id'
-      fullPath: '/hiring-processes/$id'
-      preLoaderRoute: typeof HiringProcessesIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hiring-processes/$id_/edit': {
-      id: '/hiring-processes/$id_/edit'
-      path: '/hiring-processes/$id/edit'
-      fullPath: '/hiring-processes/$id/edit'
-      preLoaderRoute: typeof HiringProcessesIdEditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+    "/login": {
+      id: "/login";
+      path: "/login";
+      fullPath: "/login";
+      preLoaderRoute: typeof LoginRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/hiring-processes/": {
+      id: "/hiring-processes/";
+      path: "/hiring-processes";
+      fullPath: "/hiring-processes";
+      preLoaderRoute: typeof HiringProcessesIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/hiring-processes/new": {
+      id: "/hiring-processes/new";
+      path: "/hiring-processes/new";
+      fullPath: "/hiring-processes/new";
+      preLoaderRoute: typeof HiringProcessesNewRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/hiring-processes/$id": {
+      id: "/hiring-processes/$id";
+      path: "/hiring-processes/$id";
+      fullPath: "/hiring-processes/$id";
+      preLoaderRoute: typeof HiringProcessesIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/hiring-processes/$id_/edit": {
+      id: "/hiring-processes/$id_/edit";
+      path: "/hiring-processes/$id/edit";
+      fullPath: "/hiring-processes/$id/edit";
+      preLoaderRoute: typeof HiringProcessesIdEditRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
@@ -162,16 +162,16 @@ const rootRouteChildren: RootRouteChildren = {
   HiringProcessesNewRoute: HiringProcessesNewRoute,
   HiringProcessesIndexRoute: HiringProcessesIndexRoute,
   HiringProcessesIdEditRoute: HiringProcessesIdEditRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
+import type { getRouter } from "./router.tsx";
+import type { createStart } from "@tanstack/react-start";
+declare module "@tanstack/react-start" {
   interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
+    ssr: true;
+    router: Awaited<ReturnType<typeof getRouter>>;
   }
 }

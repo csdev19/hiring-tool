@@ -125,4 +125,3 @@ export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormP
     </form>
   );
 }
-

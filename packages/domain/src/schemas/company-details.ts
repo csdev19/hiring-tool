@@ -41,4 +41,3 @@ export const updateCompanyDetailsSchema = createCompanyDetailsSchema;
 export type CompanyDetailsBase = z.infer<typeof companyDetailsBaseSchema>;
 export type CreateCompanyDetails = z.infer<typeof createCompanyDetailsSchema>;
 export type UpdateCompanyDetails = z.infer<typeof updateCompanyDetailsSchema>;
-

@@ -31,4 +31,3 @@ export const INTERACTION_TYPE_VALUES = [
 export function isValidInteractionType(value: string): value is InteractionType {
   return INTERACTION_TYPE_VALUES.includes(value as InteractionType);
 }
-

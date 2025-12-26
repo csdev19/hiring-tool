@@ -20,4 +20,3 @@ export function getErrorMessage(error: unknown): string {
   }
   return "An error occurred";
 }
-

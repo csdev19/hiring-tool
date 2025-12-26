@@ -15,13 +15,13 @@ tags:
 
 ## Document Information
 
-| Field            | Value             |
-| ---------------- | ----------------- |
-| **Version**      | 1.0.0             |
-| **Date**         | January 1, 2025   |
-| **Status**       | Draft             |
-| **Feature Type** | New Epic          |
-| **Target Users** | Recruiters        |
+| Field            | Value           |
+| ---------------- | --------------- |
+| **Version**      | 1.0.0           |
+| **Date**         | January 1, 2025 |
+| **Status**       | Draft           |
+| **Feature Type** | New Epic        |
+| **Target Users** | Recruiters      |
 
 ---
 
@@ -38,6 +38,7 @@ This feature enables recruiters to create and manage job postings, providing a s
 ### User Persona
 
 **Primary User:** Recruiters/HR professionals who need to:
+
 - Post job openings
 - Track applications received
 - Manage the hiring process from the recruiter perspective
@@ -74,6 +75,7 @@ This feature enables recruiters to create and manage job postings, providing a s
 **Question:** How should we distinguish between recruiters and job seekers?
 
 **Options:**
+
 - A. Add a `role` field to the user table (e.g., "recruiter" | "job_seeker" | "both")
 - B. Create separate user types/tables
 - C. Allow all users to be both recruiters and job seekers
@@ -88,6 +90,7 @@ This feature enables recruiters to create and manage job postings, providing a s
 **Question:** What information should be stored in a job posting?
 
 **Proposed Fields:**
+
 - `title` (required) - Job title/position name
 - `companyName` (required) - Company name
 - `description` (optional) - Job description/details
@@ -105,6 +108,7 @@ This feature enables recruiters to create and manage job postings, providing a s
 - `userId` (required) - Recruiter who created the posting
 
 **Questions:**
+
 - Are there additional fields needed?
 - Should we support rich text for description/requirements?
 - Do we need categories/tags for job postings?
@@ -142,6 +146,7 @@ export const jobPosting = createTable("job_posting", {
 ```
 
 **Questions:**
+
 - Should `description` and `requirements` support rich text (JSON) or plain text?
 - Should `employmentType` be an enum or free text?
 - Should `status` be an enum? What are the valid statuses?
@@ -154,6 +159,7 @@ export const jobPosting = createTable("job_posting", {
 **Question:** How should recruiters access this feature?
 
 **Options:**
+
 - A. Separate top-level navigation tab "Job Postings" (visible to all users, but only recruiters can create)
 - B. Role-based navigation (only shows for users with recruiter role)
 - C. Toggle/switch between "Job Seeker" and "Recruiter" views
@@ -162,6 +168,7 @@ export const jobPosting = createTable("job_posting", {
 **Recommendation:** Option B or C - Role-based or toggle view
 
 **Questions:**
+
 - Should the same user be able to switch between job seeker and recruiter views?
 - Should we show both views in the same navigation?
 
@@ -172,6 +179,7 @@ export const jobPosting = createTable("job_posting", {
 **Question:** What columns should be displayed in the job postings table?
 
 **Proposed Columns:**
+
 - Job Title
 - Company Name
 - Location
@@ -182,6 +190,7 @@ export const jobPosting = createTable("job_posting", {
 - Actions (View, Edit, Delete)
 
 **Questions:**
+
 - Should we show application count (number of applications received)?
 - Should we support filtering by status, date, location?
 - Should we support sorting by different columns?
@@ -194,6 +203,7 @@ export const jobPosting = createTable("job_posting", {
 **Question:** What validation rules should apply?
 
 **Proposed Validation:**
+
 - `title`: Required, min 3 characters, max 200 characters
 - `companyName`: Required, min 2 characters, max 100 characters
 - `description`: Optional, max 5000 characters
@@ -202,6 +212,7 @@ export const jobPosting = createTable("job_posting", {
 - `contactEmail`: If provided, must be valid email format
 
 **Questions:**
+
 - Are there additional validation rules needed?
 - Should we validate salary ranges against industry standards?
 - Should we require certain fields based on status (e.g., active postings need description)?
@@ -213,11 +224,13 @@ export const jobPosting = createTable("job_posting", {
 **Question:** Who can create and manage job postings?
 
 **Proposed Rules:**
+
 - Only users with "recruiter" role can create job postings
 - Users can only view/edit/delete their own job postings
 - Job seekers can view active job postings (future - for applying)
 
 **Questions:**
+
 - Should there be admin users who can manage all job postings?
 - Should recruiters be able to share job postings with other recruiters?
 - Should we support team/organization-based job postings?
@@ -229,12 +242,14 @@ export const jobPosting = createTable("job_posting", {
 **Question:** What statuses should job postings have?
 
 **Proposed Statuses:**
+
 - `draft` - Not yet published
 - `active` - Currently accepting applications
 - `closed` - No longer accepting applications
 - `archived` - Archived for historical reference
 
 **Questions:**
+
 - Are there additional statuses needed?
 - Should status transitions be restricted (e.g., can't go from closed to active)?
 - Should we track status change history?
@@ -246,6 +261,7 @@ export const jobPosting = createTable("job_posting", {
 **Question:** What features should be planned for future phases?
 
 **Potential Future Features:**
+
 - Application management (view applications for each posting)
 - Candidate management (track candidates through interview process)
 - Email notifications for new applications
@@ -257,6 +273,7 @@ export const jobPosting = createTable("job_posting", {
 - File attachments (job descriptions, company logos)
 
 **Questions:**
+
 - Which of these should be prioritized for future phases?
 - Are there other features needed?
 
@@ -267,6 +284,7 @@ export const jobPosting = createTable("job_posting", {
 ### Phase 1: Database Schema
 
 1. **Add role to user table** (if not exists)
+
    ```typescript
    role: text("role").default("job_seeker") // "job_seeker" | "recruiter" | "both"
    ```
@@ -422,11 +440,13 @@ export type JobPostingInsert = typeof jobPosting.$inferInsert;
 ### GET /api/job-postings
 
 **Query Parameters:**
+
 - `status` (optional) - Filter by status
 - `page` (optional) - Page number for pagination
 - `limit` (optional) - Items per page
 
 **Response:**
+
 ```typescript
 {
   data: JobPosting[];
@@ -444,6 +464,7 @@ export type JobPostingInsert = typeof jobPosting.$inferInsert;
 ### GET /api/job-postings/:id
 
 **Response:**
+
 ```typescript
 {
   data: JobPosting | null;
@@ -454,6 +475,7 @@ export type JobPostingInsert = typeof jobPosting.$inferInsert;
 ### POST /api/job-postings
 
 **Request Body:**
+
 ```typescript
 {
   title: string;
@@ -473,6 +495,7 @@ export type JobPostingInsert = typeof jobPosting.$inferInsert;
 ```
 
 **Response:**
+
 ```typescript
 {
   data: JobPosting;
@@ -485,6 +508,7 @@ export type JobPostingInsert = typeof jobPosting.$inferInsert;
 **Request Body:** Same as POST (all fields optional except those that can't be changed)
 
 **Response:**
+
 ```typescript
 {
   data: JobPosting;
@@ -495,6 +519,7 @@ export type JobPostingInsert = typeof jobPosting.$inferInsert;
 ### DELETE /api/job-postings/:id
 
 **Response:**
+
 ```typescript
 {
   data: null;
@@ -518,6 +543,7 @@ interface JobPostingFormProps {
 ```
 
 **Fields:**
+
 - Title (text input, required)
 - Company Name (text input, required)
 - Description (textarea, optional)
@@ -534,6 +560,7 @@ interface JobPostingFormProps {
 ### JobPostingTable Component
 
 Similar structure to `HiringProcessTable`:
+
 - Sortable columns
 - Status badges
 - Action buttons (View, Edit, Delete)
@@ -545,6 +572,7 @@ Similar structure to `HiringProcessTable`:
 ## Implementation Checklist
 
 ### Database
+
 - [ ] Add `role` field to user table (if needed)
 - [ ] Create `job_posting` table schema
 - [ ] Create enums for status and employment type
@@ -553,6 +581,7 @@ Similar structure to `HiringProcessTable`:
 - [ ] Test migration
 
 ### Backend
+
 - [ ] Create job posting routes
 - [ ] Add role-based authorization
 - [ ] Implement validation schemas
@@ -562,6 +591,7 @@ Similar structure to `HiringProcessTable`:
 - [ ] Test all endpoints
 
 ### Frontend
+
 - [ ] Create job posting hooks
 - [ ] Create JobPostingForm component
 - [ ] Create JobPostingTable component
@@ -572,6 +602,7 @@ Similar structure to `HiringProcessTable`:
 - [ ] Test all user flows
 
 ### Testing
+
 - [ ] Test create job posting
 - [ ] Test list job postings
 - [ ] Test update job posting
@@ -613,4 +644,3 @@ Please provide answers to the following questions before implementation:
 - [Architecture V1](/docs/v1/architecture) - System architecture
 - [Implementation Summary](/docs/v1/implementation-summary) - Previous feature implementation
 - [Web UI Package](/docs/web-ui-package) - UI component library documentation
-
