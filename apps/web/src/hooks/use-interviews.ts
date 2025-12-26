@@ -2,35 +2,20 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { clientTreaty } from "@/lib/client-treaty";
 import { getErrorMessage } from "@/lib/error";
 import type { Currency, InterviewStatus } from "@interviews-tool/domain/constants";
+import type {
+  HiringProcessBase,
+  CreateHiringProcess,
+  UpdateHiringProcess,
+} from "@interviews-tool/domain/schemas";
 
 // Re-export types from domain package
 export type { Currency, InterviewStatus } from "@interviews-tool/domain/constants";
 
-// Type definitions based on our schema
-export interface Interview {
-  id: string;
-  companyName: string;
-  status: InterviewStatus;
-  salary: number | null;
-  currency: Currency;
-  createdAt: Date;
-  updatedAt: Date;
-  userId: string;
-}
-
-export interface CreateInterviewInput {
-  companyName: string;
-  status: InterviewStatus;
-  salary?: number;
-  currency?: Currency;
-}
-
-export interface UpdateInterviewInput {
-  companyName: string;
-  status: InterviewStatus;
-  salary?: number;
-  currency?: Currency;
-}
+// Note: Interviews are currently aliased to hiring processes
+// Re-export domain types for convenience
+export type Interview = HiringProcessBase;
+export type CreateInterviewInput = CreateHiringProcess;
+export type UpdateInterviewInput = UpdateHiringProcess;
 
 // Query keys
 const interviewKeys = {

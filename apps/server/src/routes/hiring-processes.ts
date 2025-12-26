@@ -1,5 +1,5 @@
 import { Elysia, t } from "elysia";
-import { db } from "@interviews-tool/db";
+import { db } from "@interviews-tool/db/client";
 import { hiringProcessTable, type NewHiringProcess } from "@interviews-tool/db/schemas";
 import { CURRENCIES } from "@interviews-tool/domain/constants";
 import {
