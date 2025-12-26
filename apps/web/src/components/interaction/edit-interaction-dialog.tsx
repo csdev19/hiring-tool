@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@interviews-tool/web-ui";
 import MDEditor from "@uiw/react-md-editor";
-import { INTERACTION_TYPES, type InteractionType } from "@interviews-tool/domain/constants";
+import { type InteractionType } from "@interviews-tool/domain/constants";
 import {
   useUpdateInteraction,
   type Interaction,
