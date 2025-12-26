@@ -1,8 +1,12 @@
 import { Elysia, t } from "elysia";
 import { db } from "@interviews-tool/db";
-import { hiringProcess, type NewHiringProcess } from "@interviews-tool/db/schema/hiring-process";
+import { hiringProcessTable, type NewHiringProcess } from "@interviews-tool/db/schemas";
 import { CURRENCIES } from "@interviews-tool/domain/constants";
-import { createHiringProcessSchema, updateHiringProcessSchema, paginationQuerySchema } from "@interviews-tool/domain/schemas";
+import {
+  createHiringProcessSchema,
+  updateHiringProcessSchema,
+  paginationQuerySchema,
+} from "@interviews-tool/domain/schemas";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { auth } from "@interviews-tool/auth";
 import { UnauthorizedError, NotFoundError } from "../utils/errors";
@@ -38,16 +42,16 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
 
       const processes = await db
         .select()
-        .from(hiringProcess)
-        .where(eq(hiringProcess.userId, user.id))
-        .orderBy(desc(hiringProcess.updatedAt))
+        .from(hiringProcessTable)
+        .where(eq(hiringProcessTable.userId, user.id))
+        .orderBy(desc(hiringProcessTable.updatedAt))
         .limit(pagination.limit)
         .offset(pagination.offset);
 
       const countResult = await db
         .select({ count: sql<number>`count(*)` })
-        .from(hiringProcess)
-        .where(eq(hiringProcess.userId, user.id));
+        .from(hiringProcessTable)
+        .where(eq(hiringProcessTable.userId, user.id));
 
       const total = countResult[0] ? Number(countResult[0].count) : 0;
 
@@ -69,8 +73,8 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
 
       const [result] = await db
         .select()
-        .from(hiringProcess)
-        .where(and(eq(hiringProcess.id, params.id), eq(hiringProcess.userId, user.id)));
+        .from(hiringProcessTable)
+        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
 
       if (!result) {
         throw new NotFoundError("Hiring process");
@@ -105,7 +109,10 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
         userId: user.id,
       };
 
-      const [createdProcess] = await db.insert(hiringProcess).values(newHiringProcess).returning();
+      const [createdProcess] = await db
+        .insert(hiringProcessTable)
+        .values(newHiringProcess)
+        .returning();
 
       return status(201, createdBody(createdProcess));
     },
@@ -125,15 +132,15 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       // Check if hiring process exists and belongs to user
       const [existing] = await db
         .select()
-        .from(hiringProcess)
-        .where(and(eq(hiringProcess.id, params.id), eq(hiringProcess.userId, user.id)));
+        .from(hiringProcessTable)
+        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
 
       if (!existing) {
         throw new NotFoundError("Hiring process");
       }
 
       const [updated] = await db
-        .update(hiringProcess)
+        .update(hiringProcessTable)
         .set({
           companyName: body.companyName,
           status: body.status,
@@ -141,7 +148,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
           currency: body.currency || existing.currency || CURRENCIES.USD,
           updatedAt: new Date(),
         })
-        .where(eq(hiringProcess.id, params.id))
+        .where(eq(hiringProcessTable.id, params.id))
         .returning();
 
       return successBody(updated);
@@ -165,14 +172,14 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       // Check if hiring process exists and belongs to user
       const [existing] = await db
         .select()
-        .from(hiringProcess)
-        .where(and(eq(hiringProcess.id, params.id), eq(hiringProcess.userId, user.id)));
+        .from(hiringProcessTable)
+        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
 
       if (!existing) {
         throw new NotFoundError("Hiring process");
       }
 
-      await db.delete(hiringProcess).where(eq(hiringProcess.id, params.id));
+      await db.delete(hiringProcessTable).where(eq(hiringProcessTable.id, params.id));
 
       return status(204);
     },

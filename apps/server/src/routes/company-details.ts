@@ -1,10 +1,16 @@
 import { Elysia, t } from "elysia";
-import { db } from "@interviews-tool/db";
-import { companyDetails, type NewCompanyDetails } from "@interviews-tool/db/schema/company-details";
-import { hiringProcess } from "@interviews-tool/db/schema/hiring-process";
+import { db } from "@interviews-tool/db/client";
+import {
+  companyDetailsTable,
+  type NewCompanyDetails,
+  hiringProcessTable,
+} from "@interviews-tool/db/schemas";
 import { eq, and } from "drizzle-orm";
 import { auth } from "@interviews-tool/auth";
-import { createCompanyDetailsSchema, updateCompanyDetailsSchema } from "@interviews-tool/domain/schemas";
+import {
+  createCompanyDetailsSchema,
+  updateCompanyDetailsSchema,
+} from "@interviews-tool/domain/schemas";
 import { UnauthorizedError, NotFoundError, ConflictError } from "../utils/errors";
 import { successBody, createdBody } from "../utils/response-helpers";
 import { errorHandlerPlugin } from "../utils/error-handler-plugin";
@@ -34,8 +40,8 @@ export const companyDetailsRoutes = new Elysia({
       // Verify hiring process exists and belongs to user
       const [hiringProcessRecord] = await db
         .select()
-        .from(hiringProcess)
-        .where(and(eq(hiringProcess.id, params.id), eq(hiringProcess.userId, user.id)));
+        .from(hiringProcessTable)
+        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
 
       if (!hiringProcessRecord) {
         throw new NotFoundError("Hiring process");
@@ -44,8 +50,8 @@ export const companyDetailsRoutes = new Elysia({
       // Get company details (optional - may not exist yet)
       const [result] = await db
         .select()
-        .from(companyDetails)
-        .where(eq(companyDetails.hiringProcessId, params.id));
+        .from(companyDetailsTable)
+        .where(eq(companyDetailsTable.hiringProcessId, params.id));
 
       // Return null if company details don't exist (they're optional)
       if (!result) {
@@ -72,8 +78,8 @@ export const companyDetailsRoutes = new Elysia({
       // Verify hiring process exists and belongs to user
       const [hiringProcessRecord] = await db
         .select()
-        .from(hiringProcess)
-        .where(and(eq(hiringProcess.id, params.id), eq(hiringProcess.userId, user.id)));
+        .from(hiringProcessTable)
+        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
 
       if (!hiringProcessRecord) {
         throw new NotFoundError("Hiring process");
@@ -82,8 +88,8 @@ export const companyDetailsRoutes = new Elysia({
       // Check if company details already exist
       const [existing] = await db
         .select()
-        .from(companyDetails)
-        .where(eq(companyDetails.hiringProcessId, params.id));
+        .from(companyDetailsTable)
+        .where(eq(companyDetailsTable.hiringProcessId, params.id));
 
       if (existing) {
         throw new ConflictError("Company details already exist for this hiring process");
@@ -104,7 +110,7 @@ export const companyDetailsRoutes = new Elysia({
       };
 
       const [createdDetails] = await db
-        .insert(companyDetails)
+        .insert(companyDetailsTable)
         .values(newCompanyDetails)
         .returning();
 
@@ -129,8 +135,8 @@ export const companyDetailsRoutes = new Elysia({
       // Verify hiring process exists and belongs to user
       const [hiringProcessRecord] = await db
         .select()
-        .from(hiringProcess)
-        .where(and(eq(hiringProcess.id, params.id), eq(hiringProcess.userId, user.id)));
+        .from(hiringProcessTable)
+        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
 
       if (!hiringProcessRecord) {
         throw new NotFoundError("Hiring process");
@@ -139,15 +145,15 @@ export const companyDetailsRoutes = new Elysia({
       // Check if company details exist
       const [existing] = await db
         .select()
-        .from(companyDetails)
-        .where(eq(companyDetails.hiringProcessId, params.id));
+        .from(companyDetailsTable)
+        .where(eq(companyDetailsTable.hiringProcessId, params.id));
 
       if (!existing) {
         throw new NotFoundError("Company details");
       }
 
       const [updated] = await db
-        .update(companyDetails)
+        .update(companyDetailsTable)
         .set({
           website: body.website,
           location: body.location,
@@ -157,7 +163,7 @@ export const companyDetailsRoutes = new Elysia({
           interviewSteps: body.interviewSteps,
           updatedAt: new Date(),
         })
-        .where(eq(companyDetails.hiringProcessId, params.id))
+        .where(eq(companyDetailsTable.hiringProcessId, params.id))
         .returning();
 
       return successBody(updated);
@@ -181,8 +187,8 @@ export const companyDetailsRoutes = new Elysia({
       // Verify hiring process exists and belongs to user
       const [hiringProcessRecord] = await db
         .select()
-        .from(hiringProcess)
-        .where(and(eq(hiringProcess.id, params.id), eq(hiringProcess.userId, user.id)));
+        .from(hiringProcessTable)
+        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
 
       if (!hiringProcessRecord) {
         throw new NotFoundError("Hiring process");
@@ -191,14 +197,16 @@ export const companyDetailsRoutes = new Elysia({
       // Check if company details exist
       const [existing] = await db
         .select()
-        .from(companyDetails)
-        .where(eq(companyDetails.hiringProcessId, params.id));
+        .from(companyDetailsTable)
+        .where(eq(companyDetailsTable.hiringProcessId, params.id));
 
       if (!existing) {
         throw new NotFoundError("Company details");
       }
 
-      await db.delete(companyDetails).where(eq(companyDetails.hiringProcessId, params.id));
+      await db
+        .delete(companyDetailsTable)
+        .where(eq(companyDetailsTable.hiringProcessId, params.id));
 
       set.status = 204;
     },

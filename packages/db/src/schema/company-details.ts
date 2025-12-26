@@ -1,15 +1,15 @@
 import { relations } from "drizzle-orm";
 import { text, timestamp, integer, index, unique } from "drizzle-orm/pg-core";
 import { createTable } from "../utils/table-creator";
-import { hiringProcess } from "./hiring-process";
+import { hiringProcessTable } from "./hiring-process";
 
-export const companyDetails = createTable(
+export const companyDetailsTable = createTable(
   "company_details",
   {
     id: text("id").primaryKey(),
     hiringProcessId: text("hiring_process_id")
       .notNull()
-      .references(() => hiringProcess.id, { onDelete: "cascade" }),
+      .references(() => hiringProcessTable.id, { onDelete: "cascade" }),
     website: text("website"),
     location: text("location"),
     benefits: text("benefits"),
@@ -28,13 +28,13 @@ export const companyDetails = createTable(
   ],
 );
 
-export const companyDetailsRelations = relations(companyDetails, ({ one }) => ({
-  hiringProcess: one(hiringProcess, {
-    fields: [companyDetails.hiringProcessId],
-    references: [hiringProcess.id],
+export const companyDetailsRelations = relations(companyDetailsTable, ({ one }) => ({
+  hiringProcess: one(hiringProcessTable, {
+    fields: [companyDetailsTable.hiringProcessId],
+    references: [hiringProcessTable.id],
   }),
 }));
 
 // Type exports for TypeScript
-export type CompanyDetails = typeof companyDetails.$inferSelect;
-export type NewCompanyDetails = typeof companyDetails.$inferInsert;
+export type CompanyDetails = typeof companyDetailsTable.$inferSelect;
+export type NewCompanyDetails = typeof companyDetailsTable.$inferInsert;
