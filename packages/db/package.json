@@ -5,11 +5,19 @@
     ".": {
       "default": "./src/index.ts"
     },
-    "./*": {
-      "default": "./src/*.ts"
+    "./schemas": {
+      "types": "./dist/schemas.d.mts",
+      "import": "./dist/schemas.mjs",
+      "default": "./dist/schemas.mjs"
+    },
+    "./client": {
+      "types": "./dist/client.d.mts",
+      "import": "./dist/client.mjs",
+      "default": "./dist/client.mjs"
     }
   },
   "scripts": {
+    "build": "tsdown",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
@@ -27,6 +35,7 @@
     "@interviews-tool/domain": "workspace:*",
     "@types/ws": "^8.18.1",
     "drizzle-kit": "^0.31.8",
-    "typescript": "^5"
+    "typescript": "^5",
+    "tsdown": "^0.18.2"
   }
 }

@@ -3,6 +3,7 @@ import { text, timestamp, integer, index, pgEnum } from "drizzle-orm/pg-core";
 import { createTable } from "../utils/table-creator";
 import { user } from "./auth";
 import { companyDetails } from "./company-details";
+import { interaction } from "./interaction";
 import { INTERVIEW_STATUS_VALUES, CURRENCY_VALUES } from "@interviews-tool/domain/constants";
 
 // Database enum for interview status
@@ -34,7 +35,7 @@ export const hiringProcess = createTable(
   ],
 );
 
-export const hiringProcessRelations = relations(hiringProcess, ({ one }) => ({
+export const hiringProcessRelations = relations(hiringProcess, ({ one, many }) => ({
   user: one(user, {
     fields: [hiringProcess.userId],
     references: [user.id],
@@ -43,6 +44,7 @@ export const hiringProcessRelations = relations(hiringProcess, ({ one }) => ({
     fields: [hiringProcess.id],
     references: [companyDetails.hiringProcessId],
   }),
+  interactions: many(interaction),
   // interviews: many(interview), // Prepared for future - will be uncommented when interview entity is implemented
 }));
 

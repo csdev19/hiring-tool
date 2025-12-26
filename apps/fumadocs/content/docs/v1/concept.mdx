@@ -34,14 +34,18 @@ The goal is to build a web application that enables users to create and manage h
 - Store comprehensive company information including: salary, benefits, location, name, website, and contact details
 
 **Interaction Tracking:**
-With that information, we want to be able to create a list of meetings related to those hiring processes, or to be precise, a list of steps related to the hiring process. For example:
+A comprehensive system for recording and organizing all communications and activities throughout the hiring process. Users can create chronological interaction notes with markdown formatting, categorize interactions by type (Email, Call, Meeting, Technical Challenge, etc.), and maintain a complete history of all touchpoints with companies.
 
-- If we were contacted from LinkedIn, Gmail, Facebook, etc.
-- If we had a call with HR (RRHH - Recursos Humanos)
-- If we had a technical challenge
-- If we were hired
-- If we dropped out
-- If we received an email, we should be able to store the email content and the sender information
+Key capabilities include:
+- Create a chronological timeline of all interactions (meetings, calls, emails, challenges, etc.)
+- Track where initial contact was made (LinkedIn, Gmail, Facebook, etc.)
+- Record HR calls, technical challenges, and interview sessions
+- Store email content and sender information
+- Document offer details, negotiations, and outcomes
+- Use markdown formatting for rich, detailed notes
+- Chat-style interface for quick note-taking
+
+*For detailed specifications, see the [Interaction Tracking System](#interaction-tracking-system) section.*
 
 ### Target Audience
 
@@ -161,6 +165,355 @@ With that information, we want to be able to create a list of meetings related t
 - One Hiring Process has many Interviews (1:N) - Future feature
 - One Hiring Process has many Interactions (1:N) - Future feature
 - One User has many Hiring Processes (1:N)
+
+---
+
+## Interaction Tracking System
+
+### Overview
+
+The Interaction Tracking system enables users to maintain a comprehensive chronological record of all communications and activities related to each hiring process. This feature transforms the detail view into a powerful note-taking and history-tracking tool, similar to a chat interface or project management timeline.
+
+### Purpose
+
+**Primary Goals:**
+
+- Capture every touchpoint with a company throughout the hiring process
+- Maintain a searchable history of all interactions
+- Enable quick note-taking with rich text formatting
+- Provide context for decision-making and follow-ups
+- Track progress through interview stages
+
+**Key Benefits:**
+
+- Never lose track of important conversation details
+- Quick reference to previous interactions before calls or meetings
+- Document technical challenges and their outcomes
+- Record salary negotiations and offer details
+- Maintain professional relationship history
+
+### Interaction Types
+
+The system supports multiple interaction types to categorize different forms of communication:
+
+| Type                | Description                                                                 | Common Use Cases                                    |
+| ------------------- | --------------------------------------------------------------------------- | --------------------------------------------------- |
+| **Email**           | Written correspondence via email                                           | Application submissions, follow-ups, offer letters |
+| **Phone Call**      | Voice conversations over the phone                                          | Initial screenings, HR calls, follow-up calls       |
+| **Video Call**      | Video conference meetings                                                   | Remote interviews, virtual meetings                |
+| **In-Person Meeting** | Face-to-face interactions                                                 | On-site interviews, office visits                    |
+| **Technical Challenge** | Coding tests, take-home assignments, or technical assessments          | Programming challenges, design tasks                |
+| **Application**     | Initial job application submission                                          | Job application sent, resume submitted              |
+| **Offer**           | Job offer received or extended                                             | Offer details, negotiation notes                    |
+| **Rejection**       | Application or interview rejection                                         | Rejection notices, feedback received                |
+| **Follow-up**       | Status checks, thank you notes, or general follow-ups                      | Post-interview thank you, status inquiries          |
+| **Note**            | General notes or reminders (default type)                                   | Personal notes, reminders, research findings        |
+
+**Type Selection:**
+
+- Users can select an interaction type from a dropdown when creating a new interaction
+- Type is optional - if not specified, defaults to "Note"
+- Type helps filter and organize interactions in the timeline
+- Visual indicators (icons or badges) can distinguish types in the UI
+
+### Detailed Data Model
+
+#### Interaction Entity
+
+The Interaction entity extends the basic model with additional considerations:
+
+| Field           | Type     | Required | Description                                                                 |
+| --------------- | -------- | -------- | --------------------------------------------------------------------------- |
+| id              | UUID     | Yes      | Unique identifier                                                           |
+| hiringProcessId | UUID     | Yes      | Foreign key to Hiring Process (cascade delete)                              |
+| title           | String   | No       | Short title or subject line (e.g., "Technical Interview Round 2")            |
+| content         | Text     | Yes      | Markdown-formatted content (supports rich text, lists, links, code blocks) |
+| type            | Enum     | No       | Interaction type (Email, Call, Meeting, etc.) - defaults to "Note"         |
+| createdAt       | DateTime | Yes      | Creation timestamp (used for chronological ordering)                        |
+| updatedAt       | DateTime | No       | Last update timestamp (if editing is supported)                             |
+
+**Content Guidelines:**
+
+- **Minimum Length:** At least 10 characters to ensure meaningful notes
+- **Maximum Length:** 10,000 characters to support detailed documentation
+- **Formatting:** Full Markdown support including:
+  - Headers (#, ##, ###)
+  - Bold and italic text
+  - Lists (ordered and unordered)
+  - Links
+  - Code blocks (for technical challenges)
+  - Blockquotes (for email content or quotes)
+
+**Title Guidelines:**
+
+- Optional but recommended for better organization
+- Should be concise (max 100 characters)
+- Examples:
+  - "HR Screening Call"
+  - "Technical Challenge - React Component"
+  - "Final Interview with CTO"
+  - "Salary Negotiation Discussion"
+
+### Interaction Workflow
+
+#### Creating an Interaction
+
+**User Flow:**
+
+1. User navigates to hiring process detail view
+2. Scrolls to interaction timeline section
+3. Clicks "Add Interaction" or focuses on markdown input field
+4. Optionally selects interaction type from dropdown
+5. Optionally enters a title
+6. Enters markdown-formatted content in text area
+7. Clicks submit button (CTA)
+8. Interaction appears immediately in timeline (optimistic update)
+
+**Input Validation:**
+
+- Content is required (minimum 10 characters)
+- Title is optional (if provided, max 100 characters)
+- Type is optional (defaults to "Note")
+- Markdown syntax is validated on submit
+- Invalid markdown is highlighted but doesn't prevent submission
+
+#### Viewing Interactions
+
+**Timeline Display:**
+
+- Interactions displayed in reverse chronological order (newest first)
+- Each interaction shown as a card/thread with:
+  - Date and time (formatted: "MM-DD-YYYY HH:MMam/pm")
+  - Type badge/icon (if type is specified)
+  - Title (if provided)
+  - Rendered markdown content
+  - Optional action buttons (edit, delete)
+
+**Visual Design:**
+
+- Chat-style bubbles or cards
+- Alternating background colors for readability
+- Clear visual separation between interactions
+- Responsive design for mobile and desktop
+- Smooth scrolling for long timelines
+
+#### Editing Interactions
+
+**Edit Capability:**
+
+- Users can edit their own interactions
+- Edit button appears on hover or as an icon on each interaction card
+- Clicking edit opens inline editor or modal
+- Changes are saved with updated timestamp
+- Original creation date is preserved
+
+#### Deleting Interactions
+
+**Delete Capability:**
+
+- Users can delete their own interactions
+- Delete button with confirmation dialog
+- Soft delete option (mark as deleted, hide from view)
+- Or hard delete (permanently remove from database)
+
+### Use Cases and Examples
+
+#### Use Case 1: Initial Application
+
+**Scenario:** User applies for a job via LinkedIn
+
+**Interaction Created:**
+- **Type:** Application
+- **Title:** "Application Submitted via LinkedIn"
+- **Content:**
+  ```markdown
+  Applied for **Senior Frontend Developer** position at Acme Corp.
+  
+  - Found job posting on LinkedIn
+  - Submitted resume and cover letter
+  - Position: Remote, Full-time
+  - Expected salary range: $120k - $150k
+  ```
+
+#### Use Case 2: Technical Challenge
+
+**Scenario:** User receives and completes a coding challenge
+
+**Interaction Created:**
+- **Type:** Technical Challenge
+- **Title:** "React Component Challenge"
+- **Content:**
+  ```markdown
+  Received technical challenge on **2025-12-20**
+  
+  **Requirements:**
+  - Build a responsive data table component
+  - Use React and TypeScript
+  - Implement sorting and filtering
+  - Deadline: 3 days
+  
+  **My Solution:**
+  - Used TanStack Table for data management
+  - Implemented custom sorting logic
+  - Added responsive design with TailwindCSS
+  - Submitted on 2025-12-22
+  
+  **Notes:**
+  - Challenge was well-designed
+  - Took approximately 6 hours to complete
+  ```
+
+#### Use Case 3: Interview Follow-up
+
+**Scenario:** User wants to follow up after an interview
+
+**Interaction Created:**
+- **Type:** Follow-up
+- **Title:** "Post-Interview Thank You"
+- **Content:**
+  ```markdown
+  Sent thank you email to:
+  - **Sarah Johnson** (Hiring Manager) - sarah@acme.com
+  - **Mike Chen** (Technical Lead) - mike@acme.com
+  
+  **Key Points Mentioned:**
+  - Thanked them for their time
+  - Highlighted my interest in the role
+  - Referenced specific discussion points from interview
+  - Asked about next steps
+  
+  **Sent:** 2025-12-23 2:30pm
+  ```
+
+#### Use Case 4: Salary Negotiation
+
+**Scenario:** User receives an offer and negotiates salary
+
+**Interaction Created:**
+- **Type:** Offer
+- **Title:** "Initial Offer and Negotiation"
+- **Content:**
+  ```markdown
+  **Initial Offer Received:**
+  - Base Salary: $130,000
+  - Equity: 0.1%
+  - Benefits: Health, Dental, 401k match
+  
+  **My Counter-Offer:**
+  - Base Salary: $145,000
+  - Equity: 0.15%
+  - Additional: $5,000 signing bonus
+  
+  **Discussion Notes:**
+  - Had call with HR on 2025-12-24
+  - They're considering my counter-offer
+  - Will respond by end of week
+  - I emphasized my relevant experience and market research
+  ```
+
+### Technical Implementation Details
+
+#### Markdown Editor
+
+**Requirements:**
+
+- Rich text editing with markdown preview
+- Syntax highlighting for code blocks
+- Toolbar with common formatting options
+- Keyboard shortcuts support
+- Auto-save draft functionality (optional)
+- Character count indicator
+
+**Recommended Libraries:**
+
+- `react-markdown` for rendering
+- `react-simplemde-editor` or `@uiw/react-md-editor` for editing
+- `remark-gfm` for GitHub Flavored Markdown support
+
+#### Interaction Timeline Component
+
+**Features:**
+
+- Virtual scrolling for performance (if 100+ interactions)
+- Lazy loading for older interactions
+- Smooth animations for new interactions
+- Search/filter by type or date range
+- Export interactions as markdown or PDF (future)
+
+#### API Considerations
+
+**Endpoints Needed:**
+
+```typescript
+// List interactions for a hiring process
+GET /api/hiring-processes/:id/interactions
+  Query params: ?type=email&limit=50&offset=0
+
+// Create new interaction
+POST /api/hiring-processes/:id/interactions
+  Body: { title?, type?, content }
+
+// Get single interaction
+GET /api/interactions/:id
+
+// Update interaction
+PUT /api/interactions/:id
+  Body: { title?, type?, content }
+
+// Delete interaction
+DELETE /api/interactions/:id
+```
+
+**Performance Optimizations:**
+
+- Pagination for large interaction lists
+- Caching of rendered markdown
+- Optimistic updates for better UX
+- Batch operations for bulk edits
+
+### Integration with Hiring Process
+
+**Relationship:**
+
+- Interactions are tightly coupled to hiring processes
+- Deleting a hiring process cascades to delete all interactions
+- Interactions provide context for status changes
+- Timeline helps track progress through interview stages
+
+**Status Correlation:**
+
+- Interactions can trigger status updates (e.g., "Offer" interaction → status "Hired")
+- Status changes can be logged as interactions automatically
+- Timeline shows correlation between interactions and status changes
+
+### Future Enhancements
+
+**Phase 2 Features:**
+
+1. **Email Integration**
+   - Auto-import emails as interactions
+   - Parse email content and metadata
+   - Link email threads to interactions
+
+2. **File Attachments**
+   - Attach files to interactions (resumes, offer letters, etc.)
+   - Store in cloud storage
+   - Preview attachments in timeline
+
+3. **Templates**
+   - Pre-defined interaction templates
+   - Quick actions for common scenarios
+   - Template library for different interaction types
+
+4. **Search and Filtering**
+   - Full-text search across all interactions
+   - Filter by type, date range, keywords
+   - Advanced search with boolean operators
+
+5. **Collaboration**
+   - Share interactions with mentors/advisors
+   - Comments on interactions
+   - Collaborative editing
 
 ---
 
@@ -395,6 +748,8 @@ With that information, we want to be able to create a list of meetings related t
 - **Create new interactions:**
   - Ability to create a new thread and leave detailed notes there
 
+**Note:** For detailed information about the Interaction Tracking system, interaction types, workflows, and implementation details, see the [Interaction Tracking System](#interaction-tracking-system) section above.
+
 ![interview process detail](/images/v1-image4.png)
 
 #### Interface Details
@@ -514,7 +869,8 @@ Located at the bottom of the screen:
 - **State Management:** TanStack Query for server state
 - **Form Handling:** TanStack Form
 - **Routing:** TanStack Router
-- **Markdown Editor:** To be determined (e.g., react-markdown, MDX)
+- **Markdown Editor:** react-markdown for rendering, @uiw/react-md-editor or react-simplemde-editor for editing
+- **Markdown Processing:** remark-gfm for GitHub Flavored Markdown support
 - **Date Handling:** To be determined (e.g., date-fns, dayjs)
 
 ### API Endpoints (Proposed)
@@ -528,10 +884,17 @@ PUT    /api/hiring-processes/:id      // Update hiring process
 DELETE /api/hiring-processes/:id      // Delete hiring process
 
 // Interactions
-GET    /api/hiring-processes/:id/interactions     // List interactions (future)
-POST   /api/hiring-processes/:id/interactions     // Create interaction (future)
-PUT    /api/interactions/:id                // Update interaction
-DELETE /api/interactions/:id                // Delete interaction
+GET    /api/hiring-processes/:id/interactions     // List interactions for a hiring process
+POST   /api/hiring-processes/:id/interactions     // Create new interaction
+GET    /api/interactions/:id                     // Get single interaction
+PUT    /api/interactions/:id                     // Update interaction
+DELETE /api/interactions/:id                    // Delete interaction
+
+// Company Details
+GET    /api/hiring-processes/:id/company-details  // Get company details
+POST   /api/hiring-processes/:id/company-details  // Create company details
+PUT    /api/hiring-processes/:id/company-details  // Update company details
+DELETE /api/hiring-processes/:id/company-details  // Delete company details
 ```
 
 ---

@@ -29,6 +29,11 @@
       "import": "./dist/types.mjs",
       "default": "./dist/types.mjs"
     },
+    "./schemas": {
+      "types": "./dist/schemas.d.mts",
+      "import": "./dist/schemas.mjs",
+      "default": "./dist/schemas.mjs"
+    },
     "./config": {
       "types": "./dist/config.d.mts",
       "import": "./dist/config.mjs",
@@ -43,6 +48,9 @@
     "check-types": "tsc --noEmit",
     "lint": "oxlint src",
     "lint:fix": "oxlint --fix src"
+  },
+  "dependencies": {
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",

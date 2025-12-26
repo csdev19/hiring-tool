@@ -1,9 +1,25 @@
 import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
-import { Card, CardContent, CardHeader, CardTitle, Button } from "@interviews-tool/web-ui";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@interviews-tool/web-ui";
 import { StatusBadge } from "@/components/hiring-process/status-badge";
 import { DeleteConfirmDialog } from "@/components/hiring-process/delete-confirm-dialog";
+import { HiringProcessDetailSkeleton } from "@/components/hiring-process/hiring-process-detail-skeleton";
 import { useHiringProcess, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";
 import { useCompanyDetails } from "@/hooks/use-company-details";
+import { InteractionTimeline } from "@/components/interaction/interaction-timeline";
+import { InteractionForm } from "@/components/interaction/interaction-form";
+import { EditInteractionDialog } from "@/components/interaction/edit-interaction-dialog";
+import { DeleteInteractionDialog } from "@/components/interaction/delete-interaction-dialog";
+import type { Interaction } from "@/hooks/use-interactions";
 import type { Currency } from "@interviews-tool/domain/constants";
 import {
   Pencil,
@@ -39,6 +55,8 @@ function HiringProcessDetailPage() {
   const { data: companyDetailsData, isLoading: isLoadingCompanyDetails } = useCompanyDetails(id);
   const deleteMutation = useDeleteHiringProcess();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [editingInteraction, setEditingInteraction] = useState<Interaction | null>(null);
+  const [deletingInteractionId, setDeletingInteractionId] = useState<string | null>(null);
 
   const handleDelete = async () => {
     try {
@@ -67,15 +85,7 @@ function HiringProcessDetailPage() {
   }
 
   if (isLoading || isLoadingCompanyDetails) {
-    return (
-      <div className="container mx-auto max-w-4xl px-4 py-8">
-        <Card>
-          <CardContent className="py-8 text-center">
-            <p className="text-muted-foreground">Loading hiring process...</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <HiringProcessDetailSkeleton />;
   }
 
   const hiringProcess = data;
@@ -137,6 +147,7 @@ function HiringProcessDetailPage() {
         </Link>
       </div>
 
+      {/* Core Information & Complementary Information Card */}
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between">
@@ -161,113 +172,134 @@ function HiringProcessDetailPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-6">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Company Name</h3>
-                <p className="text-sm">{hiringProcess.companyName}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Status</h3>
-                <StatusBadge status={hiringProcess.status} />
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Salary</h3>
-                <p className="text-sm">
-                  {formatSalary(hiringProcess.salary, hiringProcess.currency)}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Created</h3>
-                <p className="text-sm">{formatDate(hiringProcess.createdAt)}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Last Updated</h3>
-                <p className="text-sm">{formatDate(hiringProcess.updatedAt)}</p>
-              </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">Company Name</h3>
+              <p className="text-sm">{hiringProcess.companyName}</p>
             </div>
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">Status</h3>
+              <StatusBadge status={hiringProcess.status} />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">Salary</h3>
+              <p className="text-sm">
+                {formatSalary(hiringProcess.salary, hiringProcess.currency)}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">Created</h3>
+              <p className="text-sm">{formatDate(hiringProcess.createdAt)}</p>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">Last Updated</h3>
+              <p className="text-sm">{formatDate(hiringProcess.updatedAt)}</p>
+            </div>
+          </div>
 
-            {/* Company Details Section */}
-            {companyDetails && (
-              <>
-                <div className="border-t pt-4 mt-2">
-                  <h3 className="text-sm font-semibold mb-4">Company Information</h3>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {companyDetails.website && (
-                      <div>
-                        <h4 className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                          <Building2 className="size-3" />
-                          Website
-                        </h4>
-                        {isValidUrl(companyDetails.website) ? (
-                          <a
-                            href={companyDetails.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-primary hover:underline flex items-center gap-1"
-                          >
-                            {companyDetails.website}
-                            <ExternalLink className="size-3" />
-                          </a>
-                        ) : (
-                          <p className="text-sm">{companyDetails.website}</p>
-                        )}
-                      </div>
-                    )}
-
-                    {companyDetails.location && (
-                      <div>
-                        <h4 className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                          <MapPin className="size-3" />
-                          Location
-                        </h4>
-                        <p className="text-sm">{companyDetails.location}</p>
-                      </div>
-                    )}
-
-                    {companyDetails.contactedVia && (
-                      <div>
-                        <h4 className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                          <MessageSquare className="size-3" />
-                          Contacted Via
-                        </h4>
-                        <p className="text-sm">{companyDetails.contactedVia}</p>
-                      </div>
-                    )}
-
-                    {companyDetails.contactPerson && (
-                      <div>
-                        <h4 className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                          <User className="size-3" />
-                          Contact Person
-                        </h4>
-                        <p className="text-sm">{companyDetails.contactPerson}</p>
-                      </div>
-                    )}
-
-                    {companyDetails.interviewSteps !== null &&
-                      companyDetails.interviewSteps !== undefined && (
+          {/* Complementary Information Section */}
+          {companyDetails && (
+            <div className="mt-6">
+              <Accordion>
+                <AccordionItem value="company-info">
+                  <AccordionTrigger>
+                    <h3 className="text-sm font-semibold">Complementary Information</h3>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                      {companyDetails.website && (
                         <div>
-                          <h4 className="text-xs font-medium text-muted-foreground mb-1">
-                            Interview Steps
+                          <h4 className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                            <Building2 className="size-3" />
+                            Website
                           </h4>
-                          <p className="text-sm">{companyDetails.interviewSteps}</p>
+                          {isValidUrl(companyDetails.website) ? (
+                            <a
+                              href={companyDetails.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-primary hover:underline flex items-center gap-1"
+                            >
+                              {companyDetails.website}
+                              <ExternalLink className="size-3" />
+                            </a>
+                          ) : (
+                            <p className="text-sm">{companyDetails.website}</p>
+                          )}
                         </div>
                       )}
-                  </div>
 
-                  {companyDetails.benefits && (
-                    <div className="mt-4">
-                      <h4 className="text-xs font-medium text-muted-foreground mb-1">Benefits</h4>
-                      <p className="text-sm whitespace-pre-wrap">{companyDetails.benefits}</p>
+                      {companyDetails.location && (
+                        <div>
+                          <h4 className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                            <MapPin className="size-3" />
+                            Location
+                          </h4>
+                          <p className="text-sm">{companyDetails.location}</p>
+                        </div>
+                      )}
+
+                      {companyDetails.contactedVia && (
+                        <div>
+                          <h4 className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                            <MessageSquare className="size-3" />
+                            Contacted Via
+                          </h4>
+                          <p className="text-sm">{companyDetails.contactedVia}</p>
+                        </div>
+                      )}
+
+                      {companyDetails.contactPerson && (
+                        <div>
+                          <h4 className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                            <User className="size-3" />
+                            Contact Person
+                          </h4>
+                          <p className="text-sm">{companyDetails.contactPerson}</p>
+                        </div>
+                      )}
+
+                      {companyDetails.interviewSteps !== null &&
+                        companyDetails.interviewSteps !== undefined && (
+                          <div>
+                            <h4 className="text-xs font-medium text-muted-foreground mb-1">
+                              Interview Steps
+                            </h4>
+                            <p className="text-sm">{companyDetails.interviewSteps}</p>
+                          </div>
+                        )}
                     </div>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
+
+                    {companyDetails.benefits && (
+                      <div className="mt-4">
+                        <h4 className="text-xs font-medium text-muted-foreground mb-1">Benefits</h4>
+                        <p className="text-sm whitespace-pre-wrap">{companyDetails.benefits}</p>
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {/* Interactions Card */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Interaction History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <InteractionForm hiringProcessId={id} />
+        </CardContent>
+      </Card>
+      <div className="mt-6 h-[50vh] overflow-y-auto pr-2">
+        <InteractionTimeline
+          hiringProcessId={id}
+          onEdit={(interaction) => setEditingInteraction(interaction)}
+          onDelete={(interaction) => setDeletingInteractionId(interaction.id)}
+        />
+      </div>
 
       {showDeleteDialog && (
         <DeleteConfirmDialog
@@ -275,6 +307,24 @@ function HiringProcessDetailPage() {
           onConfirm={handleDelete}
           onCancel={() => setShowDeleteDialog(false)}
           isDeleting={deleteMutation.isPending}
+        />
+      )}
+
+      {editingInteraction && (
+        <EditInteractionDialog
+          interaction={editingInteraction}
+          hiringProcessId={id}
+          open={!!editingInteraction}
+          onOpenChange={(open) => !open && setEditingInteraction(null)}
+        />
+      )}
+
+      {deletingInteractionId && (
+        <DeleteInteractionDialog
+          interactionId={deletingInteractionId}
+          hiringProcessId={id}
+          open={!!deletingInteractionId}
+          onOpenChange={(open) => !open && setDeletingInteractionId(null)}
         />
       )}
     </div>

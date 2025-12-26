@@ -3,10 +3,8 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
   // Entry points for each domain layer
   entry: {
-    constants: "src/constants/index.ts",
-    types: "src/types/index.ts",
-    config: "src/config/index.ts",
-    schemas: "src/schemas/index.ts",
+    schemas: "src/schema/index.ts",
+    client: "src/client/index.ts",
   },
 
   // Output formats
