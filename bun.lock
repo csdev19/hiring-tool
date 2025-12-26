@@ -123,11 +123,11 @@
         "@interviews-tool/db": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:",
-        "tsdown": "^0.18.2",
         "zod": "catalog:",
       },
       "devDependencies": {
         "@interviews-tool/config": "workspace:*",
+        "tsdown": "^0.18.2",
         "typescript": "^5",
       },
     },
