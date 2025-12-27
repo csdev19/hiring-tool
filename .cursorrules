@@ -142,6 +142,46 @@ Use custom errors from `apps/server/src/utils/errors.ts`:
 - Use `createTable()` from table-creator for consistent naming
 - Export types: `typeof table.$inferSelect` and `typeof table.$inferInsert`
 
+### Constants Pattern with Zod
+
+**IMPORTANT**: When using constants in Zod schemas, use the const object directly with `z.enum()`:
+
+```typescript
+// ✅ CORRECT: Use the const object directly
+import { z } from "zod";
+import { HIRING_PROCESS_STATUSES } from "@interviews-tool/domain/constants";
+
+export const schema = z.object({
+  status: z.enum(HIRING_PROCESS_STATUSES),
+});
+
+// ✅ CORRECT: For optional fields
+export const filterSchema = z.object({
+  status: z.enum(HIRING_PROCESS_STATUSES).optional(),
+});
+
+// ❌ WRONG: Don't use Object.values() - use the const object directly
+status: z.enum(Object.values(HIRING_PROCESS_STATUSES) as [string, ...string[]]),
+
+// ❌ WRONG: Don't use the values array - use the const object
+status: z.enum(HIRING_PROCESS_STATUS_VALUES),
+```
+
+**Key Principle**: According to [Zod's enum API](https://zod.dev/api#enum), `z.enum()` accepts enum-like object literals (`{ [key: string]: string | number }`). Use the const object (`HIRING_PROCESS_STATUSES`) directly - it is the single source of truth.
+
+For database enums (Drizzle), use the values array:
+
+```typescript
+// ✅ CORRECT: Database enum (Drizzle requires array)
+import { pgEnum } from "drizzle-orm/pg-core";
+import { HIRING_PROCESS_STATUS_VALUES } from "@interviews-tool/domain/constants";
+
+export const hiringProcessStatusEnum = pgEnum(
+  "hiring_process_status",
+  HIRING_PROCESS_STATUS_VALUES,
+);
+```
+
 ---
 
 ## Frontend Patterns
@@ -231,7 +271,7 @@ hiring-tool/
 
 ```typescript
 // From domain
-import { INTERVIEW_STATUSES } from "@interviews-tool/domain/constants";
+import { HIRING_PROCESS_STATUSES } from "@interviews-tool/domain/constants";
 import { type ApiResponse } from "@interviews-tool/domain/types";
 import { updateHiringProcessSchema } from "@interviews-tool/domain/schemas";
 

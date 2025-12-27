@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { clientTreaty } from "@/lib/client-treaty";
 import { getErrorMessage } from "@/lib/error";
-import type { Currency, InterviewStatus } from "@interviews-tool/domain/constants";
+import type { Currency, HiringProcessStatus } from "@interviews-tool/domain/constants";
 import type {
   HiringProcessBase,
   CreateHiringProcess,
@@ -9,7 +9,7 @@ import type {
 } from "@interviews-tool/domain/schemas";
 
 // Re-export types from domain package
-export type { Currency, InterviewStatus } from "@interviews-tool/domain/constants";
+export type { Currency, HiringProcessStatus } from "@interviews-tool/domain/constants";
 
 // Re-export domain types for convenience
 export type HiringProcess = HiringProcessBase;

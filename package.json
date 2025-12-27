@@ -1,8 +1,8 @@
 {
-  "name": "interviews-tool",
+  "name": "hiring-tool",
   "version": "1.0.0",
   "private": true,
-  "description": "A modern web application for tracking job interviews and managing hiring processes",
+  "description": "A modern web application for tracking job applications and managing hiring processes",
   "license": "MIT",
   "workspaces": {
     "packages": [

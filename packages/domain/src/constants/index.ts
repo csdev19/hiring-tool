@@ -1,3 +1,3 @@
 export * from "./currency";
-export * from "./interview-status";
+export * from "./hiring-process-status";
 export * from "./interaction-type";
