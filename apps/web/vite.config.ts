@@ -10,4 +10,10 @@ export default defineConfig({
   server: {
     port: 3001,
   },
+  css: {
+    devSourcemap: true,
+  },
+  build: {
+    cssCodeSplit: false,
+  },
 });

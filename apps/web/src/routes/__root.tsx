@@ -8,6 +8,7 @@ import { Toaster } from "@interviews-tool/web-ui";
 
 import Header from "../components/header";
 import appCss from "../index.css?url";
+
 export interface RouterAppContext {
   queryClient: QueryClient;
 }
@@ -39,11 +40,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 function RootDocument() {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <div className="grid h-svh grid-rows-[auto_1fr]">
           <Header />
           <Outlet />
