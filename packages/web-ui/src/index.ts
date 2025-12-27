@@ -6,6 +6,7 @@ export * from "./components/checkbox";
 export * from "./components/dropdown-menu";
 export * from "./components/input";
 export * from "./components/label";
+export * from "./components/markdown-content";
 export * from "./components/skeleton";
 export * from "./components/sonner";
 export * from "./components/table";
@@ -16,7 +17,6 @@ export * from "./components/badge";
 export * from "./components/select";
 export * from "./components/dialog";
 export * from "./components/alert-dialog";
-export * from "./components/accordion";
 
 // Export utilities
 export * from "./lib/utils";
