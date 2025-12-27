@@ -4,10 +4,12 @@ import { Button, Input, Label, Textarea } from "@interviews-tool/web-ui";
 import type { CreateHiringProcessInput } from "@/hooks/use-hiring-processes";
 import type { CreateCompanyDetailsInput } from "@/hooks/use-company-details";
 import {
-  INTERVIEW_STATUSES,
+  HIRING_PROCESS_STATUSES,
+  HIRING_PROCESS_STATUS_INFO,
+  DEFAULT_HIRING_PROCESS_STATUS,
   CURRENCIES,
   CURRENCY_INFO,
-  type InterviewStatus,
+  type HiringProcessStatus,
   type Currency,
 } from "@interviews-tool/domain/constants";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -28,11 +30,31 @@ const contactedViaOptions = [
   { value: "Other", label: "Other" },
 ];
 
-const statusOptions: { value: InterviewStatus; label: string }[] = [
-  { value: INTERVIEW_STATUSES.ONGOING, label: "Ongoing" },
-  { value: INTERVIEW_STATUSES.REJECTED, label: "Rejected" },
-  { value: INTERVIEW_STATUSES.DROPPED_OUT, label: "Dropped Out" },
-  { value: INTERVIEW_STATUSES.HIRED, label: "Hired" },
+const statusOptions: { value: HiringProcessStatus; label: string }[] = [
+  {
+    value: HIRING_PROCESS_STATUSES.FIRST_CONTACT,
+    label: HIRING_PROCESS_STATUS_INFO[HIRING_PROCESS_STATUSES.FIRST_CONTACT].label,
+  },
+  {
+    value: HIRING_PROCESS_STATUSES.ONGOING,
+    label: HIRING_PROCESS_STATUS_INFO[HIRING_PROCESS_STATUSES.ONGOING].label,
+  },
+  {
+    value: HIRING_PROCESS_STATUSES.ON_HOLD,
+    label: HIRING_PROCESS_STATUS_INFO[HIRING_PROCESS_STATUSES.ON_HOLD].label,
+  },
+  {
+    value: HIRING_PROCESS_STATUSES.REJECTED,
+    label: HIRING_PROCESS_STATUS_INFO[HIRING_PROCESS_STATUSES.REJECTED].label,
+  },
+  {
+    value: HIRING_PROCESS_STATUSES.DROPPED_OUT,
+    label: HIRING_PROCESS_STATUS_INFO[HIRING_PROCESS_STATUSES.DROPPED_OUT].label,
+  },
+  {
+    value: HIRING_PROCESS_STATUSES.HIRED,
+    label: HIRING_PROCESS_STATUS_INFO[HIRING_PROCESS_STATUSES.HIRED].label,
+  },
 ];
 
 const currencyOptions: { value: Currency; label: string; symbol: string }[] = [
@@ -62,7 +84,7 @@ export function HiringProcessForm({
   const defaultValues = useMemo(
     () => ({
       companyName: initialValues?.companyName || "",
-      status: initialValues?.status || INTERVIEW_STATUSES.ONGOING,
+      status: initialValues?.status || DEFAULT_HIRING_PROCESS_STATUS,
       salary: initialValues?.salary,
       currency: initialValues?.currency || CURRENCIES.USD,
     }),
@@ -122,7 +144,7 @@ export function HiringProcessForm({
   useEffect(() => {
     if (initialValues) {
       form.setFieldValue("companyName", initialValues.companyName || "");
-      form.setFieldValue("status", initialValues.status || INTERVIEW_STATUSES.ONGOING);
+      form.setFieldValue("status", initialValues.status || DEFAULT_HIRING_PROCESS_STATUS);
       form.setFieldValue("currency", initialValues.currency || CURRENCIES.USD);
       if (initialValues.salary !== undefined) {
         form.setFieldValue("salary", initialValues.salary);
@@ -211,7 +233,7 @@ export function HiringProcessForm({
             <select
               id="status"
               value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value as InterviewStatus)}
+              onChange={(e) => field.handleChange(e.target.value as HiringProcessStatus)}
               className="flex h-8 w-full rounded-md border border-input bg-background px-2.5 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               disabled={isSubmitting}
             >

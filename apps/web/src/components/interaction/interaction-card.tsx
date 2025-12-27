@@ -1,8 +1,6 @@
-import { Card, CardContent, Button } from "@interviews-tool/web-ui";
+import { Card, CardContent, Button, MarkdownContent } from "@interviews-tool/web-ui";
 import { InteractionTypeBadge } from "./interaction-type-badge";
 import type { Interaction } from "@/hooks/use-interactions";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { Pencil, Trash2 } from "lucide-react";
 
 interface InteractionCardProps {
@@ -62,9 +60,7 @@ export function InteractionCard({ interaction, onEdit, onDelete }: InteractionCa
           </h4>
         )}
 
-        <div className="prose prose-sm dark:prose-invert max-w-none interaction-content">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{interaction.content}</ReactMarkdown>
-        </div>
+        <MarkdownContent content={interaction.content} variant="compact" />
       </CardContent>
     </Card>
   );

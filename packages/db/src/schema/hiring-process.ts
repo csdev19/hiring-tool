@@ -4,14 +4,14 @@ import { createTable } from "../utils/table-creator";
 import { userTable } from "./auth";
 import { companyDetailsTable } from "./company-details";
 import { interactionTable } from "./interaction";
-import { interviewStatusEnum, currencyEnum } from "../enums";
+import { hiringProcessStatusEnum, currencyEnum } from "../enums";
 
 export const hiringProcessTable = createTable(
   "hiring_process",
   {
     id: text("id").primaryKey(),
     companyName: text("company_name").notNull(),
-    status: interviewStatusEnum("status").notNull(),
+    status: hiringProcessStatusEnum("status").notNull(),
     salary: integer("salary"), // Optional salary amount
     currency: currencyEnum("currency").default("USD").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),

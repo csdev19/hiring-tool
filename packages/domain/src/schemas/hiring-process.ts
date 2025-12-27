@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { INTERVIEW_STATUSES, CURRENCIES } from "../constants";
+import { HIRING_PROCESS_STATUS_VALUES, CURRENCIES } from "../constants";
 
 /**
  * Base schema for HiringProcess
@@ -9,12 +9,7 @@ import { INTERVIEW_STATUSES, CURRENCIES } from "../constants";
 export const hiringProcessBaseSchema = z.object({
   id: z.uuid(),
   companyName: z.string().min(1, "Company name is required"),
-  status: z.enum([
-    INTERVIEW_STATUSES.ONGOING,
-    INTERVIEW_STATUSES.REJECTED,
-    INTERVIEW_STATUSES.DROPPED_OUT,
-    INTERVIEW_STATUSES.HIRED,
-  ]),
+  status: z.enum(HIRING_PROCESS_STATUS_VALUES as [string, ...string[]]),
   salary: z.number().min(0, "Salary must be positive").nullable(),
   currency: z.enum([CURRENCIES.USD, CURRENCIES.PEN]),
   userId: z.string(),
@@ -55,14 +50,7 @@ export const partialUpdateHiringProcessSchema = updateHiringProcessSchema.partia
  * For filtering hiring processes
  */
 export const filterHiringProcessSchema = z.object({
-  status: z
-    .enum([
-      INTERVIEW_STATUSES.ONGOING,
-      INTERVIEW_STATUSES.REJECTED,
-      INTERVIEW_STATUSES.DROPPED_OUT,
-      INTERVIEW_STATUSES.HIRED,
-    ])
-    .optional(),
+  status: z.enum(HIRING_PROCESS_STATUS_VALUES as [string, ...string[]]).optional(),
   companyName: z.string().optional(),
 });
 

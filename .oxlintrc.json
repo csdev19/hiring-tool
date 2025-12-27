@@ -138,5 +138,10 @@
     "builtin": true
   },
   "globals": {},
-  "ignorePatterns": []
+  "ignorePatterns": [
+    "**/routeTree.gen.ts",
+    "**/*routeTree.gen.ts",
+    "routeTree.gen.ts",
+    "apps/web/src/routeTree.gen.ts"
+  ]
 }

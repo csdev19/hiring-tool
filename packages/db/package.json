@@ -2,18 +2,15 @@
   "name": "@interviews-tool/db",
   "type": "module",
   "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    },
-    "./schemas": {
-      "types": "./dist/schemas.d.mts",
-      "import": "./dist/schemas.mjs",
-      "default": "./dist/schemas.mjs"
-    },
-    "./client": {
-      "types": "./dist/client.d.mts",
-      "import": "./dist/client.mjs",
-      "default": "./dist/client.mjs"
+    "./client": "./src/client/index.ts",
+    "./schemas": "./src/schema/index.ts",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      "./client": "./dist/client.mjs",
+      "./schemas": "./dist/schemas.mjs",
+      "./package.json": "./package.json"
     }
   },
   "scripts": {
