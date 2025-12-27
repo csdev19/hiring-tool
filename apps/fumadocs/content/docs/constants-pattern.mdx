@@ -10,7 +10,7 @@ tags:
 
 # Constants Pattern
 
-**Last Updated:** December 22, 2025  
+**Last Updated:** January 2, 2025  
 **Status:** Active Pattern
 
 ## Overview
@@ -21,10 +21,12 @@ This document describes the **type-safe constants pattern** used throughout the 
 
 The pattern consists of four main parts:
 
-1. **Constant Object** - Defines the values as a const object
+1. **Constant Object** - Defines the values as a const object (single source of truth)
 2. **Type Definition** - Extracts the type from the constant object
-3. **Values Array** - Array of all valid values for runtime checks
+3. **Values Array** - Array of all valid values for runtime checks and Zod schemas (derived from object)
 4. **Validation Function** - Type guard to validate values at runtime
+
+**Key Principle:** The constant object is the single source of truth. Use the const object directly with `z.enum()` - Zod accepts enum-like object literals (`{ [key: string]: string | number }`) according to the [Zod enum API](https://zod.dev/api#enum).
 
 ## Example Implementation
 
@@ -40,12 +42,12 @@ export const CURRENCIES = {
 // 2. Type extracted from the constant object
 export type Currency = ObjectProperties<typeof CURRENCIES>;
 
-// 3. Array of all valid values
+// 3. Array of all valid values (for database enums and runtime checks)
 export const CURRENCY_VALUES = [CURRENCIES.USD, CURRENCIES.PEN] as const;
 
 // 4. Type guard for runtime validation
 export function isValidCurrency(value: string): value is Currency {
-  return CURRENCY_VALUES.includes(value as Currency);
+  return Object.values(CURRENCIES).includes(value as Currency);
 }
 ```
 
@@ -130,6 +132,27 @@ body: t.Object({
   ),
 })
 ```
+
+### In Zod Schemas
+
+```typescript
+// ✅ Good: Using the const object directly with z.enum()
+import { z } from "zod";
+import { HIRING_PROCESS_STATUSES } from "@interviews-tool/domain/constants";
+
+export const hiringProcessSchema = z.object({
+  status: z.enum(HIRING_PROCESS_STATUSES),
+});
+
+// ✅ Good: For optional status fields
+export const filterSchema = z.object({
+  status: z.enum(HIRING_PROCESS_STATUSES).optional(),
+});
+```
+
+**Important:** According to [Zod's enum documentation](https://zod.dev/api#enum), `z.enum()` accepts enum-like object literals (`{ [key: string]: string | number }`). Use the const object (`HIRING_PROCESS_STATUSES`) directly with `z.enum()`. The constant object is the single source of truth.
+
+**Note:** For database enums (like Drizzle's `pgEnum`), you still need to use the `*_VALUES` array since database libraries require arrays, not objects.
 
 ## When to Use This Pattern
 
@@ -237,12 +260,14 @@ This utility is essential for the pattern to work correctly.
 - `isValidCurrency()` - Validation function
 - `CURRENCY_INFO` - Display information (label, symbol)
 
-### Interview Status (`packages/domain/src/constants/interview-status.ts`)
+### Hiring Process Status (`packages/domain/src/constants/hiring-process-status.ts`)
 
-- `INTERVIEW_STATUSES` - Status values (ongoing, rejected, dropped-out, hired)
-- `InterviewStatus` - Type for status values
-- `INTERVIEW_STATUS_VALUES` - Array of all statuses
-- `isValidInterviewStatus()` - Validation function
+- `HIRING_PROCESS_STATUSES` - Status values (first-contact, ongoing, on-hold, rejected, dropped-out, hired)
+- `HiringProcessStatus` - Type for status values
+- `HIRING_PROCESS_STATUS_VALUES` - Array of all statuses (deprecated, use `Object.values(HIRING_PROCESS_STATUSES)`)
+- `isValidHiringProcessStatus()` - Validation function
+- `HIRING_PROCESS_STATUS_INFO` - Display metadata (label, description, order, category)
+- `STATUS_TRANSITIONS` - Valid status transition rules
 
 ## Best Practices
 
