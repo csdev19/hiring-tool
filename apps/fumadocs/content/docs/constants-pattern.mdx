@@ -136,21 +136,50 @@ body: t.Object({
 ### In Zod Schemas
 
 ```typescript
-// ✅ Good: Using the const object directly with z.enum()
+// ✅ Good: Using the const object directly with z.enum() - simpler and less work
 import { z } from "zod";
-import { HIRING_PROCESS_STATUSES } from "@interviews-tool/domain/constants";
+import { INTERACTION_TYPES } from "@interviews-tool/domain/constants";
 
-export const hiringProcessSchema = z.object({
-  status: z.enum(HIRING_PROCESS_STATUSES),
+export const interactionSchema = z.object({
+  type: z.enum(INTERACTION_TYPES),
 });
 
-// ✅ Good: For optional status fields
-export const filterSchema = z.object({
-  status: z.enum(HIRING_PROCESS_STATUSES).optional(),
+// ✅ Good: For optional enum fields with defaults
+export const createInteractionSchema = z.object({
+  type: z.enum(INTERACTION_TYPES).optional().default(INTERACTION_TYPES.NOTE),
+});
+
+// ✅ Good: For optional enum fields
+export const updateInteractionSchema = z.object({
+  type: z.enum(INTERACTION_TYPES).optional(),
 });
 ```
 
-**Important:** According to [Zod's enum documentation](https://zod.dev/api#enum), `z.enum()` accepts enum-like object literals (`{ [key: string]: string | number }`). Use the const object (`HIRING_PROCESS_STATUSES`) directly with `z.enum()`. The constant object is the single source of truth.
+**Important:** Always use the const object (e.g., `INTERACTION_TYPES`) directly with `z.enum()`, not the `*_VALUES` array. This is:
+
+- **Simpler** - No need to manually list all values
+- **Less work** - Single source of truth, automatically stays in sync
+- **More maintainable** - Adding/removing values automatically updates schemas
+- **Direct** - Use the constant object itself, which is the single source of truth
+
+**❌ Never do this** - Don't manually list enum values in Zod schemas:
+
+```typescript
+// ❌ Bad: Manual listing is verbose and error-prone
+type: z.enum([
+  INTERACTION_TYPES.EMAIL,
+  INTERACTION_TYPES.PHONE_CALL,
+  INTERACTION_TYPES.VIDEO_CALL,
+  // ... more values
+])
+```
+
+**✅ Always do this** - Use the const object directly:
+
+```typescript
+// ✅ Good: Simple, maintainable, single source of truth
+type: z.enum(INTERACTION_TYPES)
+```
 
 **Note:** For database enums (like Drizzle's `pgEnum`), you still need to use the `*_VALUES` array since database libraries require arrays, not objects.
 

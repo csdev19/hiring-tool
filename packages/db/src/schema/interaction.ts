@@ -1,10 +1,9 @@
 import { relations } from "drizzle-orm";
-import { text, timestamp, pgEnum, index } from "drizzle-orm/pg-core";
+import { text, index } from "drizzle-orm/pg-core";
 import { createTable } from "../utils/table-creator";
+import { timestamps } from "../utils/timestamps";
 import { hiringProcessTable } from "./hiring-process";
-import { INTERACTION_TYPE_VALUES } from "@interviews-tool/domain/constants";
-
-export const interactionTypeEnum = pgEnum("interaction_type", INTERACTION_TYPE_VALUES);
+import { interactionTypeEnum } from "../enums";
 
 export const interactionTable = createTable(
   "interaction",
@@ -16,15 +15,12 @@ export const interactionTable = createTable(
     title: text("title"),
     content: text("content").notNull(),
     type: interactionTypeEnum("type").default("note"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .defaultNow()
-      .$onUpdate(() => new Date())
-      .notNull(),
+    ...timestamps,
   },
   (table) => [
     index("interaction_hiringProcessId_idx").on(table.hiringProcessId),
     index("interaction_createdAt_idx").on(table.createdAt),
+    index("interaction_deletedAt_idx").on(table.deletedAt),
   ],
 );
 

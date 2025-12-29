@@ -9,12 +9,14 @@ import { HIRING_PROCESS_STATUSES, CURRENCIES } from "../constants";
 export const hiringProcessBaseSchema = z.object({
   id: z.uuid(),
   companyName: z.string().min(1, "Company name is required"),
+  jobTitle: z.string().nullable().optional(), // Optional job title (e.g., "Frontend Developer", "React Native Developer", "DevOps Engineer")
   status: z.enum(HIRING_PROCESS_STATUSES),
   salary: z.number().min(0, "Salary must be positive").nullable(),
   currency: z.enum([CURRENCIES.USD, CURRENCIES.PEN]),
   userId: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  deletedAt: z.coerce.date().nullable().optional(),
 });
 
 /**
@@ -31,6 +33,7 @@ export const createHiringProcessSchema = hiringProcessBaseSchema
     // Make salary and currency optional on creation
     salary: z.number().min(0, "Salary must be positive").optional(),
     currency: z.enum([CURRENCIES.USD, CURRENCIES.PEN]).optional(),
+    jobTitle: z.string().optional(), // Optional job title
   });
 
 /**

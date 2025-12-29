@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
-import { text, timestamp, integer, index } from "drizzle-orm/pg-core";
+import { text, integer, index } from "drizzle-orm/pg-core";
 import { createTable } from "../utils/table-creator";
+import { timestamps } from "../utils/timestamps";
 import { userTable } from "./auth";
 import { companyDetailsTable } from "./company-details";
 import { interactionTable } from "./interaction";
@@ -11,14 +12,11 @@ export const hiringProcessTable = createTable(
   {
     id: text("id").primaryKey(),
     companyName: text("company_name").notNull(),
+    jobTitle: text("job_title"), // Optional job title (e.g., "Frontend Developer", "React Native Developer", "DevOps Engineer")
     status: hiringProcessStatusEnum("status").notNull(),
     salary: integer("salary"), // Optional salary amount
     currency: currencyEnum("currency").default("USD").notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .defaultNow()
-      .$onUpdate(() => new Date())
-      .notNull(),
+    ...timestamps,
     userId: text("user_id")
       .notNull()
       .references(() => userTable.id, { onDelete: "cascade" }),
@@ -26,6 +24,7 @@ export const hiringProcessTable = createTable(
   (table) => [
     index("hiring_process_userId_idx").on(table.userId),
     index("hiring_process_status_idx").on(table.status),
+    index("hiring_process_deletedAt_idx").on(table.deletedAt),
   ],
 );
 
