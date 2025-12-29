@@ -109,6 +109,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       const newHiringProcess: NewHiringProcess = {
         id,
         companyName: body.companyName,
+        jobTitle: body.jobTitle,
         status: body.status,
         salary: body.salary,
         currency: body.currency || CURRENCIES.USD,
@@ -155,6 +156,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
         .update(hiringProcessTable)
         .set({
           companyName: body.companyName,
+          jobTitle: body.jobTitle,
           status: body.status,
           salary: body.salary,
           currency: body.currency || existing.currency || CURRENCIES.USD,

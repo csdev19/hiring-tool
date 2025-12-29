@@ -124,6 +124,7 @@ function EditHiringProcessPage() {
           <HiringProcessForm
             initialValues={{
               companyName: hiringProcess.companyName,
+              jobTitle: hiringProcess.jobTitle || undefined,
               status: hiringProcess.status,
               salary: hiringProcess.salary || undefined,
               currency: hiringProcess.currency,

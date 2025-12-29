@@ -84,12 +84,14 @@ export function HiringProcessForm({
   const defaultValues = useMemo(
     () => ({
       companyName: initialValues?.companyName || "",
+      jobTitle: initialValues?.jobTitle || "",
       status: initialValues?.status || DEFAULT_HIRING_PROCESS_STATUS,
       salary: initialValues?.salary,
       currency: initialValues?.currency || CURRENCIES.USD,
     }),
     [
       initialValues?.companyName,
+      initialValues?.jobTitle,
       initialValues?.status,
       initialValues?.salary,
       initialValues?.currency,
@@ -144,6 +146,7 @@ export function HiringProcessForm({
   useEffect(() => {
     if (initialValues) {
       form.setFieldValue("companyName", initialValues.companyName || "");
+      form.setFieldValue("jobTitle", initialValues.jobTitle || "");
       form.setFieldValue("status", initialValues.status || DEFAULT_HIRING_PROCESS_STATUS);
       form.setFieldValue("currency", initialValues.currency || CURRENCIES.USD);
       if (initialValues.salary !== undefined) {
@@ -153,6 +156,7 @@ export function HiringProcessForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     initialValues?.companyName,
+    initialValues?.jobTitle,
     initialValues?.status,
     initialValues?.salary,
     initialValues?.currency,
@@ -220,6 +224,22 @@ export function HiringProcessForm({
             {field.state.meta.errors && (
               <p className="text-xs text-destructive">{field.state.meta.errors[0]}</p>
             )}
+          </div>
+        )}
+      </form.Field>
+
+      <form.Field name="jobTitle">
+        {(field) => (
+          <div className="space-y-1.5">
+            <Label htmlFor="jobTitle">Job Title (Optional)</Label>
+            <Input
+              id="jobTitle"
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+              placeholder="e.g., Frontend Developer, React Native Developer, DevOps Engineer"
+              disabled={isSubmitting}
+            />
           </div>
         )}
       </form.Field>

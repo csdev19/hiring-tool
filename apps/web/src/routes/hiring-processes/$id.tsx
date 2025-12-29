@@ -153,6 +153,9 @@ function HiringProcessDetailPage() {
           <div className="flex items-start justify-between">
             <div>
               <CardTitle className="text-2xl">{hiringProcess.companyName}</CardTitle>
+              {hiringProcess.jobTitle && (
+                <p className="text-muted-foreground mt-1">{hiringProcess.jobTitle}</p>
+              )}
               <div className="mt-2">
                 <StatusBadge status={hiringProcess.status} />
               </div>
@@ -177,6 +180,12 @@ function HiringProcessDetailPage() {
               <h3 className="text-sm font-medium text-muted-foreground mb-1">Company Name</h3>
               <p className="text-sm">{hiringProcess.companyName}</p>
             </div>
+            {hiringProcess.jobTitle && (
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-1">Job Title</h3>
+                <p className="text-sm">{hiringProcess.jobTitle}</p>
+              </div>
+            )}
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-1">Status</h3>
               <StatusBadge status={hiringProcess.status} />
