@@ -73,6 +73,18 @@ export function InterviewTable({ interviews, onDelete, isDeleting = false }: Int
         },
         enableSorting: true,
       }),
+      columnHelper.accessor("jobTitle", {
+        header: "Job Title",
+        cell: (info) => {
+          const jobTitle = info.getValue();
+          return jobTitle ? (
+            <span className="text-muted-foreground">{jobTitle}</span>
+          ) : (
+            <span className="text-muted-foreground italic">-</span>
+          );
+        },
+        enableSorting: true,
+      }),
       columnHelper.accessor("status", {
         header: "Status",
         cell: (info) => <StatusBadge status={info.getValue()} />,

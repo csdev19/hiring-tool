@@ -5,7 +5,7 @@ import {
   type NewCompanyDetails,
   hiringProcessTable,
 } from "@interviews-tool/db/schemas";
-import { eq, and } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { auth } from "@interviews-tool/auth";
 import {
   createCompanyDetailsSchema,
@@ -41,7 +41,13 @@ export const companyDetailsRoutes = new Elysia({
       const [hiringProcessRecord] = await db
         .select()
         .from(hiringProcessTable)
-        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
       if (!hiringProcessRecord) {
         throw new NotFoundError("Hiring process");
@@ -51,7 +57,12 @@ export const companyDetailsRoutes = new Elysia({
       const [result] = await db
         .select()
         .from(companyDetailsTable)
-        .where(eq(companyDetailsTable.hiringProcessId, params.id));
+        .where(
+          and(
+            eq(companyDetailsTable.hiringProcessId, params.id),
+            isNull(companyDetailsTable.deletedAt),
+          ),
+        );
 
       // Return null if company details don't exist (they're optional)
       if (!result) {
@@ -79,7 +90,13 @@ export const companyDetailsRoutes = new Elysia({
       const [hiringProcessRecord] = await db
         .select()
         .from(hiringProcessTable)
-        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
       if (!hiringProcessRecord) {
         throw new NotFoundError("Hiring process");
@@ -89,7 +106,12 @@ export const companyDetailsRoutes = new Elysia({
       const [existing] = await db
         .select()
         .from(companyDetailsTable)
-        .where(eq(companyDetailsTable.hiringProcessId, params.id));
+        .where(
+          and(
+            eq(companyDetailsTable.hiringProcessId, params.id),
+            isNull(companyDetailsTable.deletedAt),
+          ),
+        );
 
       if (existing) {
         throw new ConflictError("Company details already exist for this hiring process");
@@ -136,7 +158,13 @@ export const companyDetailsRoutes = new Elysia({
       const [hiringProcessRecord] = await db
         .select()
         .from(hiringProcessTable)
-        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
       if (!hiringProcessRecord) {
         throw new NotFoundError("Hiring process");
@@ -146,7 +174,12 @@ export const companyDetailsRoutes = new Elysia({
       const [existing] = await db
         .select()
         .from(companyDetailsTable)
-        .where(eq(companyDetailsTable.hiringProcessId, params.id));
+        .where(
+          and(
+            eq(companyDetailsTable.hiringProcessId, params.id),
+            isNull(companyDetailsTable.deletedAt),
+          ),
+        );
 
       if (!existing) {
         throw new NotFoundError("Company details");
@@ -188,7 +221,13 @@ export const companyDetailsRoutes = new Elysia({
       const [hiringProcessRecord] = await db
         .select()
         .from(hiringProcessTable)
-        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
       if (!hiringProcessRecord) {
         throw new NotFoundError("Hiring process");
@@ -198,14 +237,21 @@ export const companyDetailsRoutes = new Elysia({
       const [existing] = await db
         .select()
         .from(companyDetailsTable)
-        .where(eq(companyDetailsTable.hiringProcessId, params.id));
+        .where(
+          and(
+            eq(companyDetailsTable.hiringProcessId, params.id),
+            isNull(companyDetailsTable.deletedAt),
+          ),
+        );
 
       if (!existing) {
         throw new NotFoundError("Company details");
       }
 
+      // Soft delete by setting deletedAt timestamp
       await db
-        .delete(companyDetailsTable)
+        .update(companyDetailsTable)
+        .set({ deletedAt: new Date() })
         .where(eq(companyDetailsTable.hiringProcessId, params.id));
 
       set.status = 204;

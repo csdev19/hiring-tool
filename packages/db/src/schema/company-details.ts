@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
-import { text, timestamp, integer, index, unique } from "drizzle-orm/pg-core";
+import { text, integer, index, unique } from "drizzle-orm/pg-core";
 import { createTable } from "../utils/table-creator";
+import { timestamps } from "../utils/timestamps";
 import { hiringProcessTable } from "./hiring-process";
 
 export const companyDetailsTable = createTable(
@@ -16,15 +17,12 @@ export const companyDetailsTable = createTable(
     contactedVia: text("contacted_via"),
     contactPerson: text("contact_person"),
     interviewSteps: integer("interview_steps").default(0),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .defaultNow()
-      .$onUpdate(() => new Date())
-      .notNull(),
+    ...timestamps,
   },
   (table) => [
     index("company_details_hiringProcessId_idx").on(table.hiringProcessId),
     unique("company_details_hiringProcessId_unique").on(table.hiringProcessId),
+    index("company_details_deletedAt_idx").on(table.deletedAt),
   ],
 );
 

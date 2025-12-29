@@ -5,7 +5,7 @@ import {
   interactionTable,
   type NewInteraction,
 } from "@interviews-tool/db/schemas";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, isNull } from "drizzle-orm";
 import { auth } from "@interviews-tool/auth";
 import { createInteractionSchema, updateInteractionSchema } from "@interviews-tool/domain/schemas";
 import { UnauthorizedError, NotFoundError } from "../utils/errors";
@@ -32,14 +32,22 @@ export const interactionRoutes = new Elysia({
     const [hiringProcessRecord] = await db
       .select()
       .from(hiringProcessTable)
-      .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
+      .where(
+        and(
+          eq(hiringProcessTable.id, params.id),
+          eq(hiringProcessTable.userId, user.id),
+          isNull(hiringProcessTable.deletedAt),
+        ),
+      );
 
     if (!hiringProcessRecord) throw new NotFoundError("Hiring process");
 
     const interactions = await db
       .select()
       .from(interactionTable)
-      .where(eq(interactionTable.hiringProcessId, params.id))
+      .where(
+        and(eq(interactionTable.hiringProcessId, params.id), isNull(interactionTable.deletedAt)),
+      )
       .orderBy(desc(interactionTable.createdAt));
 
     // Always return an array, even if empty
@@ -55,7 +63,13 @@ export const interactionRoutes = new Elysia({
       const [hiringProcessRecord] = await db
         .select()
         .from(hiringProcessTable)
-        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
       if (!hiringProcessRecord) throw new NotFoundError("Hiring process");
 
@@ -85,14 +99,22 @@ export const interactionRoutes = new Elysia({
       const [hiringProcessRecord] = await db
         .select()
         .from(hiringProcessTable)
-        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
       if (!hiringProcessRecord) throw new NotFoundError("Hiring process");
 
       const [existing] = await db
         .select()
         .from(interactionTable)
-        .where(eq(interactionTable.id, params.interactionId));
+        .where(
+          and(eq(interactionTable.id, params.interactionId), isNull(interactionTable.deletedAt)),
+        );
 
       if (!existing) throw new NotFoundError("Interaction");
 
@@ -127,18 +149,30 @@ export const interactionRoutes = new Elysia({
       const [hiringProcessRecord] = await db
         .select()
         .from(hiringProcessTable)
-        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
       if (!hiringProcessRecord) throw new NotFoundError("Hiring process");
 
       const [existing] = await db
         .select()
         .from(interactionTable)
-        .where(eq(interactionTable.id, params.interactionId));
+        .where(
+          and(eq(interactionTable.id, params.interactionId), isNull(interactionTable.deletedAt)),
+        );
 
       if (!existing) throw new NotFoundError("Interaction");
 
-      await db.delete(interactionTable).where(eq(interactionTable.id, params.interactionId));
+      // Soft delete by setting deletedAt timestamp
+      await db
+        .update(interactionTable)
+        .set({ deletedAt: new Date() })
+        .where(eq(interactionTable.id, params.interactionId));
       set.status = 204;
     },
     {

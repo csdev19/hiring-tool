@@ -10,20 +10,10 @@ export const interactionBaseSchema = z.object({
   hiringProcessId: z.uuid(),
   title: z.string().max(100, "Title must be less than 100 characters").nullable(),
   content: z.string().min(10, "Content must be at least 10 characters").max(10000),
-  type: z.enum([
-    INTERACTION_TYPES.EMAIL,
-    INTERACTION_TYPES.PHONE_CALL,
-    INTERACTION_TYPES.VIDEO_CALL,
-    INTERACTION_TYPES.IN_PERSON_MEETING,
-    INTERACTION_TYPES.TECHNICAL_CHALLENGE,
-    INTERACTION_TYPES.APPLICATION,
-    INTERACTION_TYPES.OFFER,
-    INTERACTION_TYPES.REJECTION,
-    INTERACTION_TYPES.FOLLOW_UP,
-    INTERACTION_TYPES.NOTE,
-  ]),
+  type: z.enum(INTERACTION_TYPES),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  deletedAt: z.coerce.date().nullable().optional(),
 });
 
 /**
@@ -33,21 +23,7 @@ export const interactionBaseSchema = z.object({
 export const createInteractionSchema = z.object({
   title: z.string().max(100, "Title must be less than 100 characters").optional(),
   content: z.string().min(10, "Content must be at least 10 characters").max(10000),
-  type: z
-    .enum([
-      INTERACTION_TYPES.EMAIL,
-      INTERACTION_TYPES.PHONE_CALL,
-      INTERACTION_TYPES.VIDEO_CALL,
-      INTERACTION_TYPES.IN_PERSON_MEETING,
-      INTERACTION_TYPES.TECHNICAL_CHALLENGE,
-      INTERACTION_TYPES.APPLICATION,
-      INTERACTION_TYPES.OFFER,
-      INTERACTION_TYPES.REJECTION,
-      INTERACTION_TYPES.FOLLOW_UP,
-      INTERACTION_TYPES.NOTE,
-    ])
-    .optional()
-    .default(INTERACTION_TYPES.NOTE),
+  type: z.enum(INTERACTION_TYPES).optional().default(INTERACTION_TYPES.NOTE),
 });
 
 /**
@@ -56,20 +32,7 @@ export const createInteractionSchema = z.object({
 export const updateInteractionSchema = z.object({
   title: z.string().max(100, "Title must be less than 100 characters").optional(),
   content: z.string().min(10, "Content must be at least 10 characters").max(10000),
-  type: z
-    .enum([
-      INTERACTION_TYPES.EMAIL,
-      INTERACTION_TYPES.PHONE_CALL,
-      INTERACTION_TYPES.VIDEO_CALL,
-      INTERACTION_TYPES.IN_PERSON_MEETING,
-      INTERACTION_TYPES.TECHNICAL_CHALLENGE,
-      INTERACTION_TYPES.APPLICATION,
-      INTERACTION_TYPES.OFFER,
-      INTERACTION_TYPES.REJECTION,
-      INTERACTION_TYPES.FOLLOW_UP,
-      INTERACTION_TYPES.NOTE,
-    ])
-    .optional(),
+  type: z.enum(INTERACTION_TYPES).optional(),
 });
 
 // Type exports

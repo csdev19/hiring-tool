@@ -15,6 +15,7 @@ export const companyDetailsBaseSchema = z.object({
   interviewSteps: z.number().int().min(0, "Must be a positive integer").nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  deletedAt: z.coerce.date().nullable().optional(),
 });
 
 /**

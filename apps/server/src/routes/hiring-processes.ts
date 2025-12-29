@@ -7,7 +7,7 @@ import {
   updateHiringProcessSchema,
   paginationQuerySchema,
 } from "@interviews-tool/domain/schemas";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, isNull } from "drizzle-orm";
 import { auth } from "@interviews-tool/auth";
 import { UnauthorizedError, NotFoundError } from "../utils/errors";
 import {
@@ -43,7 +43,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       const processes = await db
         .select()
         .from(hiringProcessTable)
-        .where(eq(hiringProcessTable.userId, user.id))
+        .where(and(eq(hiringProcessTable.userId, user.id), isNull(hiringProcessTable.deletedAt)))
         .orderBy(desc(hiringProcessTable.updatedAt))
         .limit(pagination.limit)
         .offset(pagination.offset);
@@ -51,7 +51,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       const countResult = await db
         .select({ count: sql<number>`count(*)` })
         .from(hiringProcessTable)
-        .where(eq(hiringProcessTable.userId, user.id));
+        .where(and(eq(hiringProcessTable.userId, user.id), isNull(hiringProcessTable.deletedAt)));
 
       const total = countResult[0] ? Number(countResult[0].count) : 0;
 
@@ -74,7 +74,13 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       const [result] = await db
         .select()
         .from(hiringProcessTable)
-        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
       if (!result) {
         throw new NotFoundError("Hiring process");
@@ -103,6 +109,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       const newHiringProcess: NewHiringProcess = {
         id,
         companyName: body.companyName,
+        jobTitle: body.jobTitle,
         status: body.status,
         salary: body.salary,
         currency: body.currency || CURRENCIES.USD,
@@ -133,7 +140,13 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       const [existing] = await db
         .select()
         .from(hiringProcessTable)
-        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
       if (!existing) {
         throw new NotFoundError("Hiring process");
@@ -143,6 +156,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
         .update(hiringProcessTable)
         .set({
           companyName: body.companyName,
+          jobTitle: body.jobTitle,
           status: body.status,
           salary: body.salary,
           currency: body.currency || existing.currency || CURRENCIES.USD,
@@ -173,13 +187,23 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       const [existing] = await db
         .select()
         .from(hiringProcessTable)
-        .where(and(eq(hiringProcessTable.id, params.id), eq(hiringProcessTable.userId, user.id)));
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
       if (!existing) {
         throw new NotFoundError("Hiring process");
       }
 
-      await db.delete(hiringProcessTable).where(eq(hiringProcessTable.id, params.id));
+      // Soft delete by setting deletedAt timestamp
+      await db
+        .update(hiringProcessTable)
+        .set({ deletedAt: new Date() })
+        .where(eq(hiringProcessTable.id, params.id));
 
       return status(204);
     },
