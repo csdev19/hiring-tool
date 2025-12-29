@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@interviews-tool/web-ui";
 import { HiringProcessForm } from "@/components/hiring-process/hiring-process-form";
+import { HiringProcessEditSkeleton } from "@/components/hiring-process/hiring-process-edit-skeleton";
 import { useHiringProcess, useUpdateHiringProcess } from "@/hooks/use-hiring-processes";
 import {
   useCompanyDetails,
@@ -38,6 +39,7 @@ function EditHiringProcessPage() {
     companyDetails?: CreateCompanyDetailsInput,
   ) => {
     try {
+      console.log("formData", formData);
       await updateMutation.mutateAsync({ id, data: formData });
 
       // Handle company details
@@ -82,15 +84,7 @@ function EditHiringProcessPage() {
   }
 
   if (isLoading || isLoadingCompanyDetails) {
-    return (
-      <div className="container mx-auto max-w-2xl px-4 py-8">
-        <Card>
-          <CardContent className="py-8 text-center">
-            <p className="text-muted-foreground">Loading hiring process...</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <HiringProcessEditSkeleton />;
   }
 
   const hiringProcess = data;
@@ -128,6 +122,7 @@ function EditHiringProcessPage() {
               status: hiringProcess.status,
               salary: hiringProcess.salary || undefined,
               currency: hiringProcess.currency,
+              salaryRateType: hiringProcess.salaryRateType as "monthly" | "hourly" | undefined,
             }}
             initialCompanyDetails={
               companyDetailsData?.data

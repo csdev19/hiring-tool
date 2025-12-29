@@ -12,7 +12,7 @@ tags:
 
 # Features Status - V1
 
-**Last Updated:** December 22, 2025  
+**Last Updated:** January 27, 2025  
 **Concept Document:** [Concept V1](./concept.mdx)  
 **Implementation Summary:** [Implementation Summary](./implementation-summary.mdx)
 
@@ -38,6 +38,7 @@ This document tracks the implementation status of all features outlined in the V
 - ✅ `hiring_process` table with all required fields
 - ✅ Status enum (ongoing, rejected, dropped-out, hired)
 - ✅ Currency enum support
+- ✅ Salary rate type enum (monthly, hourly) - **Added January 27, 2025**
 - ✅ User relationship with cascade delete
 - ✅ Timestamps (createdAt, updatedAt)
 
@@ -300,41 +301,42 @@ interactions table:
 
 ## Feature Comparison Table
 
-| Feature                               | Concept Document | Implementation Status | Notes                           |
-| ------------------------------------- | ---------------- | --------------------- | ------------------------------- |
+| Feature                               | Concept Document | Implementation Status | Notes                             |
+| ------------------------------------- | ---------------- | --------------------- | --------------------------------- |
 | **Epic 1: Hiring Process Management** |
-| Create hiring process                 | ✅ Required      | ✅ Complete           | Full CRUD implemented           |
-| List hiring processes                 | ✅ Required      | ✅ Complete           | Table with sorting              |
-| Edit hiring process                   | ✅ Required      | ✅ Complete           | Form with validation            |
-| Delete hiring process                 | ✅ Required      | ✅ Complete           | With confirmation               |
-| Status management                     | ✅ Required      | ✅ Complete           | Enum with badges                |
-| Salary tracking                       | ✅ Required      | ✅ Complete           | With currency support           |
+| Create hiring process                 | ✅ Required      | ✅ Complete           | Full CRUD implemented             |
+| List hiring processes                 | ✅ Required      | ✅ Complete           | Table with sorting                |
+| Edit hiring process                   | ✅ Required      | ✅ Complete           | Form with validation              |
+| Delete hiring process                 | ✅ Required      | ✅ Complete           | With confirmation                 |
+| Status management                     | ✅ Required      | ✅ Complete           | Enum with badges                  |
+| Salary tracking                       | ✅ Required      | ✅ Complete           | With currency support             |
+| Salary rate type                      | ✅ Enhanced      | ✅ Complete           | Monthly/hourly - **Jan 27, 2025** |
 | **Epic 2: Interaction Tracking**      |
-| Interaction schema                    | ✅ Required      | ❌ Missing            | Need to create                  |
-| Create interactions                   | ✅ Required      | ❌ Missing            | No API or UI                    |
-| View interaction timeline             | ✅ Required      | ❌ Missing            | No component                    |
-| Markdown editor                       | ✅ Required      | ❌ Missing            | Need to implement               |
-| Chat-style interface                  | ✅ Required      | ❌ Missing            | No UI                           |
-| Interaction types                     | ✅ Required      | ❌ Missing            | Need enum                       |
+| Interaction schema                    | ✅ Required      | ❌ Missing            | Need to create                    |
+| Create interactions                   | ✅ Required      | ❌ Missing            | No API or UI                      |
+| View interaction timeline             | ✅ Required      | ❌ Missing            | No component                      |
+| Markdown editor                       | ✅ Required      | ❌ Missing            | Need to implement                 |
+| Chat-style interface                  | ✅ Required      | ❌ Missing            | No UI                             |
+| Interaction types                     | ✅ Required      | ❌ Missing            | Need enum                         |
 | **Epic 3: Company Information**       |
-| Company details schema                | ✅ Required      | ✅ Complete           | Backend ready                   |
-| Company details API                   | ✅ Required      | ✅ Complete           | Full CRUD                       |
-| Display company details               | ✅ Required      | ✅ Complete           | Read-only on detail page        |
-| Create company details                | ✅ Required      | ❌ Missing            | No form/UI                      |
-| Edit company details                  | ✅ Required      | ❌ Missing            | No form/UI                      |
+| Company details schema                | ✅ Required      | ✅ Complete           | Backend ready                     |
+| Company details API                   | ✅ Required      | ✅ Complete           | Full CRUD                         |
+| Display company details               | ✅ Required      | ✅ Complete           | Read-only on detail page          |
+| Create company details                | ✅ Required      | ❌ Missing            | No form/UI                        |
+| Edit company details                  | ✅ Required      | ❌ Missing            | No form/UI                        |
 | **Screen 1: Dashboard**               |
-| Table view                            | ✅ Required      | ✅ Complete           | Matches concept                 |
-| Create button                         | ✅ Required      | ✅ Complete           | CTA button                      |
-| Sorting                               | ✅ Required      | ✅ Complete           | By multiple columns             |
+| Table view                            | ✅ Required      | ✅ Complete           | Matches concept                   |
+| Create button                         | ✅ Required      | ✅ Complete           | CTA button                        |
+| Sorting                               | ✅ Required      | ✅ Complete           | By multiple columns               |
 | **Screen 2: Form**                    |
-| Company name field                    | ✅ Required      | ✅ Complete           | Text input                      |
-| Status dropdown                       | ✅ Required      | ✅ Complete           | Enum dropdown                   |
-| Salary slider                         | ✅ Required      | ✅ Complete           | With number input               |
+| Company name field                    | ✅ Required      | ✅ Complete           | Text input                        |
+| Status dropdown                       | ✅ Required      | ✅ Complete           | Enum dropdown                     |
+| Salary slider                         | ✅ Required      | ✅ Complete           | With number input                 |
 | **Screen 3: Detail View**             |
-| Company header                        | ✅ Required      | ⚠️ Partial            | Shows info but not exact format |
-| Interaction timeline                  | ✅ Required      | ❌ Missing            | Not implemented                 |
-| Markdown input                        | ✅ Required      | ❌ Missing            | Not implemented                 |
-| Create interaction                    | ✅ Required      | ❌ Missing            | Not implemented                 |
+| Company header                        | ✅ Required      | ⚠️ Partial            | Shows info but not exact format   |
+| Interaction timeline                  | ✅ Required      | ❌ Missing            | Not implemented                   |
+| Markdown input                        | ✅ Required      | ❌ Missing            | Not implemented                   |
+| Create interaction                    | ✅ Required      | ❌ Missing            | Not implemented                   |
 
 ---
 
@@ -398,9 +400,22 @@ interactions table:
 
 ---
 
+## Recent Enhancements
+
+### Salary Rate Type Feature (January 27, 2025)
+
+Added ability to specify whether salary is monthly or hourly rate:
+
+- ✅ Domain constants for rate types (monthly, hourly)
+- ✅ Database enum and schema field
+- ✅ Frontend form with dynamic label
+- ✅ Display components show rate type in salary formatting
+- 📄 [Full Documentation](./salary-rate-type-feature.mdx)
+
 ## Related Documents
 
 - [Concept Document](./concept.mdx) - Original feature requirements
 - [Implementation Summary](./implementation-summary.mdx) - Epic 1 implementation details
+- [Salary Rate Type Feature](./salary-rate-type-feature.mdx) - Salary rate type implementation
 - [User Stories](./stories.mdx) - User flows and scenarios
 - [Architecture](./architecture.mdx) - Technical architecture decisions

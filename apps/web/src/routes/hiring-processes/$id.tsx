@@ -20,7 +20,8 @@ import { InteractionForm } from "@/components/interaction/interaction-form";
 import { EditInteractionDialog } from "@/components/interaction/edit-interaction-dialog";
 import { DeleteInteractionDialog } from "@/components/interaction/delete-interaction-dialog";
 import type { Interaction } from "@/hooks/use-interactions";
-import type { Currency } from "@interviews-tool/domain/constants";
+import type { Currency, SalaryRateType } from "@interviews-tool/domain/constants";
+import { SALARY_RATE_TYPE_LABELS } from "@interviews-tool/domain/constants";
 import {
   Pencil,
   Trash2,
@@ -115,13 +116,19 @@ function HiringProcessDetailPage() {
     });
   };
 
-  const formatSalary = (salary: number | null, currency: Currency = "USD") => {
+  const formatSalary = (
+    salary: number | null,
+    currency: Currency = "USD",
+    salaryRateType?: SalaryRateType,
+  ) => {
     if (!salary) return "Not specified";
-    return new Intl.NumberFormat("en-US", {
+    const formatted = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency,
       minimumFractionDigits: 0,
     }).format(salary);
+    const rateTypeLabel = salaryRateType ? SALARY_RATE_TYPE_LABELS[salaryRateType] : undefined;
+    return rateTypeLabel ? `${formatted}/${rateTypeLabel.toLowerCase()}` : formatted;
   };
 
   const isValidUrl = (url: string | null | undefined): boolean => {
@@ -193,7 +200,11 @@ function HiringProcessDetailPage() {
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-1">Salary</h3>
               <p className="text-sm">
-                {formatSalary(hiringProcess.salary, hiringProcess.currency)}
+                {formatSalary(
+                  hiringProcess.salary,
+                  hiringProcess.currency,
+                  hiringProcess.salaryRateType as SalaryRateType | undefined,
+                )}
               </p>
             </div>
             <div>

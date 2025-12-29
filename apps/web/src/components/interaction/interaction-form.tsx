@@ -69,7 +69,7 @@ export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormP
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="title">Title (Optional)</Label>
           <Input
             id="title"
@@ -79,7 +79,7 @@ export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormP
             maxLength={100}
           />
         </div>
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="type">Type</Label>
           <Select value={type} onValueChange={(value) => setType(value as InteractionType)}>
             <SelectTrigger id="type">

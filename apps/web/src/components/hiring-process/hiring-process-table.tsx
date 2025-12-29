@@ -19,7 +19,8 @@ import {
 import { StatusBadge } from "./status-badge";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import type { HiringProcess } from "@/hooks/use-hiring-processes";
-import type { Currency } from "@interviews-tool/domain/constants";
+import type { Currency, SalaryRateType } from "@interviews-tool/domain/constants";
+import { SALARY_RATE_TYPE_LABELS } from "@interviews-tool/domain/constants";
 import { Pencil, Trash2, Eye } from "lucide-react";
 
 const columnHelper = createColumnHelper<HiringProcess>();
@@ -32,14 +33,19 @@ const formatDate = (date: Date) => {
   });
 };
 
-const formatSalary = (salary: number | null, currency: Currency = "USD") => {
+const formatSalary = (
+  salary: number | null,
+  currency: Currency = "USD",
+  salaryRateType?: SalaryRateType,
+) => {
   if (!salary) return "-";
   const formatted = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currency,
     minimumFractionDigits: 0,
   }).format(salary);
-  return `${formatted} ${currency}`;
+  const rateTypeLabel = salaryRateType ? SALARY_RATE_TYPE_LABELS[salaryRateType] : undefined;
+  return rateTypeLabel ? `${formatted}/${rateTypeLabel.toLowerCase()}` : `${formatted} ${currency}`;
 };
 
 interface InterviewTableProps {
@@ -65,7 +71,8 @@ export function InterviewTable({ interviews, onDelete, isDeleting = false }: Int
             <Link
               to="/hiring-processes/$id"
               params={{ id: interview.id }}
-              className="font-medium hover:underline"
+              className="font-medium hover:underline truncate block max-w-[200px]"
+              title={info.getValue()}
             >
               {info.getValue()}
             </Link>
@@ -78,7 +85,9 @@ export function InterviewTable({ interviews, onDelete, isDeleting = false }: Int
         cell: (info) => {
           const jobTitle = info.getValue();
           return jobTitle ? (
-            <span className="text-muted-foreground">{jobTitle}</span>
+            <span className="text-muted-foreground truncate block max-w-[300px]" title={jobTitle}>
+              {jobTitle}
+            </span>
           ) : (
             <span className="text-muted-foreground italic">-</span>
           );
@@ -94,7 +103,11 @@ export function InterviewTable({ interviews, onDelete, isDeleting = false }: Int
         header: "Salary",
         cell: (info) => {
           const interview = info.row.original;
-          return formatSalary(info.getValue(), interview.currency);
+          return formatSalary(
+            info.getValue(),
+            interview.currency,
+            interview.salaryRateType as SalaryRateType | undefined,
+          );
         },
         enableSorting: true,
         sortingFn: (rowA, rowB) => {

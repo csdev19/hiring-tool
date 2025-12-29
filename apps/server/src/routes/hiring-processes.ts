@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
 import { db } from "@interviews-tool/db/client";
 import { hiringProcessTable, type NewHiringProcess } from "@interviews-tool/db/schemas";
-import { CURRENCIES } from "@interviews-tool/domain/constants";
+import { CURRENCIES, SALARY_RATE_TYPES } from "@interviews-tool/domain/constants";
 import {
   createHiringProcessSchema,
   updateHiringProcessSchema,
@@ -113,6 +113,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
         status: body.status,
         salary: body.salary,
         currency: body.currency || CURRENCIES.USD,
+        salaryRateType: body.salaryRateType || SALARY_RATE_TYPES.MONTHLY,
         userId: user.id,
       };
 
@@ -160,6 +161,7 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
           status: body.status,
           salary: body.salary,
           currency: body.currency || existing.currency || CURRENCIES.USD,
+          salaryRateType: body.salaryRateType ?? existing.salaryRateType,
           updatedAt: new Date(),
         })
         .where(eq(hiringProcessTable.id, params.id))
