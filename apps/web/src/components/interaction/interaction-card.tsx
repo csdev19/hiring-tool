@@ -1,7 +1,7 @@
-import { Card, CardContent, Button, MarkdownContent } from "@interviews-tool/web-ui";
-import { InteractionTypeBadge } from "./interaction-type-badge";
 import type { Interaction } from "@/hooks/use-interactions";
+import { Button, Card, CardContent, MarkdownContent } from "@interviews-tool/web-ui";
 import { Pencil, Trash2 } from "lucide-react";
+import { InteractionTypeBadge } from "./interaction-type-badge";
 
 interface InteractionCardProps {
   interaction: Interaction;
