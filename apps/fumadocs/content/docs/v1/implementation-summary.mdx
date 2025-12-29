@@ -241,6 +241,71 @@ npm run db:generate
 npm run db:push
 ```
 
+---
+
+## ✅ Salary Rate Type Feature (December 29, 2025)
+
+### Overview
+
+Added salary rate type (monthly/hourly) functionality to hiring processes, allowing users to specify whether a salary is a monthly rate or hourly rate.
+
+### Implementation Summary
+
+**Status:** ✅ Complete
+
+**Changes Made:**
+
+1. **Domain Constants** ✅
+   - Created `packages/domain/src/constants/salary-rate-type.ts`
+   - Added `SALARY_RATE_TYPES`, `SALARY_RATE_TYPE_VALUES`, `SALARY_RATE_TYPE_LABELS`
+   - Follows same pattern as currency constants
+
+2. **Database Enum** ✅
+   - Created `packages/db/src/enums/salary-rate-type.ts`
+   - Added `salaryRateTypeEnum` using `pgEnum`
+
+3. **Database Schema** ✅
+   - Added `salaryRateType` field to `hiringProcessTable`
+   - Default value: `"monthly"` for backward compatibility
+   - Required field (not nullable)
+
+4. **Domain Schemas** ✅
+   - Updated `hiringProcessBaseSchema` to include `salaryRateType`
+   - Updated `createHiringProcessSchema` to make it optional
+   - Uses `z.enum(SALARY_RATE_TYPES)` for validation
+
+5. **Frontend Form** ✅
+   - Added rate type select field to `hiring-process-form.tsx`
+   - Dynamic label: "Monthly Salary" vs "Hourly Rate"
+   - Positioned between salary input and currency select
+
+6. **Display Components** ✅
+   - Updated table view to show rate type (e.g., "$5,000/monthly")
+   - Updated detail view to show rate type
+   - Updated edit view to pre-populate rate type
+
+**Files Modified:**
+
+- `packages/domain/src/constants/salary-rate-type.ts` (new)
+- `packages/domain/src/constants/index.ts`
+- `packages/db/src/enums/salary-rate-type.ts` (new)
+- `packages/db/src/enums/index.ts`
+- `packages/db/src/schema/hiring-process.ts`
+- `packages/domain/src/schemas/hiring-process.ts`
+- `apps/web/src/components/hiring-process/hiring-process-form.tsx`
+- `apps/web/src/components/hiring-process/hiring-process-table.tsx`
+- `apps/web/src/routes/hiring-processes/$id.tsx`
+- `apps/web/src/routes/hiring-processes/$id_.edit.tsx`
+
+**Documentation:**
+
+- Created `v1/salary-rate-type-feature.mdx` with full implementation details
+
+**Migration Status:**
+
+- Ready for generation: `bun run db:generate`
+- Will add `salary_rate_type` enum and column to `hiring_process` table
+
 ### Dependencies Removed
 
 - `@orpc/server`

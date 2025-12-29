@@ -9,8 +9,11 @@ import {
   DEFAULT_HIRING_PROCESS_STATUS,
   CURRENCIES,
   CURRENCY_INFO,
+  SALARY_RATE_TYPES,
+  SALARY_RATE_TYPE_LABELS,
   type HiringProcessStatus,
   type Currency,
+  type SalaryRateType,
 } from "@interviews-tool/domain/constants";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -70,6 +73,17 @@ const currencyOptions: { value: Currency; label: string; symbol: string }[] = [
   },
 ];
 
+const salaryRateTypeOptions: { value: SalaryRateType; label: string }[] = [
+  {
+    value: SALARY_RATE_TYPES.MONTHLY,
+    label: SALARY_RATE_TYPE_LABELS[SALARY_RATE_TYPES.MONTHLY],
+  },
+  {
+    value: SALARY_RATE_TYPES.HOURLY,
+    label: SALARY_RATE_TYPE_LABELS[SALARY_RATE_TYPES.HOURLY],
+  },
+];
+
 export function HiringProcessForm({
   initialValues,
   initialCompanyDetails,
@@ -88,6 +102,7 @@ export function HiringProcessForm({
       status: initialValues?.status || DEFAULT_HIRING_PROCESS_STATUS,
       salary: initialValues?.salary,
       currency: initialValues?.currency || CURRENCIES.USD,
+      salaryRateType: initialValues?.salaryRateType || SALARY_RATE_TYPES.MONTHLY,
     }),
     [
       initialValues?.companyName,
@@ -95,6 +110,7 @@ export function HiringProcessForm({
       initialValues?.status,
       initialValues?.salary,
       initialValues?.currency,
+      initialValues?.salaryRateType,
     ],
   );
 
@@ -149,6 +165,9 @@ export function HiringProcessForm({
       form.setFieldValue("jobTitle", initialValues.jobTitle || "");
       form.setFieldValue("status", initialValues.status || DEFAULT_HIRING_PROCESS_STATUS);
       form.setFieldValue("currency", initialValues.currency || CURRENCIES.USD);
+      if (initialValues.salaryRateType !== undefined) {
+        form.setFieldValue("salaryRateType", initialValues.salaryRateType);
+      }
       if (initialValues.salary !== undefined) {
         form.setFieldValue("salary", initialValues.salary);
       }
@@ -160,6 +179,7 @@ export function HiringProcessForm({
     initialValues?.status,
     initialValues?.salary,
     initialValues?.currency,
+    initialValues?.salaryRateType,
   ]);
 
   // Update company details form values when initialCompanyDetails change
@@ -267,59 +287,72 @@ export function HiringProcessForm({
         )}
       </form.Field>
 
-      <form.Field name="currency">
-        {(currencyField) => (
-          <form.Field name="salary">
-            {(salaryField) => (
-              <div className="space-y-1.5">
-                <Label htmlFor="salary">Monthly Salary (Optional)</Label>
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <Input
-                        id="salary"
-                        type="number"
-                        min="0"
-                        max="25000"
-                        step="100"
-                        value={salaryField.state.value || ""}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          salaryField.handleChange(value ? Number(value) : undefined);
-                        }}
-                        placeholder="Enter salary (optional)"
-                        disabled={isSubmitting}
-                      />
+      <form.Field name="salaryRateType">
+        {(rateTypeField) => {
+          const salaryLabel =
+            rateTypeField.state.value === SALARY_RATE_TYPES.MONTHLY
+              ? "Monthly Salary (Optional)"
+              : "Hourly Rate (Optional)";
+          return (
+            <form.Field name="currency">
+              {(currencyField) => (
+                <form.Field name="salary">
+                  {(salaryField) => (
+                    <div className="space-y-2">
+                      <Label htmlFor="salary">{salaryLabel}</Label>
+                      <div className="flex gap-2">
+                        <div className="flex-1">
+                          <Input
+                            id="salary"
+                            type="number"
+                            min="0"
+                            max="25000"
+                            value={salaryField.state.value || ""}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              salaryField.handleChange(value ? Number(value) : undefined);
+                            }}
+                            placeholder="Enter salary (optional)"
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                        <select
+                          id="salaryRateType"
+                          value={rateTypeField.state.value}
+                          onChange={(e) =>
+                            rateTypeField.handleChange(e.target.value as SalaryRateType)
+                          }
+                          onBlur={rateTypeField.handleBlur}
+                          className="flex h-8 w-28 rounded-md border border-input bg-background px-2.5 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                          disabled={isSubmitting}
+                        >
+                          {salaryRateTypeOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          id="currency"
+                          value={currencyField.state.value}
+                          onChange={(e) => currencyField.handleChange(e.target.value as Currency)}
+                          className="flex h-8 w-24 rounded-md border border-input bg-background px-2.5 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                          disabled={isSubmitting}
+                        >
+                          {currencyOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.value}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
-                    <select
-                      id="currency"
-                      value={currencyField.state.value}
-                      onChange={(e) => currencyField.handleChange(e.target.value as Currency)}
-                      className="flex h-8 w-24 rounded-md border border-input bg-background px-2.5 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                      disabled={isSubmitting}
-                    >
-                      {currencyOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.value}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="25000"
-                    step="100"
-                    value={salaryField.state.value || 0}
-                    onChange={(e) => salaryField.handleChange(Number(e.target.value))}
-                    className="w-full"
-                    disabled={isSubmitting}
-                  />
-                </div>
-              </div>
-            )}
-          </form.Field>
-        )}
+                  )}
+                </form.Field>
+              )}
+            </form.Field>
+          );
+        }}
       </form.Field>
 
       {/* Company Details Section */}

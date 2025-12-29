@@ -1,0 +1,353 @@
+---
+title: Salary Rate Type Feature - V1
+description: Implementation of salary rate type (monthly/hourly) for hiring processes
+date: 2025-12-29
+version: v1
+status: complete
+tags:
+  - feature
+  - database
+  - frontend
+  - constants
+  - v1
+---
+
+# Salary Rate Type Feature - V1
+
+**Implementation Date:** December 29, 2025  
+**Status:** ✅ Complete  
+**Version:** v1
+
+## Overview
+
+This feature adds the ability to specify whether a salary is a monthly rate or hourly rate for hiring processes. This enhancement provides more accurate salary tracking and better displays salary information throughout the application.
+
+## Requirements
+
+- Add a field to indicate if payment is monthly rate or hourly rate
+- Create domain constants following the existing pattern
+- Update database schema with new enum field
+- Update frontend forms to include rate type selection
+- Update display components to show rate type in salary formatting
+
+## Implementation Details
+
+### 1. Domain Constants
+
+**File:** `packages/domain/src/constants/salary-rate-type.ts`
+
+Created new constants following the same pattern as `currency.ts`:
+
+```typescript
+export const SALARY_RATE_TYPES = {
+  MONTHLY: "monthly",
+  HOURLY: "hourly",
+} as const;
+
+export type SalaryRateType = ObjectProperties<typeof SALARY_RATE_TYPES>;
+
+export const SALARY_RATE_TYPE_VALUES = [
+  SALARY_RATE_TYPES.MONTHLY,
+  SALARY_RATE_TYPES.HOURLY,
+] as const;
+
+export const SALARY_RATE_TYPE_LABELS: Record<SalaryRateType, string> = {
+  [SALARY_RATE_TYPES.MONTHLY]: "Monthly",
+  [SALARY_RATE_TYPES.HOURLY]: "Hourly",
+};
+```
+
+**Pattern Followed:**
+
+- Constant object with `as const` for type safety
+- Type extraction using `ObjectProperties`
+- Values array for database enum usage
+- Labels object for display purposes
+- Validation function for runtime checks
+
+### 2. Database Enum
+
+**File:** `packages/db/src/enums/salary-rate-type.ts`
+
+Created database enum using Drizzle's `pgEnum`:
+
+```typescript
+import { pgEnum } from "drizzle-orm/pg-core";
+import { SALARY_RATE_TYPE_VALUES } from "@interviews-tool/domain/constants";
+
+export const salaryRateTypeEnum = pgEnum("salary_rate_type", SALARY_RATE_TYPE_VALUES);
+```
+
+**Pattern Followed:**
+
+- Uses domain constants as single source of truth
+- Follows same pattern as `currencyEnum`
+
+### 3. Database Schema Update
+
+**File:** `packages/db/src/schema/hiring-process.ts`
+
+Added `salaryRateType` field to `hiringProcessTable`:
+
+```typescript
+salaryRateType: salaryRateTypeEnum("salary_rate_type").default("monthly").notNull(),
+```
+
+**Details:**
+
+- Field name: `salary_rate_type` (snake_case in database)
+- Default value: `"monthly"` for backward compatibility
+- Required field (not nullable)
+- Positioned after `currency` field
+
+### 4. Domain Schema Update
+
+**File:** `packages/domain/src/schemas/hiring-process.ts`
+
+Updated Zod schemas to include `salaryRateType`:
+
+**Base Schema:**
+
+```typescript
+salaryRateType: z.enum(SALARY_RATE_TYPES),
+```
+
+**Create Schema:**
+
+```typescript
+salaryRateType: z.enum(SALARY_RATE_TYPES).optional(),
+```
+
+**Pattern:**
+
+- Uses `z.enum(SALARY_RATE_TYPES)` directly (not the values array)
+- Optional in create schema for flexibility
+- Required in base schema (matches database)
+
+### 5. Frontend Form Updates
+
+**File:** `apps/web/src/components/hiring-process/hiring-process-form.tsx`
+
+**Changes Made:**
+
+1. **Imports Added:**
+   - `SALARY_RATE_TYPES`
+   - `SALARY_RATE_TYPE_LABELS`
+   - `SalaryRateType` type
+
+2. **Options Array Created:**
+
+   ```typescript
+   const salaryRateTypeOptions: { value: SalaryRateType; label: string }[] = [
+     {
+       value: SALARY_RATE_TYPES.MONTHLY,
+       label: SALARY_RATE_TYPE_LABELS[SALARY_RATE_TYPES.MONTHLY],
+     },
+     {
+       value: SALARY_RATE_TYPES.HOURLY,
+       label: SALARY_RATE_TYPE_LABELS[SALARY_RATE_TYPES.HOURLY],
+     },
+   ];
+   ```
+
+3. **Default Values:**
+   - Added `salaryRateType` to form default values with default `SALARY_RATE_TYPES.MONTHLY`
+
+4. **Form Field:**
+   - Added nested form field for `salaryRateType`
+   - Positioned between salary input and currency select
+   - Dynamic label that changes based on selection:
+     - "Monthly Salary (Optional)" when monthly is selected
+     - "Hourly Rate (Optional)" when hourly is selected
+
+5. **Form State Management:**
+   - Updated `useEffect` to handle `salaryRateType` in edit mode
+   - Added to dependency arrays
+
+**UI Layout:**
+
+```
+[Salary Input] [Rate Type Select] [Currency Select]
+[Salary Slider]
+```
+
+### 6. Display Component Updates
+
+#### Table View
+
+**File:** `apps/web/src/components/hiring-process/hiring-process-table.tsx`
+
+**Changes:**
+
+- Updated `formatSalary` function to accept `salaryRateType` parameter
+- Format: `${formatted}/${rateTypeLabel.toLowerCase()}` (e.g., "$5,000/monthly" or "$50/hourly")
+- Updated salary column cell to pass `salaryRateType` to formatter
+
+#### Detail View
+
+**File:** `apps/web/src/routes/hiring-processes/$id.tsx`
+
+**Changes:**
+
+- Updated `formatSalary` function to accept `salaryRateType` parameter
+- Same formatting as table view
+- Updated salary display to include rate type
+
+#### Edit View
+
+**File:** `apps/web/src/routes/hiring-processes/$id_.edit.tsx`
+
+**Changes:**
+
+- Added `salaryRateType` to `initialValues` when editing
+- Ensures form is pre-populated with existing rate type
+
+## Database Migration
+
+**Status:** Ready for generation
+
+The database schema has been updated. To apply changes:
+
+```bash
+bun run db:generate
+bun run db:migrate
+```
+
+**Migration Will Include:**
+
+- New enum type: `salary_rate_type` with values `['monthly', 'hourly']`
+- New column: `salary_rate_type` on `hiring_process` table
+- Default value: `'monthly'` for existing and new records
+- Not null constraint
+
+## API Changes
+
+**No API endpoint changes required.** The existing hiring process endpoints automatically support the new field:
+
+- `POST /api/hiring-processes` - Accepts `salaryRateType` in request body (optional)
+- `PUT /api/hiring-processes/:id` - Accepts `salaryRateType` in request body (optional)
+- `GET /api/hiring-processes` - Returns `salaryRateType` in response
+- `GET /api/hiring-processes/:id` - Returns `salaryRateType` in response
+
+The field is handled automatically through the domain schemas and database schema.
+
+## Frontend Changes Summary
+
+### Components Modified
+
+1. **hiring-process-form.tsx**
+   - Added rate type select field
+   - Dynamic label based on selection
+   - Integrated with existing salary/currency fields
+
+2. **hiring-process-table.tsx**
+   - Updated salary formatting to include rate type
+   - Enhanced display with rate type suffix
+
+3. **$id.tsx (Detail View)**
+   - Updated salary formatting to include rate type
+   - Consistent display with table view
+
+4. **$id\_.edit.tsx (Edit View)**
+   - Added rate type to initial form values
+   - Ensures proper form pre-population
+
+### User Experience
+
+**Before:**
+
+- Salary displayed as: "$5,000 USD"
+- No indication of rate type (monthly vs hourly)
+
+**After:**
+
+- Salary displayed as: "$5,000/monthly" or "$50/hourly"
+- Clear indication of rate type
+- Form label changes dynamically: "Monthly Salary" vs "Hourly Rate"
+- Rate type selector in form between salary input and currency
+
+## Type Safety
+
+All changes maintain full type safety:
+
+- ✅ Domain constants provide type-safe values
+- ✅ Database enum ensures valid database values
+- ✅ Zod schemas validate at runtime
+- ✅ TypeScript types exported and used throughout
+- ✅ No `any` types introduced
+
+## Backward Compatibility
+
+**Handled Gracefully:**
+
+- Default value `"monthly"` ensures existing records have a valid value
+- Optional in create schema allows gradual adoption
+- Display functions handle undefined rate type (falls back to currency-only format)
+- No breaking changes to existing API contracts
+
+## Testing Checklist
+
+### Database
+
+- [ ] Migration generates correctly
+- [ ] Migration applies without errors
+- [ ] Existing records get default value `"monthly"`
+- [ ] New records can be created with both rate types
+- [ ] Enum constraint prevents invalid values
+
+### Frontend Forms
+
+- [ ] Create form shows rate type selector
+- [ ] Default selection is "Monthly"
+- [ ] Label changes when rate type changes
+- [ ] Edit form pre-populates with existing rate type
+- [ ] Form submission includes rate type in payload
+
+### Display
+
+- [ ] Table shows rate type in salary column
+- [ ] Detail view shows rate type in salary display
+- [ ] Formatting is correct for both monthly and hourly
+- [ ] Handles missing rate type gracefully (backward compatibility)
+
+### API
+
+- [ ] Create endpoint accepts rate type
+- [ ] Update endpoint accepts rate type
+- [ ] Get endpoints return rate type
+- [ ] Validation works correctly
+
+## Files Modified
+
+### Domain Package
+
+- `packages/domain/src/constants/salary-rate-type.ts` (new)
+- `packages/domain/src/constants/index.ts`
+- `packages/domain/src/schemas/hiring-process.ts`
+
+### Database Package
+
+- `packages/db/src/enums/salary-rate-type.ts` (new)
+- `packages/db/src/enums/index.ts`
+- `packages/db/src/schema/hiring-process.ts`
+
+### Frontend
+
+- `apps/web/src/components/hiring-process/hiring-process-form.tsx`
+- `apps/web/src/components/hiring-process/hiring-process-table.tsx`
+- `apps/web/src/routes/hiring-processes/$id.tsx`
+- `apps/web/src/routes/hiring-processes/$id_.edit.tsx`
+
+## Related Documentation
+
+- [Constants Pattern](../../constants-pattern.mdx) - Pattern used for domain constants
+- [Schemas Implementation](../../schemas-implementation.mdx) - Domain schema patterns
+- [Features Status](./features-status.mdx) - Overall feature tracking
+
+## Notes
+
+- The implementation follows all existing patterns in the codebase
+- No breaking changes introduced
+- Backward compatibility maintained through default values
+- Type safety maintained throughout
+- Ready for migration generation and deployment

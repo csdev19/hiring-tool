@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { HIRING_PROCESS_STATUSES, CURRENCIES } from "../constants";
+import { HIRING_PROCESS_STATUSES, CURRENCIES, SALARY_RATE_TYPES } from "../constants";
 
 /**
  * Base schema for HiringProcess
@@ -13,6 +13,7 @@ export const hiringProcessBaseSchema = z.object({
   status: z.enum(HIRING_PROCESS_STATUSES),
   salary: z.number().min(0, "Salary must be positive").nullable(),
   currency: z.enum([CURRENCIES.USD, CURRENCIES.PEN]),
+  salaryRateType: z.enum(SALARY_RATE_TYPES),
   userId: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
@@ -33,6 +34,7 @@ export const createHiringProcessSchema = hiringProcessBaseSchema
     // Make salary and currency optional on creation
     salary: z.number().min(0, "Salary must be positive").optional(),
     currency: z.enum([CURRENCIES.USD, CURRENCIES.PEN]).optional(),
+    salaryRateType: z.enum(SALARY_RATE_TYPES).optional(),
     jobTitle: z.string().optional(), // Optional job title
   });
 
