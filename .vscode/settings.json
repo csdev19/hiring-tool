@@ -1,0 +1,44 @@
+{
+  "editor.formatOnSave": true,
+  "oxc.enable": true,
+  "oxc.fmt.enable": true,
+  "oxc.lint.enable": true,
+  "oxc.path.oxfmt": "/Users/cristiansotomayor/.bun/bin/oxfmt",
+  "oxc.path.oxlint": "/Users/cristiansotomayor/.bun/bin/oxlint",
+  "terminal.integrated.env.osx": {
+    "PATH": "${env:PATH}:/Users/cristiansotomayor/.bun/bin"
+  },
+  "oxc.lint.run": "onSave",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "explicit",
+    "source.organizeImports": "never"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  }
+}

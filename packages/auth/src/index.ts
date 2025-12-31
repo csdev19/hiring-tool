@@ -3,20 +3,40 @@ import { userTable, accountTable, sessionTable } from "@interviews-tool/db/schem
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
-export const auth = betterAuth({
-  database: drizzleAdapter(db, {
-    provider: "pg",
-    schema: { user: userTable, account: accountTable, session: sessionTable },
-  }),
-  trustedOrigins: [process.env.CORS_ORIGIN || ""],
-  emailAndPassword: {
-    enabled: true,
-  },
-  advanced: {
-    defaultCookieAttributes: {
-      sameSite: "none",
-      secure: true,
-      httpOnly: true,
+// export const auth = betterAuth({
+//   database: drizzleAdapter(db, {
+//     provider: "pg",
+//     schema: { user: userTable, account: accountTable, session: sessionTable },
+//   }),
+//   trustedOrigins: [process.env.CORS_ORIGIN || ""],
+//   emailAndPassword: {
+//     enabled: true,
+//   },
+//   advanced: {
+//     defaultCookieAttributes: {
+//       sameSite: "none",
+//       secure: true,
+//       httpOnly: true,
+//     },
+//   },
+// });
+
+export const createAuth = (origin: string) => {
+  return betterAuth({
+    database: drizzleAdapter(db, {
+      provider: "pg",
+      schema: { user: userTable, account: accountTable, session: sessionTable },
+    }),
+    trustedOrigins: [origin ?? ""],
+    emailAndPassword: {
+      enabled: true,
     },
-  },
-});
+    advanced: {
+      defaultCookieAttributes: {
+        sameSite: "none",
+        secure: true,
+        httpOnly: true,
+      },
+    },
+  });
+};

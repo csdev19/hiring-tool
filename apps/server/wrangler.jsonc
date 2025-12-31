@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hiring-tool-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-10-31",
+  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
+  "vars": {
+    "CORS_ORIGIN": "http://localhost:3001",
+  },
+  "build": {
+    "command": "bun build --compile --minify-whitespace --minify-syntax --target bun ./src/index.ts --outfile server",
+  },
+}

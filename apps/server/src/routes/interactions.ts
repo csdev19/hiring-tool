@@ -6,19 +6,11 @@ import {
   type NewInteraction,
 } from "@interviews-tool/db/schemas";
 import { eq, and, desc, isNull } from "drizzle-orm";
-import { auth } from "@interviews-tool/auth";
 import { createInteractionSchema, updateInteractionSchema } from "@interviews-tool/domain/schemas";
 import { UnauthorizedError, NotFoundError } from "../utils/errors";
 import { successBody, createdBody } from "../utils/response-helpers";
 import { errorHandlerPlugin } from "../utils/error-handler-plugin";
-
-async function getUserFromRequest(request: Request): Promise<{ id: string } | null> {
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session?.user) {
-    return null;
-  }
-  return { id: session.user.id };
-}
+import { getUserFromRequest } from "../utils/auth-helpers";
 
 export const interactionRoutes = new Elysia({
   prefix: "/api/hiring-processes/:id/interactions",
