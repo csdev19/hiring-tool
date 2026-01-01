@@ -1,0 +1,3 @@
+SECRET_VARIABLE=holaaaa-secreto
+DATABASE_URL=
+CORS_ORIGIN=

@@ -49,3 +49,9 @@ coverage
 .cache
 tmp
 temp
+
+
+.env
+server
+.dev.vars
+.wrangler
