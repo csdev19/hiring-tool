@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { clientTreaty } from "@/lib/client-treaty";
 import { getErrorMessage } from "@/lib/error";
-import type { Currency, HiringProcessStatus } from "@interviews-tool/domain/constants";
 import type {
   HiringProcessBase,
   CreateHiringProcess,
@@ -30,7 +29,9 @@ export function useHiringProcesses() {
   return useQuery({
     queryKey: hiringProcessKeys.list(),
     queryFn: async () => {
-      const result = await clientTreaty.api["hiring-processes"].get();
+      // const result = await clientTreaty.api.v1["hiring-processes"].get();
+      const result = await clientTreaty.api.v1["hiring-processes"].get();
+
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
@@ -44,7 +45,7 @@ export function useHiringProcess(id: string) {
   return useQuery({
     queryKey: hiringProcessKeys.detail(id),
     queryFn: async () => {
-      const result = await clientTreaty.api["hiring-processes"]({ id }).get();
+      const result = await clientTreaty.api.v1["hiring-processes"]({ id }).get();
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
@@ -67,7 +68,7 @@ export function useCreateHiringProcess() {
 
   return useMutation<HiringProcess, Error, CreateHiringProcessInput>({
     mutationFn: async (data: CreateHiringProcessInput): Promise<HiringProcess> => {
-      const result = await clientTreaty.api["hiring-processes"].post(data);
+      const result = await clientTreaty.api.v1["hiring-processes"].post(data);
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
@@ -87,7 +88,7 @@ export function useUpdateHiringProcess() {
 
   return useMutation<HiringProcess, Error, { id: string; data: UpdateHiringProcessInput }>({
     mutationFn: async ({ id, data }): Promise<HiringProcess> => {
-      const result = await clientTreaty.api["hiring-processes"]({ id }).put(data);
+      const result = await clientTreaty.api.v1["hiring-processes"]({ id }).put(data);
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
@@ -108,7 +109,7 @@ export function useDeleteHiringProcess() {
 
   return useMutation<void, Error, string>({
     mutationFn: async (id: string) => {
-      const result = await clientTreaty.api["hiring-processes"]({ id }).delete();
+      const result = await clientTreaty.api.v1["hiring-processes"]({ id }).delete();
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }

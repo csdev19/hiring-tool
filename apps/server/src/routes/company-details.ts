@@ -6,37 +6,24 @@ import {
   hiringProcessTable,
 } from "@interviews-tool/db/schemas";
 import { eq, and, isNull } from "drizzle-orm";
-import { auth } from "@interviews-tool/auth";
 import {
   createCompanyDetailsSchema,
   updateCompanyDetailsSchema,
 } from "@interviews-tool/domain/schemas";
-import { UnauthorizedError, NotFoundError, ConflictError } from "../utils/errors";
+import { NotFoundError, ConflictError } from "../utils/errors";
 import { successBody, createdBody } from "../utils/response-helpers";
 import { errorHandlerPlugin } from "../utils/error-handler-plugin";
-
-// Helper to get user from session
-async function getUserFromRequest(request: Request): Promise<{ id: string } | null> {
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session?.user) {
-    return null;
-  }
-  return { id: session.user.id };
-}
+import { authMacro } from "@/plugins/auth.plugin";
 
 export const companyDetailsRoutes = new Elysia({
-  prefix: "/api/hiring-processes/:id/company-details",
+  prefix: "/hiring-processes/:id/company-details",
 })
   .use(errorHandlerPlugin)
+  .use(authMacro)
   // Get company details for interview
   .get(
     "/",
-    async ({ request, params }) => {
-      const user = await getUserFromRequest(request);
-      if (!user) {
-        throw new UnauthorizedError();
-      }
-
+    async ({ params, user }) => {
       // Verify hiring process exists and belongs to user
       const [hiringProcessRecord] = await db
         .select()
@@ -75,17 +62,13 @@ export const companyDetailsRoutes = new Elysia({
       params: t.Object({
         id: t.String(),
       }),
+      isAuth: true,
     },
   )
   // Create company details
   .post(
     "/",
-    async ({ request, params, body, status }) => {
-      const user = await getUserFromRequest(request);
-      if (!user) {
-        throw new UnauthorizedError();
-      }
-
+    async ({ params, body, status, user }) => {
       // Verify hiring process exists and belongs to user
       const [hiringProcessRecord] = await db
         .select()
@@ -143,17 +126,13 @@ export const companyDetailsRoutes = new Elysia({
         id: t.String(),
       }),
       body: createCompanyDetailsSchema,
+      isAuth: true,
     },
   )
   // Update company details
   .put(
     "/",
-    async ({ request, params, body }) => {
-      const user = await getUserFromRequest(request);
-      if (!user) {
-        throw new UnauthorizedError();
-      }
-
+    async ({ params, body, user }) => {
       // Verify hiring process exists and belongs to user
       const [hiringProcessRecord] = await db
         .select()
@@ -206,17 +185,13 @@ export const companyDetailsRoutes = new Elysia({
         id: t.String(),
       }),
       body: updateCompanyDetailsSchema,
+      isAuth: true,
     },
   )
   // Delete company details
   .delete(
     "/",
-    async ({ request, params, set }) => {
-      const user = await getUserFromRequest(request);
-      if (!user) {
-        throw new UnauthorizedError();
-      }
-
+    async ({ params, status, user }) => {
       // Verify hiring process exists and belongs to user
       const [hiringProcessRecord] = await db
         .select()
@@ -254,11 +229,12 @@ export const companyDetailsRoutes = new Elysia({
         .set({ deletedAt: new Date() })
         .where(eq(companyDetailsTable.hiringProcessId, params.id));
 
-      set.status = 204;
+      return status(204);
     },
     {
       params: t.Object({
         id: t.String(),
       }),
+      isAuth: true,
     },
   );

@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { clientTreaty } from "@/lib/client-treaty";
 import { getErrorMessage } from "@/lib/error";
-import type { Currency, HiringProcessStatus } from "@interviews-tool/domain/constants";
 import type {
   HiringProcessBase,
   CreateHiringProcess,
@@ -31,7 +30,7 @@ export function useInterviews() {
   return useQuery({
     queryKey: interviewKeys.list(),
     queryFn: async () => {
-      const result = await clientTreaty.api["hiring-processes"].get();
+      const result = await clientTreaty.api.v1["hiring-processes"].get();
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
@@ -45,7 +44,7 @@ export function useInterview(id: string) {
   return useQuery({
     queryKey: interviewKeys.detail(id),
     queryFn: async () => {
-      const result = await clientTreaty.api["hiring-processes"]({ id }).get();
+      const result = await clientTreaty.api.v1["hiring-processes"]({ id }).get();
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
@@ -61,7 +60,7 @@ export function useCreateInterview() {
 
   return useMutation<Interview, Error, CreateInterviewInput>({
     mutationFn: async (data: CreateInterviewInput): Promise<Interview> => {
-      const result = await clientTreaty.api["hiring-processes"].post(data);
+      const result = await clientTreaty.api.v1["hiring-processes"].post(data);
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
@@ -81,7 +80,7 @@ export function useUpdateInterview() {
 
   return useMutation<Interview, Error, { id: string; data: UpdateInterviewInput }>({
     mutationFn: async ({ id, data }): Promise<Interview> => {
-      const result = await clientTreaty.api["hiring-processes"]({ id }).put(data);
+      const result = await clientTreaty.api.v1["hiring-processes"]({ id }).put(data);
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
@@ -103,7 +102,7 @@ export function useDeleteInterview() {
 
   return useMutation<void, Error, string>({
     mutationFn: async (id: string) => {
-      const result = await clientTreaty.api["hiring-processes"]({ id }).delete();
+      const result = await clientTreaty.api.v1["hiring-processes"]({ id }).delete();
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }

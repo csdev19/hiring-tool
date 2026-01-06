@@ -10,6 +10,9 @@ export default defineConfig({
   server: {
     port: 3001,
   },
+  optimizeDeps: {
+    force: true,
+  },
   css: {
     devSourcemap: true,
   },

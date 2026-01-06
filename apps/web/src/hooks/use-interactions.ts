@@ -22,7 +22,7 @@ export function useInteractions(hiringProcessId: string) {
   return useQuery<{ data: Interaction[] }>({
     queryKey: interactionKeys.list(hiringProcessId),
     queryFn: async () => {
-      const result = await clientTreaty.api["hiring-processes"]({
+      const result = await clientTreaty.api.v1["hiring-processes"]({
         id: hiringProcessId,
       }).interactions.get();
       if (result.error) throw new Error(getErrorMessage(result.error));
@@ -46,7 +46,7 @@ export function useCreateInteraction() {
       hiringProcessId: string;
       data: CreateInteractionInput;
     }) => {
-      const result = await clientTreaty.api["hiring-processes"]({
+      const result = await clientTreaty.api.v1["hiring-processes"]({
         id: hiringProcessId,
       }).interactions.post(data);
       if (result.error) throw new Error(getErrorMessage(result.error));
@@ -73,7 +73,7 @@ export function useUpdateInteraction() {
       interactionId: string;
       data: UpdateInteractionInput;
     }) => {
-      const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })
+      const result = await clientTreaty.api.v1["hiring-processes"]({ id: hiringProcessId })
         .interactions({ interactionId })
         .put(data);
       if (result.error) throw new Error(getErrorMessage(result.error));
@@ -98,7 +98,7 @@ export function useDeleteInteraction() {
       hiringProcessId: string;
       interactionId: string;
     }) => {
-      const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })
+      const result = await clientTreaty.api.v1["hiring-processes"]({ id: hiringProcessId })
         .interactions({ interactionId })
         .delete();
       if (result.error) throw new Error(getErrorMessage(result.error));
