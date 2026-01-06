@@ -30,20 +30,19 @@ jobs:
       - name: Build packages only
         run: bun run build --filter='@interviews-tool/*'
 
-      - name: Deploy Frontend to Alchemy
-        working-directory: apps/web
-        env:
-          ENVIRONMENT: production
-          VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
-          ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
-          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-          BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
-        run: bun run deploy
-
+      # - name: Deploy Frontend to Alchemy
+      #   working-directory: apps/web
+      #   env:
+      #     ENVIRONMENT: production
+      #     VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
+      #     ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
+      #     CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      #     CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      #     CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
+      #     BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      #     BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
+      #   run: bun run deploy
       - name: Deploy Server to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3.14.1
         with:

@@ -1,10 +1,21 @@
 import alchemy from "alchemy";
 import { TanStackStart } from "alchemy/cloudflare";
+import { CloudflareStateStore } from "alchemy/state";
 import { config } from "dotenv";
 
 config({ path: "../server/.env" });
 
-const app = await alchemy("interviews-tool");
+const app = await alchemy("interviews-tool", {
+  password: alchemy.env.ALCHEMY_PASSWORD,
+  stateStore:
+    alchemy.env.ENVIRONMENT === "production"
+      ? (scope) =>
+          new CloudflareStateStore(scope, {
+            stateToken: alchemy.secret(alchemy.env.CLOUDFLARE_API_TOKEN),
+            accountId: alchemy.env.CLOUDFLARE_ACCOUNT_ID,
+          })
+      : undefined,
+});
 
 export const web = await TanStackStart("web", {
   bindings: {
