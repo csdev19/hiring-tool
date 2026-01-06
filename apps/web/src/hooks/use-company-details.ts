@@ -26,7 +26,7 @@ export function useCompanyDetails(hiringProcessId: string) {
   return useQuery<{ data: CompanyDetails | null }>({
     queryKey: companyDetailsKeys.detail(hiringProcessId),
     queryFn: async () => {
-      const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })[
+      const result = await clientTreaty.api.v1["hiring-processes"]({ id: hiringProcessId })[
         "company-details"
       ].get();
       if (result.error) {
@@ -51,7 +51,7 @@ export function useCreateCompanyDetails() {
       hiringProcessId: string;
       data: CreateCompanyDetailsInput;
     }) => {
-      const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })[
+      const result = await clientTreaty.api.v1["hiring-processes"]({ id: hiringProcessId })[
         "company-details"
       ].post(data);
       if (result.error) {
@@ -80,7 +80,7 @@ export function useUpdateCompanyDetails() {
       hiringProcessId: string;
       data: UpdateCompanyDetailsInput;
     }) => {
-      const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })[
+      const result = await clientTreaty.api.v1["hiring-processes"]({ id: hiringProcessId })[
         "company-details"
       ].put(data);
       if (result.error) {
@@ -103,7 +103,7 @@ export function useDeleteCompanyDetails() {
 
   return useMutation({
     mutationFn: async (hiringProcessId: string) => {
-      const result = await clientTreaty.api["hiring-processes"]({ id: hiringProcessId })[
+      const result = await clientTreaty.api.v1["hiring-processes"]({ id: hiringProcessId })[
         "company-details"
       ].delete();
       if (result.error) {

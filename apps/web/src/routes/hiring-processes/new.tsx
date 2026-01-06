@@ -12,7 +12,7 @@ export const Route = createFileRoute("/hiring-processes/new")({
     const session = await getUser();
     if (!session) {
       throw redirect({
-        to: "/login",
+        to: "/auth/login",
       });
     }
     return { session };

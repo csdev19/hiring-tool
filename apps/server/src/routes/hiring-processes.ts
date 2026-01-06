@@ -1,5 +1,5 @@
 import { Elysia, t } from "elysia";
-import { db } from "@interviews-tool/db/client";
+import { createDatabaseClient } from "@interviews-tool/db/client";
 import { hiringProcessTable, type NewHiringProcess } from "@interviews-tool/db/schemas";
 import { CURRENCIES, SALARY_RATE_TYPES } from "@interviews-tool/domain/constants";
 import {
@@ -8,8 +8,7 @@ import {
   paginationQuerySchema,
 } from "@interviews-tool/domain/schemas";
 import { eq, and, desc, sql, isNull } from "drizzle-orm";
-import { auth } from "@interviews-tool/auth";
-import { UnauthorizedError, NotFoundError } from "../utils/errors";
+import { NotFoundError } from "../utils/errors";
 import {
   successBody,
   createdBody,
@@ -17,27 +16,16 @@ import {
   getPaginationParams,
 } from "../utils/response-helpers";
 import { errorHandlerPlugin } from "../utils/error-handler-plugin";
+import { env } from "cloudflare:workers";
+import { authMacro } from "@/plugins/auth.plugin";
 
-// Helper to get user from session
-async function getUserFromRequest(request: Request): Promise<{ id: string } | null> {
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session?.user) {
-    return null;
-  }
-  return { id: session.user.id };
-}
-
-export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" })
+export const hiringProcessRoutes = new Elysia({ prefix: "/hiring-processes" })
   .use(errorHandlerPlugin)
-  // List all hiring processes for authenticated user
+  .decorate("db", createDatabaseClient(env.DATABASE_URL))
+  .use(authMacro)
   .get(
     "/",
-    async ({ request, query, status }) => {
-      const user = await getUserFromRequest(request);
-      if (!user) {
-        throw new UnauthorizedError();
-      }
-
+    async ({ query, status, db, user }) => {
       const pagination = getPaginationParams(query);
 
       const processes = await db
@@ -59,18 +47,13 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
     },
     {
       query: paginationQuerySchema,
+      isAuth: true,
     },
   )
   // Get single hiring process
   .get(
     "/:id",
-    async ({ request, params }) => {
-      const user = await getUserFromRequest(request);
-
-      if (!user) {
-        throw new UnauthorizedError();
-      }
-
+    async ({ params, db, user }) => {
       const [result] = await db
         .select()
         .from(hiringProcessTable)
@@ -92,17 +75,13 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       params: t.Object({
         id: t.String(),
       }),
+      isAuth: true,
     },
   )
   // Create new hiring process
   .post(
     "/",
-    async ({ request, body, status }) => {
-      const user = await getUserFromRequest(request);
-      if (!user) {
-        throw new UnauthorizedError();
-      }
-
+    async ({ body, status, db, user }) => {
       // Generate UUID for new hiring process
       const id = crypto.randomUUID();
 
@@ -126,17 +105,13 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
     },
     {
       body: createHiringProcessSchema,
+      isAuth: true,
     },
   )
   // Update hiring process
   .put(
     "/:id",
-    async ({ request, params, body }) => {
-      const user = await getUserFromRequest(request);
-      if (!user) {
-        throw new UnauthorizedError();
-      }
-
+    async ({ params, body, db, user }) => {
       // Check if hiring process exists and belongs to user
       const [existing] = await db
         .select()
@@ -174,17 +149,13 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
         id: t.String(),
       }),
       body: updateHiringProcessSchema,
+      isAuth: true,
     },
   )
   // Delete hiring process
   .delete(
     "/:id",
-    async ({ request, params, status }) => {
-      const user = await getUserFromRequest(request);
-      if (!user) {
-        throw new UnauthorizedError();
-      }
-
+    async ({ params, status, db, user }) => {
       // Check if hiring process exists and belongs to user
       const [existing] = await db
         .select()
@@ -213,5 +184,6 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/api/hiring-processes" 
       params: t.Object({
         id: t.String(),
       }),
+      isAuth: true,
     },
   );

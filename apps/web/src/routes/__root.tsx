@@ -45,9 +45,11 @@ function RootDocument() {
         <HeadContent />
       </head>
       <body suppressHydrationWarning>
-        <div className="grid h-svh grid-rows-[auto_1fr]">
+        <div className="min-h-svh">
           <Header />
-          <Outlet />
+          <main className="pt-12">
+            <Outlet />
+          </main>
         </div>
         <Toaster richColors />
         <TanStackRouterDevtools position="bottom-left" />

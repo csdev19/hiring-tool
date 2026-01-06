@@ -10,3 +10,8 @@ neonConfig.webSocketConstructor = ws;
 // neonConfig.poolQueryViaFetch = true
 const sql = neon(process.env.DATABASE_URL || "");
 export const db = drizzle(sql, { schema });
+
+export const createDatabaseClient = (databaseUrl: string) => {
+  const sql = neon(databaseUrl);
+  return drizzle(sql, { schema });
+};

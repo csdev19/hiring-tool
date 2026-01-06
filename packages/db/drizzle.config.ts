@@ -1,9 +1,9 @@
-import dotenv from "dotenv";
 import { defineConfig } from "drizzle-kit";
 import { INTERVIEWS_TOOL_TABLE_PREFIX } from "@interviews-tool/domain/config";
+import { config } from "dotenv";
 
-dotenv.config({
-  path: "../../apps/server/.env",
+config({
+  path: "../../.env",
 });
 
 export default defineConfig({

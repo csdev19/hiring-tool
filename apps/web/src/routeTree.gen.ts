@@ -9,18 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HiringProcessesIndexRouteImport } from './routes/hiring-processes/index'
 import { Route as HiringProcessesNewRouteImport } from './routes/hiring-processes/new'
 import { Route as HiringProcessesIdRouteImport } from './routes/hiring-processes/$id'
+import { Route as AuthSignupRouteImport } from './routes/auth/signup'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as HiringProcessesIdEditRouteImport } from './routes/hiring-processes/$id_.edit'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -41,6 +37,16 @@ const HiringProcessesIdRoute = HiringProcessesIdRouteImport.update({
   path: '/hiring-processes/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/auth/signup',
+  path: '/auth/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HiringProcessesIdEditRoute = HiringProcessesIdEditRouteImport.update({
   id: '/hiring-processes/$id_/edit',
   path: '/hiring-processes/$id/edit',
@@ -49,7 +55,8 @@ const HiringProcessesIdEditRoute = HiringProcessesIdEditRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/hiring-processes/$id': typeof HiringProcessesIdRoute
   '/hiring-processes/new': typeof HiringProcessesNewRoute
   '/hiring-processes': typeof HiringProcessesIndexRoute
@@ -57,7 +64,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/hiring-processes/$id': typeof HiringProcessesIdRoute
   '/hiring-processes/new': typeof HiringProcessesNewRoute
   '/hiring-processes': typeof HiringProcessesIndexRoute
@@ -66,7 +74,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/hiring-processes/$id': typeof HiringProcessesIdRoute
   '/hiring-processes/new': typeof HiringProcessesNewRoute
   '/hiring-processes/': typeof HiringProcessesIndexRoute
@@ -76,7 +85,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/login'
+    | '/auth/login'
+    | '/auth/signup'
     | '/hiring-processes/$id'
     | '/hiring-processes/new'
     | '/hiring-processes'
@@ -84,7 +94,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/login'
+    | '/auth/login'
+    | '/auth/signup'
     | '/hiring-processes/$id'
     | '/hiring-processes/new'
     | '/hiring-processes'
@@ -92,7 +103,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/login'
+    | '/auth/login'
+    | '/auth/signup'
     | '/hiring-processes/$id'
     | '/hiring-processes/new'
     | '/hiring-processes/'
@@ -101,7 +113,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  LoginRoute: typeof LoginRoute
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthSignupRoute: typeof AuthSignupRoute
   HiringProcessesIdRoute: typeof HiringProcessesIdRoute
   HiringProcessesNewRoute: typeof HiringProcessesNewRoute
   HiringProcessesIndexRoute: typeof HiringProcessesIndexRoute
@@ -110,13 +123,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -145,6 +151,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HiringProcessesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/signup': {
+      id: '/auth/signup'
+      path: '/auth/signup'
+      fullPath: '/auth/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hiring-processes/$id_/edit': {
       id: '/hiring-processes/$id_/edit'
       path: '/hiring-processes/$id/edit'
@@ -157,7 +177,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  LoginRoute: LoginRoute,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthSignupRoute: AuthSignupRoute,
   HiringProcessesIdRoute: HiringProcessesIdRoute,
   HiringProcessesNewRoute: HiringProcessesNewRoute,
   HiringProcessesIndexRoute: HiringProcessesIndexRoute,

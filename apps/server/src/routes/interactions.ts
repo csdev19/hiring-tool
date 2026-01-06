@@ -6,60 +6,56 @@ import {
   type NewInteraction,
 } from "@interviews-tool/db/schemas";
 import { eq, and, desc, isNull } from "drizzle-orm";
-import { auth } from "@interviews-tool/auth";
 import { createInteractionSchema, updateInteractionSchema } from "@interviews-tool/domain/schemas";
-import { UnauthorizedError, NotFoundError } from "../utils/errors";
+import { NotFoundError } from "../utils/errors";
 import { successBody, createdBody } from "../utils/response-helpers";
 import { errorHandlerPlugin } from "../utils/error-handler-plugin";
-
-async function getUserFromRequest(request: Request): Promise<{ id: string } | null> {
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session?.user) {
-    return null;
-  }
-  return { id: session.user.id };
-}
+import { authMacro } from "@/plugins/auth.plugin";
 
 export const interactionRoutes = new Elysia({
-  prefix: "/api/hiring-processes/:id/interactions",
+  prefix: "/hiring-processes/:id/interactions",
 })
   .use(errorHandlerPlugin)
+  .use(authMacro)
   // List interactions
-  .get("/", async ({ request, params }) => {
-    const user = await getUserFromRequest(request);
-    if (!user) throw new UnauthorizedError();
+  .get(
+    "/",
+    async ({ params, user }) => {
+      const [hiringProcessRecord] = await db
+        .select()
+        .from(hiringProcessTable)
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
-    const [hiringProcessRecord] = await db
-      .select()
-      .from(hiringProcessTable)
-      .where(
-        and(
-          eq(hiringProcessTable.id, params.id),
-          eq(hiringProcessTable.userId, user.id),
-          isNull(hiringProcessTable.deletedAt),
-        ),
-      );
+      if (!hiringProcessRecord) throw new NotFoundError("Hiring process");
 
-    if (!hiringProcessRecord) throw new NotFoundError("Hiring process");
+      const interactions = await db
+        .select()
+        .from(interactionTable)
+        .where(
+          and(eq(interactionTable.hiringProcessId, params.id), isNull(interactionTable.deletedAt)),
+        )
+        .orderBy(desc(interactionTable.createdAt));
 
-    const interactions = await db
-      .select()
-      .from(interactionTable)
-      .where(
-        and(eq(interactionTable.hiringProcessId, params.id), isNull(interactionTable.deletedAt)),
-      )
-      .orderBy(desc(interactionTable.createdAt));
-
-    // Always return an array, even if empty
-    return successBody(interactions || []);
-  })
+      // Always return an array, even if empty
+      return successBody(interactions || []);
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+      isAuth: true,
+    },
+  )
   // Create interaction
   .post(
     "/",
-    async ({ request, params, body, status }) => {
-      const user = await getUserFromRequest(request);
-      if (!user) throw new UnauthorizedError();
-
+    async ({ params, body, status, user }) => {
       const [hiringProcessRecord] = await db
         .select()
         .from(hiringProcessTable)
@@ -86,16 +82,17 @@ export const interactionRoutes = new Elysia({
       return status(201, createdBody(created));
     },
     {
+      params: t.Object({
+        id: t.String(),
+      }),
       body: createInteractionSchema,
+      isAuth: true,
     },
   )
   // Update interaction
   .put(
     "/:interactionId",
-    async ({ request, params, body }) => {
-      const user = await getUserFromRequest(request);
-      if (!user) throw new UnauthorizedError();
-
+    async ({ params, body, user }) => {
       const [hiringProcessRecord] = await db
         .select()
         .from(hiringProcessTable)
@@ -137,15 +134,13 @@ export const interactionRoutes = new Elysia({
         interactionId: t.String(),
       }),
       body: updateInteractionSchema,
+      isAuth: true,
     },
   )
   // Delete interaction
   .delete(
     "/:interactionId",
-    async ({ request, params, set }) => {
-      const user = await getUserFromRequest(request);
-      if (!user) throw new UnauthorizedError();
-
+    async ({ params, status, user }) => {
       const [hiringProcessRecord] = await db
         .select()
         .from(hiringProcessTable)
@@ -173,12 +168,14 @@ export const interactionRoutes = new Elysia({
         .update(interactionTable)
         .set({ deletedAt: new Date() })
         .where(eq(interactionTable.id, params.interactionId));
-      set.status = 204;
+
+      return status(204);
     },
     {
       params: t.Object({
         id: t.String(),
         interactionId: t.String(),
       }),
+      isAuth: true,
     },
   );
