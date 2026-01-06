@@ -30,6 +30,9 @@ jobs:
       - name: Build packages only
         run: bun run build --filter='@interviews-tool/*'
 
+      - name: Install Wrangler
+        run: bun add -g wrangler
+
       # - name: Deploy Frontend to Alchemy
       #   working-directory: apps/web
       #   env:
