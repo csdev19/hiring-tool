@@ -20,10 +20,6 @@ const app = await alchemy("interviews-tool", {
 export const web = await TanStackStart("web", {
   bindings: {
     VITE_SERVER_URL: alchemy.env.VITE_SERVER_URL,
-    DATABASE_URL: alchemy.secret.env.DATABASE_URL,
-    CORS_ORIGIN: alchemy.env.CORS_ORIGIN,
-    BETTER_AUTH_SECRET: alchemy.secret.env.BETTER_AUTH_SECRET,
-    BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL,
   },
 });
 
