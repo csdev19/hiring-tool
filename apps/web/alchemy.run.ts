@@ -5,7 +5,7 @@ import { config } from "dotenv";
 
 config({ path: "../server/.env" });
 
-const app = await alchemy("interviews-tool", {
+const app = await alchemy("hiring-tool", {
   password: alchemy.env.ALCHEMY_PASSWORD,
   stateStore:
     alchemy.env.ENVIRONMENT === "production"
