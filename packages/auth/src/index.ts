@@ -20,3 +20,23 @@ export const auth = betterAuth({
     },
   },
 });
+
+export const createAuth = (corsOrigin: string) => {
+  return betterAuth({
+    database: drizzleAdapter(db, {
+      provider: "pg",
+      schema: { user: userTable, account: accountTable, session: sessionTable },
+    }),
+    trustedOrigins: [corsOrigin],
+    emailAndPassword: {
+      enabled: true,
+    },
+    advanced: {
+      defaultCookieAttributes: {
+        sameSite: "none",
+        secure: true,
+        httpOnly: true,
+      },
+    },
+  });
+};
