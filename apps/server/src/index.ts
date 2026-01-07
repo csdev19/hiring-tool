@@ -7,16 +7,16 @@ import { interactionRoutes } from "./routes/interactions";
 import { CloudflareAdapter } from "elysia/adapter/cloudflare-worker";
 import { env } from "cloudflare:workers";
 
-const authRoutes = new Elysia()
-  .use(
-    cors({
-      origin: env.CORS_ORIGIN || "",
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-      credentials: true,
-    }),
-  )
-  .mount(auth.handler);
+// Configure CORS once at the app level
+const corsConfig = {
+  origin: env.CORS_ORIGIN || "*", // Use "*" as fallback for development
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+  credentials: true,
+  maxAge: 86400, // 24 hours
+};
+
+const authRoutes = new Elysia().use(cors(corsConfig)).mount(auth.handler);
 
 const apiRoutes = new Elysia({
   prefix: "/api/v1",
@@ -32,14 +32,7 @@ const apiRoutes = new Elysia({
 const app = new Elysia({
   adapter: CloudflareAdapter,
 })
-  .use(
-    cors({
-      origin: env.CORS_ORIGIN || "",
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-      credentials: true,
-    }),
-  )
+  .use(cors(corsConfig))
   .use(authRoutes)
   .use(apiRoutes)
   .compile();
