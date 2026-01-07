@@ -9,13 +9,23 @@ import { Plus } from "lucide-react";
 export const Route = createFileRoute("/hiring-processes/")({
   component: HiringProcessesComponent,
   beforeLoad: async () => {
-    const session = await getUser();
-    if (!session) {
-      throw redirect({
-        to: "/auth/login",
-      });
+    try {
+      const session = await getUser();
+      if (!session) {
+        throw redirect({
+          to: "/auth/login",
+        });
+      }
+      return { session };
+    } catch (error) {
+      console.error("error", error);
+      if (error instanceof Error) {
+        throw redirect({
+          to: "/auth/login",
+        });
+      }
+      throw error;
     }
-    return { session };
   },
 });
 
