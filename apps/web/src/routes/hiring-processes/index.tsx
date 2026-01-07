@@ -10,6 +10,8 @@ export const Route = createFileRoute("/hiring-processes/")({
   component: HiringProcessesComponent,
   beforeLoad: async () => {
     try {
+      console.log("process.env.VITE_SERVER_URL:", process.env.VITE_SERVER_URL);
+      console.log("import.meta.env.VITE_SERVER_URL:", import.meta.env.VITE_SERVER_URL);
       const session = await getUser();
       if (!session) {
         throw redirect({
