@@ -7,7 +7,16 @@ import { interactionRoutes } from "./routes/interactions";
 import { CloudflareAdapter } from "elysia/adapter/cloudflare-worker";
 import { env } from "cloudflare:workers";
 
-const authRoutes = new Elysia().mount(auth.handler);
+const authRoutes = new Elysia()
+  .use(
+    cors({
+      origin: env.CORS_ORIGIN || "",
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+      credentials: true,
+    }),
+  )
+  .mount(auth.handler);
 
 const apiRoutes = new Elysia({
   prefix: "/api/v1",
