@@ -7,6 +7,9 @@
   "observability": {
     "enabled": true,
   },
+  "vars": {
+    "VITE_SERVER_URL": "${{ vars.VITE_SERVER_URL }}",
+  },
   "assets": {
     "directory": "dist/client",
     "binding": "ASSETS",

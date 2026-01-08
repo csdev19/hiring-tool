@@ -35,6 +35,8 @@ jobs:
 
       - name: Build Frontend step
         working-directory: apps/web
+        env:
+          VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
         run: bun run build
 
       # - name: Deploy Frontend to Alchemy 🚀
@@ -57,6 +59,8 @@ jobs:
             VITE_SERVER_URL
             CLOUDFLARE_API_TOKEN
             CLOUDFLARE_ACCOUNT_ID
+          vars: |
+            VITE_SERVER_URL
         env:
           ENVIRONMENT: production
           VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
