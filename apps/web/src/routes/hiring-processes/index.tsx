@@ -10,6 +10,7 @@ export const Route = createFileRoute("/hiring-processes/")({
   component: HiringProcessesComponent,
   loader: async () => {
     try {
+      console.log("loader");
       const session = await getUser();
       if (!session) {
         throw redirect({
