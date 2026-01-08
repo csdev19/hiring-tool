@@ -8,4 +8,7 @@
   "observability": {
     "enabled": true,
   },
+  "vars": {
+    "CORS_ORIGIN": "https://hiring-tool-web.cristiansotomayor-dev.workers.dev",
+  },
 }
