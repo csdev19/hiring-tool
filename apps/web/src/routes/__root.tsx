@@ -7,7 +7,8 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Toaster } from "@interviews-tool/web-ui";
 
 import Header from "../components/header";
-import appCss from "../index.css?url";
+// import appCss from "../index.css?url";
+import "../index.css";
 
 export interface RouterAppContext {
   queryClient: QueryClient;
@@ -27,12 +28,12 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         title: "Hiring Tool",
       },
     ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-    ],
+    // links: [
+    //   {
+    //     rel: "stylesheet",
+    //     href: appCss,
+    //   },
+    // ],
   }),
 
   component: RootDocument,
