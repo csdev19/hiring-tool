@@ -33,6 +33,10 @@ jobs:
       - name: Build packages only
         run: bun run build --filter='@interviews-tool/*'
 
+      - name: Build Frontend step
+        working-directory: apps/web
+        run: bun run build
+
       # - name: Deploy Frontend to Alchemy 🚀
       #   working-directory: apps/web
       #   env:
@@ -51,13 +55,11 @@ jobs:
           workingDirectory: apps/web
           secrets: |
             VITE_SERVER_URL
-            ALCHEMY_PASSWORD
             CLOUDFLARE_API_TOKEN
             CLOUDFLARE_ACCOUNT_ID
         env:
           ENVIRONMENT: production
           VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
-          ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
