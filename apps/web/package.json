@@ -8,8 +8,7 @@
     "dev": "alchemy dev",
     "deploy": "alchemy deploy",
     "destroy": "alchemy destroy",
-    "cf-typegen": "wrangler types",
-    "cf-deploy": "wrangler deploy"
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
