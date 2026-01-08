@@ -48,7 +48,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          working-directory: apps/web
+          workingDirectory: apps/web
           secrets: |
             VITE_SERVER_URL
             ALCHEMY_PASSWORD
