@@ -8,10 +8,8 @@ import { Plus } from "lucide-react";
 
 export const Route = createFileRoute("/hiring-processes/")({
   component: HiringProcessesComponent,
-  beforeLoad: async () => {
+  loader: async () => {
     try {
-      console.log("process.env.VITE_SERVER_URL:", process.env.VITE_SERVER_URL);
-      console.log("import.meta.env.VITE_SERVER_URL:", import.meta.env.VITE_SERVER_URL);
       const session = await getUser();
       if (!session) {
         throw redirect({
@@ -20,7 +18,7 @@ export const Route = createFileRoute("/hiring-processes/")({
       }
       return { session };
     } catch (error) {
-      console.error("error", error);
+      console.log("error -->", error);
       if (error instanceof Error) {
         throw redirect({
           to: "/auth/login",
