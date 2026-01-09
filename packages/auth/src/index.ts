@@ -10,6 +10,12 @@ export const createAuth = (corsOrigin: string) => {
       provider: "pg",
       schema: { user: userTable, account: accountTable, session: sessionTable },
     }),
+    session: {
+      cookieCache: {
+        enabled: true,
+        maxAge: 10 * 60, // Cache duration in seconds (5 minutes)
+      },
+    },
     trustedOrigins: [corsOrigin],
     emailAndPassword: {
       enabled: true,
