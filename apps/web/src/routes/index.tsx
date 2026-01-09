@@ -1,6 +1,6 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button, Card, CardContent } from "@interviews-tool/web-ui";
-import { getUser } from "@/functions/get-user";
+import { authClient } from "@/lib/auth-client";
 import {
   Briefcase,
   Building2,
@@ -11,29 +11,15 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
-  beforeLoad: async () => {
-    try {
-      const session = await getUser();
-      if (session) {
-        throw redirect({
-          to: "/hiring-processes",
-        });
-      }
-    } catch (error) {
-      // If it's a redirect, re-throw it
-      if (error && typeof error === "object" && "to" in error) {
-        throw error;
-      }
-      // Otherwise, ignore the error and show the home page
-      // This handles cases where the server function might fail
-    }
-  },
   component: HomePage,
 });
 
 function HomePage() {
+  const { data: session } = authClient.useSession();
+  const isAuthenticated = !!session;
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-4xl mx-auto text-center space-y-8">
@@ -49,16 +35,26 @@ function HomePage() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Link to="/auth/signup">
-              <Button size="lg" className="text-lg">
-                Get Started <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/auth/login">
-              <Button size="lg" variant="outline" className="text-lg">
-                Sign In
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <Link to="/hiring-processes">
+                <Button size="lg" className="text-lg">
+                  Go to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/auth/signup">
+                  <Button size="lg" className="text-lg">
+                    Get Started <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link to="/auth/login">
+                  <Button size="lg" variant="outline" className="text-lg">
+                    Sign In
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -162,14 +158,18 @@ function HomePage() {
       <div className="container mx-auto px-4 py-16">
         <Card className="max-w-3xl mx-auto">
           <CardContent className="text-center space-y-6 p-12">
-            <h2 className="text-3xl font-bold">Ready to Organize Your Job Search?</h2>
+            <h2 className="text-3xl font-bold">
+              {isAuthenticated ? "Your Dashboard Awaits" : "Ready to Organize Your Job Search?"}
+            </h2>
             <p className="text-lg text-muted-foreground">
-              Join now and take control of your hiring journey. Start tracking your applications
-              today.
+              {isAuthenticated
+                ? "Access your applications and continue tracking your hiring journey."
+                : "Join now and take control of your hiring journey. Start tracking your applications today."}
             </p>
-            <Link to="/auth/signup">
+            <Link to={isAuthenticated ? "/hiring-processes" : "/auth/signup"}>
               <Button size="lg" className="text-lg">
-                Create Free Account <ArrowRight className="ml-2 h-5 w-5" />
+                {isAuthenticated ? "Go to Dashboard" : "Create Free Account"}{" "}
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
           </CardContent>
