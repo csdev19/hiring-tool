@@ -8,9 +8,8 @@ import { Plus } from "lucide-react";
 
 export const Route = createFileRoute("/hiring-processes/")({
   component: HiringProcessesComponent,
-  loader: async () => {
+  beforeLoad: async () => {
     try {
-      console.log("loader");
       const session = await getUser();
       if (!session) {
         throw redirect({
@@ -29,6 +28,22 @@ export const Route = createFileRoute("/hiring-processes/")({
     }
   },
 });
+
+// const getSession = createServerFn({ method: "GET" })
+//   .middleware([authMiddleware])
+//   .handler(
+//   async ({ context }) => {
+//     // const session = await authClient.getSession({
+//     //   fetchOptions: {
+//     //     headers: request?.headers,
+//     //   },
+//     // });
+//     // return session?.data ?? null;
+//     console.log("context -->", context);
+//     console.log("context.session -->", context.session);
+//       return context;
+//   }
+// );
 
 function HiringProcessesComponent() {
   const { data: hiringProcessesData, isLoading, error } = useHiringProcesses();
