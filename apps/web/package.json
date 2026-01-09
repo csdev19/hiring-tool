@@ -6,10 +6,8 @@
     "build": "vite build",
     "serve": "vite preview",
     "dev": "alchemy dev",
-    "wrangler:dev": "wrangler dev --port 3001",
     "deploy": "alchemy deploy",
-    "destroy": "alchemy destroy",
-    "cf-typegen": "wrangler types"
+    "destroy": "alchemy destroy"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
