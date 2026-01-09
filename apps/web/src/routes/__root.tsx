@@ -3,6 +3,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { useEffect, useState } from "react";
 
 import { Toaster } from "@interviews-tool/web-ui";
 
@@ -46,23 +47,15 @@ const criticalStyles = `
     margin: 0;
     padding: 0;
   }
-  #loading-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: oklch(14.5% 0 0);
-  }
-  #loading-screen h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    letter-spacing: -0.025em;
-  }
 `;
 
 function RootDocument() {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    setIsReady(true);
+  }, []);
+
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
@@ -70,14 +63,11 @@ function RootDocument() {
         <HeadContent />
       </head>
       <body suppressHydrationWarning>
-        <div id="loading-screen">
-          <h1>Hiring Tool</h1>
-        </div>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `document.getElementById("loading-screen")?.remove();`,
-          }}
-        />
+        {!isReady && (
+          <div className="fixed inset-0 z-9999 flex items-center justify-center bg-neutral-950">
+            <h1 className="text-2xl font-semibold tracking-tight">Hiring Tool</h1>
+          </div>
+        )}
 
         <div className="min-h-svh">
           <Header />
