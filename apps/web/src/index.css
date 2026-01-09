@@ -1,1 +1,5 @@
 @import "@interviews-tool/web-ui/styles.css";
+
+/* Scan app components for Tailwind classes */
+@source "./routes/**/*.tsx";
+@source "./components/**/*.tsx";
