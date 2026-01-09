@@ -1,5 +1,5 @@
 import { cors } from "@elysiajs/cors";
-import { auth, createAuth } from "@interviews-tool/auth";
+import { createAuth } from "@interviews-tool/auth";
 import { Elysia } from "elysia";
 import { hiringProcessRoutes } from "./routes/hiring-processes";
 import { companyDetailsRoutes } from "./routes/company-details";
@@ -17,7 +17,6 @@ const corsConfig = {
 };
 
 const authRoutes = new Elysia().use(cors(corsConfig)).mount(createAuth(env.CORS_ORIGIN).handler);
-// const authRoutes = new Elysia().use(cors(corsConfig)).mount(auth.handler);
 
 const apiRoutes = new Elysia({
   prefix: "/api/v1",

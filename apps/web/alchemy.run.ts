@@ -5,8 +5,6 @@ import { config } from "dotenv";
 
 config({ path: ".env" });
 
-console.log("Starting Alchemy...", alchemy.env);
-
 const app = await alchemy("hiring-tool", {
   password: alchemy.env.ALCHEMY_PASSWORD,
   stateStore:
