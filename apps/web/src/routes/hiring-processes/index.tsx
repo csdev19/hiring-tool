@@ -5,27 +5,31 @@ import { HiringProcessTableSkeleton } from "@/components/hiring-process/hiring-p
 import { useHiringProcesses, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";
 import { getUser } from "@/functions/get-user";
 import { Plus } from "lucide-react";
+import { authMiddleware } from "@/middleware/auth";
 
 export const Route = createFileRoute("/hiring-processes/")({
   component: HiringProcessesComponent,
-  beforeLoad: async () => {
-    try {
-      const session = await getUser();
-      if (!session) {
-        throw redirect({
-          to: "/auth/login",
-        });
-      }
-      return { session };
-    } catch (error) {
-      console.log("error -->", error);
-      if (error instanceof Error) {
-        throw redirect({
-          to: "/auth/login",
-        });
-      }
-      throw error;
-    }
+  // beforeLoad: async () => {
+  //   try {
+  //     const session = await getUser();
+  //     if (!session) {
+  //       throw redirect({
+  //         to: "/auth/login",
+  //       });
+  //     }
+  //     return { session };
+  //   } catch (error) {
+  //     console.log("error -->", error);
+  //     if (error instanceof Error) {
+  //       throw redirect({
+  //         to: "/auth/login",
+  //       });
+  //     }
+  //     throw error;
+  //   }
+  // },
+  server: {
+    middleware: [authMiddleware],
   },
 });
 
