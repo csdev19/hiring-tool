@@ -1,53 +1,16 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@interviews-tool/web-ui";
 import { InterviewTable } from "@/components/hiring-process/hiring-process-table";
 import { HiringProcessTableSkeleton } from "@/components/hiring-process/hiring-process-table-skeleton";
 import { useHiringProcesses, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";
-import { getUser } from "@/functions/get-user";
 import { Plus } from "lucide-react";
-import { authMiddleware } from "@/middleware/auth";
 
-export const Route = createFileRoute("/hiring-processes/")({
+export const Route = createFileRoute("/_authenticated/hiring-processes/")({
   component: HiringProcessesComponent,
-  // beforeLoad: async () => {
-  //   try {
-  //     const session = await getUser();
-  //     if (!session) {
-  //       throw redirect({
-  //         to: "/auth/login",
-  //       });
-  //     }
-  //     return { session };
-  //   } catch (error) {
-  //     console.log("error -->", error);
-  //     if (error instanceof Error) {
-  //       throw redirect({
-  //         to: "/auth/login",
-  //       });
-  //     }
-  //     throw error;
-  //   }
-  // },
-  server: {
-    middleware: [authMiddleware],
+  beforeLoad: async () => {
+    // TODO: context.session should be typed from the parent layout middleware
   },
 });
-
-// const getSession = createServerFn({ method: "GET" })
-//   .middleware([authMiddleware])
-//   .handler(
-//   async ({ context }) => {
-//     // const session = await authClient.getSession({
-//     //   fetchOptions: {
-//     //     headers: request?.headers,
-//     //   },
-//     // });
-//     // return session?.data ?? null;
-//     console.log("context -->", context);
-//     console.log("context.session -->", context.session);
-//       return context;
-//   }
-// );
 
 function HiringProcessesComponent() {
   const { data: hiringProcessesData, isLoading, error } = useHiringProcesses();

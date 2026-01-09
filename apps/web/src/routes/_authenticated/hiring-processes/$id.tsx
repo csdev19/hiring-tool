@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -34,19 +34,9 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { getUser } from "@/functions/get-user";
 
-export const Route = createFileRoute("/hiring-processes/$id")({
+export const Route = createFileRoute("/_authenticated/hiring-processes/$id")({
   component: HiringProcessDetailPage,
-  beforeLoad: async () => {
-    const session = await getUser();
-    if (!session) {
-      throw redirect({
-        to: "/auth/login",
-      });
-    }
-    return { session };
-  },
 });
 
 function HiringProcessDetailPage() {

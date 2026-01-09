@@ -1,17 +1,20 @@
 import { createMiddleware } from "@tanstack/react-start";
+import { redirect } from "@tanstack/react-router";
 
 import { authClient } from "@/lib/auth-client";
 
 export const authMiddleware = createMiddleware().server(async ({ next, request }) => {
-  console.log("pre request");
   const session = await authClient.getSession({
     fetchOptions: {
       headers: request.headers,
       throw: true,
     },
   });
-  console.log("post request");
-  console.log("session -->", session);
+
+  if (!session) {
+    throw redirect({ to: "/auth/login" });
+  }
+
   return next({
     context: { session },
   });
