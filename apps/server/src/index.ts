@@ -29,6 +29,7 @@ const apiRoutes = new Elysia({
   .get("/health", () => ({
     status: "healthy",
     timestamp: new Date().toISOString(),
+    corsOrigin: env.CORS_ORIGIN,
   }));
 
 const app = new Elysia({
