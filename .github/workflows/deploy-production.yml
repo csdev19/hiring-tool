@@ -39,16 +39,6 @@ jobs:
           VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
         run: bun run build
 
-      # - name: Deploy Frontend with Alchemy to Cloudflare Workers 🚀
-      #   working-directory: apps/web
-      #   env:
-      #     ENVIRONMENT: production
-      #     VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
-      #     ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
-      #     CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      #     CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      #   run: bun run deploy
-
       - name: Deploy Frontend to Cloudflare Workers 🚀
         uses: cloudflare/wrangler-action@v3.14.1
         with:
