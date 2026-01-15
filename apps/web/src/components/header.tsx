@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
 
-import { authClient } from "@/lib/auth-client";
+import { useSession } from "@/hooks/use-session";
 import UserMenu from "./user-menu";
 
 export default function Header() {
-  const { data: session } = authClient.useSession();
+  const { session } = useSession();
   const isAuthenticated = !!session;
 
   return (
