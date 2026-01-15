@@ -12,6 +12,10 @@ export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async 
   console.log("import.meta.env.VITE_SERVER_URL", import.meta.env.VITE_SERVER_URL);
   console.log("process.env.VITE_SERVER_URL", process.env.VITE_SERVER_URL);
 
+  // const cookies = await getRequestCookies();
+  const cookieHeader = headers.get("cookie");
+  console.log("cookieHeader ->", cookieHeader);
+
   const { data, error } = await authClient.getSession({
     fetchOptions: {
       headers: headers,
@@ -24,7 +28,11 @@ export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async 
 
   const data2 = await authClient2.getSession({
     fetchOptions: {
-      headers: headers,
+      headers: {
+        ...headers,
+        cookie: cookieHeader,
+        "content-type": "application/json",
+      },
     },
   });
 
