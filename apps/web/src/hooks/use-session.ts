@@ -18,10 +18,7 @@ export const useSession = () => {
     queryFn: async () => {
       const { data, error } = await authClient.getSession();
 
-      console.log("error ->", error);
-      console.log("data ->", data);
       if (error || !data) {
-        console.log("returning null");
         return null;
       }
 
