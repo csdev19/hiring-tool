@@ -5,12 +5,13 @@ import { getRequestHeaders } from "@tanstack/react-start/server";
 import { createAuthClient } from "better-auth/react";
 
 // Get current user
-export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async ({ context }) => {
+export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async (ctx) => {
+  console.log("ctx ->", ctx);
+  console.log("ctx.request ->", ctx as any);
+  console.log("ctx.request.headers ->", (ctx as any).request.headers);
+  console.log('ctx.request.headers.get("cookie") ->', (ctx as any).request.headers.get("cookie"));
   const headers = await getRequestHeaders();
   console.log("headers ->", headers);
-
-  console.log("import.meta.env.VITE_SERVER_URL", import.meta.env.VITE_SERVER_URL);
-  console.log("process.env.VITE_SERVER_URL", process.env.VITE_SERVER_URL);
 
   // const cookies = await getRequestCookies();
   const cookieHeader = headers.get("cookie");
@@ -44,11 +45,11 @@ export const Route = createFileRoute("/_authenticated")({
   // },
   beforeLoad: async () => {
     const session = await getCurrentUserFn();
-    console.log("session ->", session);
+    // console.log("session ->", session);
 
-    if (!session) {
-      // throw redirect({ to: "/auth/login" });
-    }
+    // if (!session) {
+    //   // throw redirect({ to: "/auth/login" });
+    // }
 
     return { session };
   },
