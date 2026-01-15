@@ -31,9 +31,10 @@ export const Route = createFileRoute("/_authenticated")({
   // },
   beforeLoad: async () => {
     const session = await getCurrentUserFn();
+    console.log("session ->", session);
 
     if (!session) {
-      throw redirect({ to: "/auth/login" });
+      // throw redirect({ to: "/auth/login" });
     }
 
     // TODO: context.session should be typed from the middleware
