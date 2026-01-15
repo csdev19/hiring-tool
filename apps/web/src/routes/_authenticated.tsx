@@ -1,21 +1,12 @@
 import { authClient } from "@/lib/auth-client";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
-import { createAuthClient } from "better-auth/react";
+import { createMiddleware, createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 
 // Get current user
 export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async (ctx) => {
-  console.log("ctx ->", ctx);
-  console.log("ctx.request ->", ctx as any);
-  console.log("ctx.request.headers ->", (ctx as any).request.headers);
-  console.log('ctx.request.headers.get("cookie") ->', (ctx as any).request.headers.get("cookie"));
-  const headers = await getRequestHeaders();
-  console.log("headers ->", headers);
-
-  // const cookies = await getRequestCookies();
-  const cookieHeader = headers.get("cookie");
-  console.log("cookieHeader ->", cookieHeader);
+  const request = await getRequest();
+  const headers = await request.headers;
 
   const sessionData = await authClient.getSession({
     fetchOptions: {
@@ -24,7 +15,6 @@ export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async 
     },
   });
 
-  console.log("sessionData ->", sessionData);
   const { data, error } = sessionData;
 
   if (error) {
@@ -38,13 +28,25 @@ export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async 
   };
 });
 
+const authMiddleware = createMiddleware().server(async ({ next, request }) => {
+  const session = await authClient.getSession({
+    fetchOptions: {
+      headers: request.headers,
+      credentials: "include",
+    },
+  });
+  console.log("session middleware ->", session);
+  return next({ context: { session } });
+});
+
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
-  // server: {
-  // middleware: [authMiddleware],
-  // },
+  server: {
+    middleware: [authMiddleware],
+  },
   beforeLoad: async () => {
     const session = await getCurrentUserFn();
+    console.log("session before load ->", session);
     // console.log("session ->", session);
 
     // if (!session) {
