@@ -1,8 +1,7 @@
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-  // No baseURL needed - auth requests go to the same origin (frontend)
-  // which proxies to the backend, ensuring cookies stay on the frontend domain
+  basePath: import.meta.env.VITE_SERVER_URL,
   fetchOptions: {
     credentials: "include",
   },
