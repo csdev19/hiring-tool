@@ -16,13 +16,15 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "development": "./src/index.ts",
       "import": "./dist/index.es.js"
     },
     "./styles.css": "./src/styles.css"
   },
   "scripts": {
     "build": "vite build",
-    "dev": "vite build --watch",
+    "build:ui": "vite build",
+    "build:watch": "vite build --watch",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
