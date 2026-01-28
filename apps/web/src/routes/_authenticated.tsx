@@ -14,9 +14,10 @@ export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async 
   const sessionData = await authClient.getSession({
     fetchOptions: {
       headers: headers,
-      credentials: "include",
     },
   });
+  // //   credentials: "include",
+  // },
 
   const { data, error } = sessionData;
 

@@ -75,9 +75,10 @@ export const createAuth = (corsOrigin: string) => {
     },
     advanced: {
       defaultCookieAttributes: {
+        httpOnly: true,
         sameSite: "none",
         secure: true,
-        httpOnly: true,
+        domain: undefined,
       },
     },
   });
