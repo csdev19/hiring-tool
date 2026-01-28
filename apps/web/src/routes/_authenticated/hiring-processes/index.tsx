@@ -1,21 +1,14 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@interviews-tool/web-ui";
 import { InterviewTable } from "@/components/hiring-process/hiring-process-table";
 import { HiringProcessTableSkeleton } from "@/components/hiring-process/hiring-process-table-skeleton";
 import { useHiringProcesses, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";
-import { getUser } from "@/functions/get-user";
 import { Plus } from "lucide-react";
 
-export const Route = createFileRoute("/hiring-processes/")({
+export const Route = createFileRoute("/_authenticated/hiring-processes/")({
   component: HiringProcessesComponent,
   beforeLoad: async () => {
-    const session = await getUser();
-    if (!session) {
-      throw redirect({
-        to: "/auth/login",
-      });
-    }
-    return { session };
+    // TODO: context.session should be typed from the parent layout middleware
   },
 });
 

@@ -1,15 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
 import dts from "vite-plugin-dts";
-import { libInjectCss } from "vite-plugin-lib-inject-css";
 import { resolve } from "node:path";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [
-    tailwindcss(),
+    tsconfigPaths(),
     react(),
-    libInjectCss(),
     dts({
       entryRoot: "src",
       outDir: "dist",
@@ -34,6 +32,7 @@ export default defineConfig({
     sourcemap: true,
     outDir: "dist",
     emptyOutDir: true,
-    cssCodeSplit: true,
+    // CSS is exported as source file - consuming app processes Tailwind
+    cssCodeSplit: false,
   },
 });

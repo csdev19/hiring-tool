@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@interviews-tool/web-ui";
 import { HiringProcessForm } from "@/components/hiring-process/hiring-process-form";
 import { HiringProcessEditSkeleton } from "@/components/hiring-process/hiring-process-edit-skeleton";
@@ -10,19 +10,9 @@ import {
   type CreateCompanyDetailsInput,
 } from "@/hooks/use-company-details";
 import { toast } from "sonner";
-import { getUser } from "@/functions/get-user";
 
-export const Route = createFileRoute("/hiring-processes/$id_/edit")({
+export const Route = createFileRoute("/_authenticated/hiring-processes/$id_/edit")({
   component: EditHiringProcessPage,
-  beforeLoad: async () => {
-    const session = await getUser();
-    if (!session) {
-      throw redirect({
-        to: "/auth/login",
-      });
-    }
-    return { session };
-  },
 });
 
 function EditHiringProcessPage() {

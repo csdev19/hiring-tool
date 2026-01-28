@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 
 import {
   DropdownMenu,
@@ -11,11 +11,11 @@ import {
   Button,
   Skeleton,
 } from "@interviews-tool/web-ui";
-import { authClient } from "@/lib/auth-client";
+import { useSession, useSignOut } from "@/hooks/use-session";
 
 export default function UserMenu() {
-  const navigate = useNavigate();
-  const { data: session, isPending } = authClient.useSession();
+  const { session, isPending } = useSession();
+  const signOut = useSignOut();
 
   if (isPending) {
     return <Skeleton className="h-9 w-24" />;
@@ -39,20 +39,7 @@ export default function UserMenu() {
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={() => {
-              authClient.signOut({
-                fetchOptions: {
-                  onSuccess: () => {
-                    navigate({
-                      to: "/",
-                    });
-                  },
-                },
-              });
-            }}
-          >
+          <DropdownMenuItem variant="destructive" onClick={() => signOut.mutate()}>
             Sign Out
           </DropdownMenuItem>
         </DropdownMenuGroup>
