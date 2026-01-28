@@ -23,14 +23,16 @@ interface Session {
 
 const getSessionFn = createServerFn({ method: "GET" }).handler(async () => {
   const headers = getRequestHeaders();
-  console.log("headers ->", headers);
   const cookie = headers.get("cookie");
+
+  console.log("getSessionFn - cookie:", cookie ? "present" : "missing");
 
   if (!cookie) {
     return null;
   }
 
   try {
+    // Forward cookie to backend to validate session
     const response = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
       method: "GET",
       headers: {
@@ -39,6 +41,8 @@ const getSessionFn = createServerFn({ method: "GET" }).handler(async () => {
       },
     });
 
+    console.log("getSessionFn - backend response:", response.status);
+
     if (!response.ok) {
       return null;
     }
@@ -46,7 +50,7 @@ const getSessionFn = createServerFn({ method: "GET" }).handler(async () => {
     const session: Session | null = await response.json();
     return session;
   } catch (error) {
-    console.error("Failed to get session:", error);
+    console.error("getSessionFn error:", error);
     return null;
   }
 });
@@ -54,15 +58,14 @@ const getSessionFn = createServerFn({ method: "GET" }).handler(async () => {
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
   beforeLoad: async () => {
-    console.log("before load ->");
     const session = await getSessionFn();
-    console.log("session ->", session);
+    console.log("beforeLoad session:", session ? "valid" : "null");
 
-    // if (!session) {
-    //   throw redirect({ to: "/auth/login" });
-    // }
+    if (!session) {
+      throw redirect({ to: "/auth/login" });
+    }
 
-    // return { session };
+    return { session };
   },
 });
 

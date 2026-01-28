@@ -16,7 +16,11 @@ const corsConfig = {
   maxAge: 86400, // 24 hours
 };
 
-const authRoutes = new Elysia().use(cors(corsConfig)).mount(createAuth(env.CORS_ORIGIN).handler);
+const auth = createAuth(env.CORS_ORIGIN);
+
+const authRoutes = new Elysia()
+  .use(cors(corsConfig))
+  .all("/api/auth/*", ({ request }) => auth.handler(request));
 
 const apiRoutes = new Elysia({
   prefix: "/api/v1",
