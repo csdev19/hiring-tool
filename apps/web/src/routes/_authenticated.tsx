@@ -9,13 +9,15 @@ import { getRequest } from "@tanstack/react-start/server";
 // Get current user
 export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async (ctx) => {
   const request = await getRequest();
+  console.log("request ->", request);
   const headers = await request.headers;
-
+  console.log("headers ->", headers);
   const sessionData = await authClient.getSession({
     fetchOptions: {
       headers: headers,
     },
   });
+  console.log("sessionData ->", sessionData);
   // //   credentials: "include",
   // },
 
