@@ -2,16 +2,14 @@ import { useSession } from "@/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Navigate, Outlet, redirect, useNavigate } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
+import { createMiddleware, createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 
 // TODO: I have to make this work eventually
 // Get current user
 export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async (ctx) => {
   const request = await getRequest();
-  console.log("request ->", request);
   const headers = await request.headers;
-  console.log("headers ->", headers);
   const sessionData = await authClient.getSession({
     fetchOptions: {
       headers: headers,
@@ -34,22 +32,36 @@ export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async 
   };
 });
 
-// const authMiddleware = createMiddleware().server(async ({ next, request }) => {
-//   const session = await authClient.getSession({
-//     fetchOptions: {
-//       headers: request.headers,
-//       credentials: "include",
-//     },
-//   });
-//   console.log("session middleware ->", session);
-//   return next({ context: { session } });
-// });
+const authMiddleware = createMiddleware().server(async ({ next, request }) => {
+  try {
+    console.log("auth middleware ->");
+    const session = await authClient.getSession({
+      fetchOptions: {
+        headers: request.headers,
+        credentials: "include",
+      },
+    });
+    console.log("session middleware1 ->", session);
+    const session2 = await authClient.getSession({
+      fetchOptions: {
+        headers: request.headers,
+      },
+    });
+    console.log("session middleware2 ->", session2);
+    const session3 = await authClient.getSession();
+    console.log("session middleware3 ->", session3);
+    return next({ context: { session } });
+  } catch (error) {
+    console.error("error", error);
+    return next({ context: { session: undefined } });
+  }
+});
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
-  // server: {
-  //   middleware: [authMiddleware],
-  // },
+  server: {
+    middleware: [authMiddleware],
+  },
   beforeLoad: async () => {
     try {
       console.log("before load ->");
