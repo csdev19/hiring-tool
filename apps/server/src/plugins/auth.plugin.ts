@@ -74,7 +74,6 @@ export const authMacro = new Elysia({ name: "auth-macro" }).error({ Unauthorized
         //   throw new ForbiddenError(`Requires ${role} role`);
         // }
 
-        console.log(`[Role Check] Required: ${role}, User: ${user?.id}`);
         // Remove this and add actual implementation when ready
       },
     };
