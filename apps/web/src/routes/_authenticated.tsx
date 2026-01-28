@@ -2,7 +2,8 @@ import { useSession } from "@/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Navigate, Outlet, redirect, useNavigate } from "@tanstack/react-router";
-
+import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeaders } from "@tanstack/react-start/server";
 // TODO: I have to make this work eventually
 // Get current user
 // export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async (ctx) => {
@@ -40,22 +41,41 @@ import { createFileRoute, Navigate, Outlet, redirect, useNavigate } from "@tanst
 //   return next({ context: { session } });
 // });
 
+const getCurrentUserFn = createServerFn({
+  method: "GET",
+}).handler(async () => {
+  const headers = getRequestHeaders();
+  console.log("Headers type:", typeof headers);
+  console.log("Headers constructor:", headers?.constructor?.name);
+  console.log("Cookie header:", headers?.get?.("cookie") ?? "NO COOKIE");
+  console.log("All headers:", JSON.stringify(Object.fromEntries(headers?.entries?.() ?? [])));
+  console.log("headers ->", headers);
+  const session2 = await authClient.getSession({
+    fetchOptions: {
+      headers,
+    },
+  });
+  console.log("session2 ->", session2);
+  // return { session, session2 };
+});
+
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
   // server: {
   //   middleware: [authMiddleware],
   // },
-  // beforeLoad: async () => {
-  //   const session = await getCurrentUserFn();
-  //   console.log("session before load ->", session);
-  //   // console.log("session ->", session);
+  beforeLoad: async () => {
+    console.log("getCurrentUserFn ->");
+    const session = await getCurrentUserFn();
+    console.log("session before load ->", session);
+    // console.log("session ->", session);
 
-  //   // if (!session) {
-  //   //   // throw redirect({ to: "/auth/login" });
-  //   // }
+    // if (!session) {
+    //   // throw redirect({ to: "/auth/login" });
+    // }
 
-  //   return { session };
-  // },
+    return { session };
+  },
 });
 
 function AuthenticatedLayout() {
