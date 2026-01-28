@@ -36,7 +36,7 @@ function NewHiringProcessPage() {
       }
 
       toast.success("Hiring process created successfully");
-      navigate({ to: "/hiring-processes" });
+      navigate({ to: "/hiring-processes/$id", params: { id: hiringProcessId } });
     } catch (error) {
       toast.error("Failed to create hiring process");
       console.error(error);
