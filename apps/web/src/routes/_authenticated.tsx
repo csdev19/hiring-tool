@@ -34,11 +34,12 @@ export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async 
 
 const authMiddleware = createMiddleware().server(async ({ next, request }) => {
   try {
-    console.log("auth middleware ->");
+    console.log("auth middleware ->", import.meta.env.VITE_SERVER_URL);
     const session = await authClient.getSession({
       fetchOptions: {
         headers: request.headers,
         credentials: "include",
+        baseURL: `${import.meta.env.VITE_SERVER_URL}/api/auth`,
       },
     });
     console.log("session middleware1 ->", session);
@@ -50,10 +51,10 @@ const authMiddleware = createMiddleware().server(async ({ next, request }) => {
     console.log("session middleware2 ->", session2);
     const session3 = await authClient.getSession();
     console.log("session middleware3 ->", session3);
-    return next({ context: { session } });
+    return next({ context: {} });
   } catch (error) {
     console.error("error", error);
-    return next({ context: { session: undefined } });
+    return next({ context: {} });
   }
 });
 
@@ -62,6 +63,7 @@ export const Route = createFileRoute("/_authenticated")({
   server: {
     middleware: [authMiddleware],
   },
+
   beforeLoad: async () => {
     try {
       console.log("before load ->");
