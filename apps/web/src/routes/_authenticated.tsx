@@ -40,7 +40,7 @@ const authMiddleware = createMiddleware().server(async ({ next, request }) => {
         credentials: "include",
       },
     });
-    console.log("session middleware4 ->", session);
+    console.log("session middleware ->", session);
     return next({ context: { session } });
   } catch (error) {
     console.error("error", error);
