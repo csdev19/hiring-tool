@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import dts from "vite-plugin-dts";
 import { resolve } from "node:path";
 import tsconfigPaths from "vite-tsconfig-paths";
+import { libInjectCss } from "vite-plugin-lib-inject-css";
 
 export default defineConfig({
   plugins: [
@@ -13,6 +14,7 @@ export default defineConfig({
       outDir: "dist",
       insertTypesEntry: true,
     }),
+    // libInjectCss(),
   ],
   resolve: {
     alias: {
