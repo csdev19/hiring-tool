@@ -35,6 +35,21 @@ export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async 
 const authMiddleware = createMiddleware().server(async ({ next, request }) => {
   try {
     console.log("auth middleware ->", import.meta.env.VITE_SERVER_URL);
+    const fetchedSession = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/auth/get-session`, {
+      headers: request.headers,
+      credentials: "include",
+    });
+    console.log("fetchedSession->", fetchedSession);
+    const fetchedSessionData = await fetchedSession.json();
+    console.log("fetchedSessionData->", fetchedSessionData);
+    const fetchedJustSession = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/auth/session`, {
+      headers: request.headers,
+      credentials: "include",
+    });
+    console.log("fetchedJustSession->", fetchedJustSession);
+    const fetchedJustSessionData = await fetchedJustSession.json();
+    console.log("fetchedJustSessionData->", fetchedJustSessionData);
+
     const session = await authClient.getSession({
       fetchOptions: {
         headers: request.headers,
