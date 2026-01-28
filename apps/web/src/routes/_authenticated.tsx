@@ -34,45 +34,14 @@ export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async 
 
 const authMiddleware = createMiddleware().server(async ({ next, request }) => {
   try {
-    console.log("auth middleware ->", import.meta.env.VITE_SERVER_URL);
-    // https://hiring-tool-api.cristiansotomayor-dev.workers.dev
-    // https://hiring-tool-api.cristiansotomayor-dev.workers.dev/api/auth/get-session
-    const fetchedJustSession = await fetch(
-      `https://hiring-tool-api.cristiansotomayor-dev.workers.dev/api/auth/get-session`,
-      {
-        headers: request.headers,
-        credentials: "include",
-      },
-    );
-    console.log("fetchedJustSession HARDCODED->", fetchedJustSession);
-    const fetchedJustSessionData = await fetchedJustSession.json();
-    console.log("fetchedJustSessionData HARDCODED->", fetchedJustSessionData);
-
-    const fetchedSession = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/auth/get-session`, {
-      headers: request.headers,
-      credentials: "include",
-    });
-    console.log("fetchedSession->", fetchedSession);
-    const fetchedSessionData = await fetchedSession.json();
-    console.log("fetchedSessionData->", fetchedSessionData);
-
     const session = await authClient.getSession({
       fetchOptions: {
         headers: request.headers,
         credentials: "include",
-        baseURL: `${import.meta.env.VITE_SERVER_URL}/api/auth`,
       },
     });
-    console.log("session middleware1 ->", session);
-    const session2 = await authClient.getSession({
-      fetchOptions: {
-        headers: request.headers,
-      },
-    });
-    console.log("session middleware2 ->", session2);
-    const session3 = await authClient.getSession();
-    console.log("session middleware3 ->", session3);
-    return next({ context: {} });
+    console.log("session middleware4 ->", session);
+    return next({ context: { session } });
   } catch (error) {
     console.error("error", error);
     return next({ context: {} });
