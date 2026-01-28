@@ -41,7 +41,9 @@ export default defineConfig({
     sourcemap: true,
     outDir: "dist",
     emptyOutDir: true,
-    minify: false, // As far as we know the apps are going to minify the css so this step is not needed
-    cssCodeSplit: true, // we don't want to charge all the css for components that are not going to be used
+    // there's no necessity to minify the css since the apps are going to minify the css, but is going to improve the legibility of the css
+    minify: false,
+    // we don't want to charge all the css for components that are not going to be used
+    cssCodeSplit: true,
   },
 });
