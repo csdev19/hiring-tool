@@ -2,6 +2,7 @@ import { useSession } from "@/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Navigate, Outlet, redirect, useNavigate } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 
 // TODO: I have to make this work eventually
 // Get current user
@@ -40,8 +41,33 @@ import { createFileRoute, Navigate, Outlet, redirect, useNavigate } from "@tanst
 //   return next({ context: { session } });
 // });
 
+export const getAuth = createServerFn({ method: "GET" }).handler(async () => {
+  const { getRequestHeaders } = await import("@tanstack/react-start/server");
+  const headers = getRequestHeaders();
+  console.log("headers ->", headers);
+  const session = await authClient.getSession({
+    fetchOptions: {
+      headers: headers,
+      credentials: "include",
+    },
+  });
+  console.log("session ->", session);
+  // return await getToken();
+});
+
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
+  beforeLoad: async () => {
+    try {
+      console.log("before load ->");
+      const session = await getAuth();
+      console.log("session before load ->", session);
+      return { session };
+    } catch (error) {
+      console.log("error ->", error);
+      return { session: null };
+    }
+  },
   // server: {
   //   middleware: [authMiddleware],
   // },
