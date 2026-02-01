@@ -1,87 +1,64 @@
 import { useSession } from "@/hooks/use-session";
-import { authClient } from "@/lib/auth-client";
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Navigate, Outlet, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate, Outlet, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 
-// TODO: I have to make this work eventually
-// Get current user
-// export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async (ctx) => {
-//   const request = await getRequest();
-//   const headers = await request.headers;
+interface SessionData {
+  user: {
+    id: string;
+    email: string;
+    name: string | null;
+  } | null;
+  session: {
+    id: string;
+    expiresAt: string;
+  } | null;
+}
 
-//   const sessionData = await authClient.getSession({
-//     fetchOptions: {
-//       headers: headers,
-//       credentials: "include",
-//     },
-//   });
+export const getAuth = createServerFn({ method: "GET" }).handler(
+  async (): Promise<SessionData | null> => {
+    const BACKEND_URL = import.meta.env.VITE_SERVER_URL;
+    console.log("BACKEND_URL ->", BACKEND_URL);
 
-//   const { data, error } = sessionData;
+    if (!BACKEND_URL) {
+      console.error("VITE_SERVER_URL is not configured");
+      return null;
+    }
 
-//   if (error) {
-//     console.log("error", error);
-//     return null;
-//   }
+    const request = getRequest();
+    const cookies = request.headers.get("cookie") || "";
+    console.log("cookies ->", cookies);
 
-//   return {
-//     user: data?.user,
-//     session: data?.session,
-//   };
-// });
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
+        headers: {
+          cookie: cookies,
+        },
+      });
 
-// const authMiddleware = createMiddleware().server(async ({ next, request }) => {
-//   const session = await authClient.getSession({
-//     fetchOptions: {
-//       headers: request.headers,
-//       credentials: "include",
-//     },
-//   });
-//   console.log("session middleware ->", session);
-//   return next({ context: { session } });
-// });
+      if (!response.ok) {
+        return null;
+      }
 
-export const getAuth = createServerFn({ method: "GET" }).handler(async () => {
-  const { getRequestHeaders } = await import("@tanstack/react-start/server");
-  const headers = getRequestHeaders();
-  console.log("headers ->", headers);
-  const session = await authClient.getSession({
-    fetchOptions: {
-      headers: headers,
-      credentials: "include",
-    },
-  });
-  console.log("session ->", session);
-  // return await getToken();
-});
+      const sessionData: SessionData = await response.json();
+      console.log("sessionData ->", sessionData);
+      return sessionData;
+    } catch (error) {
+      console.error("Failed to get session:", error);
+      return null;
+    }
+  },
+);
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
   beforeLoad: async () => {
-    try {
-      console.log("before load ->");
-      const session = await getAuth();
-      console.log("session before load ->", session);
-      return { session };
-    } catch (error) {
-      console.log("error ->", error);
-      return { session: null };
+    const session = await getAuth();
+    if (!session?.user) {
+      throw redirect({ to: "/auth/login" });
     }
+    return { session };
   },
-  // server: {
-  //   middleware: [authMiddleware],
-  // },
-  // beforeLoad: async () => {
-  //   const session = await getCurrentUserFn();
-  //   console.log("session before load ->", session);
-  //   // console.log("session ->", session);
-
-  //   // if (!session) {
-  //   //   // throw redirect({ to: "/auth/login" });
-  //   // }
-
-  //   return { session };
-  // },
 });
 
 function AuthenticatedLayout() {

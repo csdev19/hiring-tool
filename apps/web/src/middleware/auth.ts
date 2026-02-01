@@ -1,94 +1,72 @@
 import { createMiddleware } from "@tanstack/react-start";
 import { redirect } from "@tanstack/react-router";
 
-import { authClient } from "@/lib/auth-client";
-import { tryCatch, isSuccess, type Result } from "@interviews-tool/domain/types";
+interface SessionData {
+  user: {
+    id: string;
+    email: string;
+    name: string | null;
+  };
+  session: {
+    id: string;
+    expiresAt: string;
+  };
+}
 
 /**
- * Check if an error is a network-related error (timeout, fetch failure, etc.)
+ * Fetch session directly from backend (server-side only)
+ * This avoids issues with authClient's relative URL in SSR context
  */
-function isNetworkError(error: unknown): boolean {
-  return (
-    error instanceof TypeError || // Network errors
-    error instanceof DOMException || // AbortError
-    (error as any)?.name === "AbortError" ||
-    (error as any)?.message?.includes("fetch") ||
-    (error as any)?.message?.includes("network") ||
-    (error as any)?.message?.includes("aborted")
-  );
+async function getSessionFromBackend(
+  cookies: string,
+  signal?: AbortSignal,
+): Promise<SessionData | null> {
+  const BACKEND_URL = import.meta.env.VITE_SERVER_URL;
+
+  if (!BACKEND_URL) {
+    console.error("VITE_SERVER_URL is not configured");
+    return null;
+  }
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
+      headers: { cookie: cookies },
+      signal,
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    return data?.user ? data : null;
+  } catch (error) {
+    // Don't log abort errors as they're expected on timeout
+    if ((error as Error)?.name !== "AbortError") {
+      console.error("Failed to fetch session:", error);
+    }
+    return null;
+  }
 }
 
 export const authMiddleware = createMiddleware().server(async ({ next, request }) => {
-  // Use AbortController instead of AbortSignal.timeout() for Cloudflare Workers compatibility
-  console.log("auth middleware ------>");
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
 
   try {
-    // Use tryCatch to wrap the session fetch for better error handling
-    const sessionResult: Result<
-      Awaited<ReturnType<typeof authClient.getSession>>,
-      Error
-    > = await tryCatch(
-      authClient.getSession({
-        fetchOptions: {
-          headers: request.headers,
-          signal: controller.signal,
-        },
-      }),
-    );
+    const cookies = request.headers.get("cookie") || "";
+    const session = await getSessionFromBackend(cookies, controller.signal);
 
-    // Always clear the timeout
     clearTimeout(timeoutId);
 
-    // Handle the result using the Result pattern
-    if (isSuccess(sessionResult)) {
-      const session = sessionResult.data;
-
-      if (!session?.data) {
-        throw redirect({ to: "/auth/login" });
-      }
-
-      return next({
-        context: { session: session.data },
-      });
-    }
-
-    // Handle error from tryCatch
-    const error = sessionResult.error;
-
-    // Check if it's a network error
-    if (isNetworkError(error)) {
-      // Log the error for debugging
-      console.error("⚠️ Auth middleware network error:", {
-        name: (error as any)?.name,
-        message: (error as any)?.message,
-        // Don't log stack in production to avoid exposing internals
-        ...(import.meta.env.DEV && { stack: (error as any)?.stack }),
-      });
-
-      // In production, allow graceful degradation - let client handle auth
-      // This prevents users from being stuck if there's a temporary network issue
-      if (import.meta.env.PROD) {
-        // Allow request through - client-side will handle auth check
-        return next({
-          context: { session: undefined },
-        });
-      }
-
-      // In development, redirect to help catch issues early
+    if (!session?.user) {
       throw redirect({ to: "/auth/login" });
     }
 
-    // For any other error, log and redirect
-    console.error("❌ Auth middleware error:", {
-      name: (error as any)?.name,
-      message: (error as any)?.message,
-      ...(import.meta.env.DEV && { stack: (error as any)?.stack }),
+    return next({
+      context: { session },
     });
-    throw redirect({ to: "/auth/login" });
   } catch (error) {
-    // Always clear timeout in case of early return
     clearTimeout(timeoutId);
 
     // If it's already a redirect, rethrow it
@@ -96,12 +74,12 @@ export const authMiddleware = createMiddleware().server(async ({ next, request }
       throw error;
     }
 
-    // This shouldn't happen with tryCatch, but handle it just in case
-    console.error("❌ Unexpected error in auth middleware:", {
-      name: (error as any)?.name,
-      message: (error as any)?.message,
-      ...(import.meta.env.DEV && { stack: (error as any)?.stack }),
-    });
+    // In production, allow graceful degradation for network errors
+    if (import.meta.env.PROD && (error as Error)?.name === "AbortError") {
+      return next({ context: { session: undefined } });
+    }
+
+    console.error("Auth middleware error:", error);
     throw redirect({ to: "/auth/login" });
   }
 });
