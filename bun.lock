@@ -71,6 +71,7 @@
         "@base-ui/react": "^1.0.0",
         "@elysiajs/eden": "^1.4.5",
         "@interviews-tool/auth": "workspace:*",
+        "@interviews-tool/db": "workspace:*",
         "@tailwindcss/vite": "^4.1.8",
         "@tanstack/react-form": "^1.23.5",
         "@tanstack/react-query": "^5.90.12",
@@ -121,6 +122,7 @@
       "name": "@interviews-tool/auth",
       "dependencies": {
         "@interviews-tool/db": "workspace:*",
+        "@interviews-tool/domain": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:",
         "zod": "catalog:",
