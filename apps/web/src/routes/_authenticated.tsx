@@ -53,11 +53,18 @@ export const getAuth = createServerFn({ method: "GET" }).handler(
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
   beforeLoad: async () => {
-    const session = await getAuth();
-    if (!session?.user) {
-      throw redirect({ to: "/auth/login" });
+    try {
+      console.log("before load --------------->");
+      const session = await getAuth();
+      console.log("session before load--------------->", session);
+      // if (!session?.user) {
+      //   throw redirect({ to: "/auth/login" });
+      // }
+      return { session };
+    } catch (error) {
+      console.error("Failed to get session:", error);
+      return null;
     }
-    return { session };
   },
 });
 
