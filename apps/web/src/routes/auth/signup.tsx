@@ -1,9 +1,15 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 
 import SignUpForm from "@/components/sign-up-form";
 
 export const Route = createFileRoute("/auth/signup")({
   component: SignUpPage,
+  beforeLoad: async (ctx) => {
+    const { isAuthenticated } = ctx.context;
+    if (isAuthenticated) {
+      throw redirect({ to: "/hiring-processes" });
+    }
+  },
 });
 
 function SignUpPage() {
