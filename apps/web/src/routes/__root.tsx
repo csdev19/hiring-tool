@@ -9,7 +9,7 @@ import { Toaster } from "@interviews-tool/web-ui";
 
 import Header from "../components/header";
 import appCss from "../index.css?url";
-import { getAuth } from "@/lib/auth/functions";
+import { getAuthSession } from "@/lib/auth/functions";
 
 export interface RouterAppContext {
   queryClient: QueryClient;
@@ -39,7 +39,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   component: RootDocument,
   staleTime: 10 * 60 * 1000, // 10 minutes
   beforeLoad: async () => {
-    const session = await getAuth();
+    const session = await getAuthSession();
     return { session, isAuthenticated: !!session };
   },
 });

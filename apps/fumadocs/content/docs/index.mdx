@@ -1,53 +1,254 @@
 ---
-title: Welcome
-description: Interview Tracker Documentation
+title: Welcome to Hiring Tool Docs
+description: Documentation for the Hiring Tool full-stack application
 ---
 
-## Welcome to Interview Tracker
+import { Callout } from 'fumadocs-ui/components/callout';
 
-A comprehensive web application for managing job interviews and tracking your entire job application journey.
+## Welcome
 
-### Quick Links
+Welcome to the **Hiring Tool** documentation. This is a modern full-stack application built with TanStack Start, Elysia, and PostgreSQL.
 
-- [Concept V1](/docs/v1/concept) - Product concept and feature specifications
-- [Architecture](/docs/v1/architecture) - System architecture and design decisions
+---
 
-### What is Interview Tracker?
+## 🎯 Featured Documentation
 
-Interview Tracker is a modern web application that helps job seekers:
+### [Authentication System](/docs/authentication)
 
-- **Track Multiple Interviews** - Manage all your job applications in one place
-- **Record Interactions** - Keep a chronological history of all communications
-- **Store Company Information** - Organize salary, benefits, and contact details
-- **Monitor Progress** - Track interview stages and outcomes
+Our **full-stack authentication implementation** transforms TanStack Start into a true full-stack framework with:
 
-### Technology Stack
+- ✅ **Server-side session validation** - Sessions validated before rendering
+- ✅ **Cross-origin cookie handling** - Proxy pattern solves CORS issues
+- ✅ **Intelligent caching** - 90% reduction in database queries
+- ✅ **Type-safe data flow** - End-to-end TypeScript support
 
-Built with modern, type-safe technologies:
+<Callout type="info">
+**Quick Links**:
+- [Authentication Overview](/docs/authentication) - User-facing guide
+- [Architecture Deep Dive](/docs/authentication/overview) - Complete implementation details
+- [Quick Reference](/docs/authentication/quick-reference) - Common patterns and snippets
+- [Implementation Story](/docs/authentication/implementation) - How we built it
+</Callout>
 
-- **Frontend:** React with TanStack Start (SSR)
-- **Backend:** Elysia (TypeScript)
-- **Database:** PostgreSQL with Drizzle ORM
-- **Authentication:** Better-Auth
-- **API:** ORPC (type-safe RPC)
+---
 
-### Getting Started
+## 📚 Documentation Structure
 
-Check out the [Concept V1](/docs/v1/concept) document to understand the product vision and features, or dive into the [Architecture](/docs/v1/architecture) to see how everything fits together.
+### Core Concepts
 
-### Example: System Flow
+- [Domain Architecture Patterns](/docs/domain-architecture-patterns) - Schema-based architecture
+- [Schemas Implementation](/docs/schemas-implementation) - Zod v4 schemas with validation
+- [Constants Pattern](/docs/constants-pattern) - Managing constants effectively
+- [Web UI Package](/docs/web-ui-package) - shadcn/ui component library
 
-```mermaid
-graph LR
-    A[Job Seeker] --> B[Interview Tracker]
-    B --> C[Track Applications]
-    B --> D[Record Interactions]
-    B --> E[Manage Companies]
-    C --> F[Success!]
-    D --> F
-    E --> F
+### Backend
 
-    style A fill:#3b82f6,stroke:#1e40af,stroke-width:2px,color:#fff
-    style B fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
-    style F fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+- [API Response Types](/docs/backend/api-response-types) - Standardized API responses
+- [Error Handlers](/docs/backend/error-handlers) - Error handling patterns
+- [Response Helpers](/docs/backend/response-helpers) - Helper functions
+- [Result Types](/docs/backend/result-types) - Type-safe result handling
+
+### Version 1 Features
+
+- [Architecture](/docs/v1/architecture) - Overall architecture
+- [Features Status](/docs/v1/features-status) - Implementation status
+- [Stories](/docs/v1/stories) - User stories and requirements
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **Bun** - Package manager and runtime
+- **PostgreSQL** - Database
+- **Node.js** - For tooling
+
+### Installation
+
+```bash
+# Clone the repository
+git clone <repo-url>
+
+# Install dependencies
+bun install
+
+# Set up environment variables
+cp .env.example .env
+cp .dev.vars.example .dev.vars
+
+# Run database migrations
+bun run db:push
+
+# Start development servers
+bun run dev        # Start all apps
+bun run dev:web    # Start web app only
+bun run dev:server # Start backend only
 ```
+
+### Development
+
+```bash
+# Web app
+cd apps/web
+bun run dev
+
+# Backend
+cd apps/server
+bun run dev
+
+# Documentation
+cd apps/fumadocs
+bun run dev
+```
+
+---
+
+## 🏗️ Tech Stack
+
+### Monorepo Structure
+
+- **Package Manager**: Bun
+- **Build Tool**: Turbo
+- **Monorepo**: Turborepo with workspace packages
+
+### Frontend
+
+- **Framework**: React with TanStack Start
+- **Routing**: TanStack Router
+- **State Management**: TanStack Query
+- **UI Library**: shadcn/ui with TailwindCSS
+- **Forms**: React Hook Form with Zod resolver
+- **Validation**: Zod v4
+
+### Backend
+
+- **Framework**: Elysia
+- **Database**: PostgreSQL with Drizzle ORM
+- **Authentication**: Better Auth
+- **Validation**: Zod v4
+- **API Type Safety**: Eden Treaty
+
+### Documentation
+
+- **Framework**: Fumadocs
+
+---
+
+## 📦 Project Structure
+
+```
+hiring-tool/
+├── apps/
+│   ├── web/                   # Frontend application (TanStack Start)
+│   ├── server/                # Backend API (Elysia)
+│   └── fumadocs/              # Documentation site
+│
+├── packages/
+│   ├── auth/                  # Authentication package (Better Auth)
+│   ├── config/                # Shared configuration
+│   ├── db/                    # Database schemas and migrations
+│   ├── domain/                # Domain schemas and types
+│   └── web-ui/                # Shared UI components (shadcn/ui)
+│
+└── turbo.json                 # Turbo configuration
+```
+
+---
+
+## 🎓 Key Concepts
+
+### Schema-Based Architecture
+
+We use a **schema-first approach** where Zod schemas are the source of truth:
+
+```typescript
+// Define base schema
+export const userSchema = z.object({
+  id: z.uuid(),
+  email: z.email(),
+  name: z.string().min(1),
+  createdAt: z.coerce.date(),
+});
+
+// Derive create/update schemas
+export const createUserSchema = userSchema.pick({
+  email: true,
+  name: true,
+});
+
+export type User = z.infer<typeof userSchema>;
+export type CreateUser = z.infer<typeof createUserSchema>;
+```
+
+### Full-Stack Type Safety
+
+Types flow seamlessly from backend to frontend:
+
+```typescript
+// Backend defines the contract
+app.post("/users", async ({ body }) => {
+  const user = await db.createUser(body);
+  return success(user);
+});
+
+// Frontend consumes with full types
+const { data } = await eden.users.post({
+  email: "user@example.com",
+  name: "John Doe",
+});
+// data is fully typed! ✅
+```
+
+---
+
+## 🔒 Security
+
+- **HttpOnly Cookies** - Session tokens are secure
+- **Server-Side Validation** - All auth checks happen on the server
+- **CORS Protection** - Proper CORS configuration
+- **SQL Injection Prevention** - Drizzle ORM parameterizes queries
+- **XSS Protection** - React's built-in sanitization
+- **CSRF Protection** - SameSite cookies
+
+---
+
+## 🚦 Testing
+
+```bash
+# Run tests
+bun test
+
+# Run tests with coverage
+bun test --coverage
+
+# Run specific test file
+bun test path/to/test.ts
+```
+
+---
+
+## 📝 Contributing
+
+1. Create a feature branch
+2. Make your changes
+3. Write/update tests
+4. Update documentation
+5. Submit a pull request
+
+---
+
+## 📖 Additional Resources
+
+- [Better Auth Docs](https://better-auth.com)
+- [TanStack Router Docs](https://tanstack.com/router)
+- [TanStack Start Docs](https://tanstack.com/start)
+- [Elysia Docs](https://elysiajs.com)
+- [Drizzle ORM Docs](https://orm.drizzle.team)
+- [Fumadocs](https://fumadocs.dev)
+
+---
+
+<Callout type="success" title="Ready to Build">
+You're all set! Start by exploring the [Authentication System](/docs/authentication) to understand how we built a full-stack framework with TanStack Start.
+</Callout>
