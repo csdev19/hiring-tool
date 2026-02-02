@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button, Card, CardContent } from "@interviews-tool/web-ui";
-import { authClient } from "@/lib/auth-client";
 import {
   Briefcase,
   Building2,
@@ -15,8 +14,8 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const { data: session } = authClient.useSession();
-  const isAuthenticated = !!session;
+  const context = Route.useRouteContext();
+  const { isAuthenticated } = context;
 
   return (
     <div className="min-h-screen bg-linear-to-b from-background to-muted/20">

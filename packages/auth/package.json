@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@interviews-tool/db": "workspace:*",
+    "@interviews-tool/domain": "workspace:*",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:"

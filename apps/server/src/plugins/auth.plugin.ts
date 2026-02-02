@@ -1,7 +1,6 @@
 import { Elysia } from "elysia";
-import { createAuth } from "@interviews-tool/auth";
 import { UnauthorizedError } from "@/utils/errors";
-import { env } from "cloudflare:workers";
+import { auth } from "@/lib/auth";
 
 /**
  * Authentication macro plugin
@@ -24,7 +23,6 @@ import { env } from "cloudflare:workers";
 export const authMacro = new Elysia({ name: "auth-macro" }).error({ UnauthorizedError }).macro({
   isAuth: {
     async resolve({ request: { headers } }) {
-      const auth = createAuth(env.CORS_ORIGIN);
       const session = await auth.api.getSession({ headers });
       if (!session) throw new UnauthorizedError();
 
