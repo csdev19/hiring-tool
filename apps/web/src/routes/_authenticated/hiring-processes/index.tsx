@@ -7,7 +7,7 @@ import { Plus } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/hiring-processes/")({
   component: HiringProcessesComponent,
-  beforeLoad: async (ctx) => {
+  beforeLoad: async () => {
     // TODO: context.session should be typed from the parent layout middleware
   },
 });
