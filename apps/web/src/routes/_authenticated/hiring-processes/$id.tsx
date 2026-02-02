@@ -37,7 +37,6 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/hiring-processes/$id")({
   component: HiringProcessDetailPage,
-  beforeLoad: async (ctx) => {},
 });
 
 function HiringProcessDetailPage() {
