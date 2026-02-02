@@ -1,11 +1,11 @@
 import { cors } from "@elysiajs/cors";
+import { createAuth } from "@interviews-tool/auth";
 import { Elysia } from "elysia";
 import { hiringProcessRoutes } from "./routes/hiring-processes";
 import { companyDetailsRoutes } from "./routes/company-details";
 import { interactionRoutes } from "./routes/interactions";
 import { CloudflareAdapter } from "elysia/adapter/cloudflare-worker";
 import { env } from "cloudflare:workers";
-import { auth } from "./lib/auth";
 
 // Configure CORS once at the app level
 const corsConfig = {
@@ -16,7 +16,7 @@ const corsConfig = {
   maxAge: 86400, // 24 hours
 };
 
-const authRoutes = new Elysia().use(cors(corsConfig)).mount(auth.handler);
+const authRoutes = new Elysia().use(cors(corsConfig)).mount(createAuth(env.CORS_ORIGIN).handler);
 
 const apiRoutes = new Elysia({
   prefix: "/api/v1",

@@ -14,7 +14,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthenticatedHiringProcessesIndexRouteImport } from './routes/_authenticated/hiring-processes/index'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthenticatedHiringProcessesNewRouteImport } from './routes/_authenticated/hiring-processes/new'
 import { Route as AuthenticatedHiringProcessesIdRouteImport } from './routes/_authenticated/hiring-processes/$id'
 import { Route as AuthenticatedHiringProcessesIdEditRouteImport } from './routes/_authenticated/hiring-processes/$id_.edit'
@@ -44,11 +43,6 @@ const AuthenticatedHiringProcessesIndexRoute =
     path: '/hiring-processes/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedHiringProcessesNewRoute =
   AuthenticatedHiringProcessesNewRouteImport.update({
     id: '/hiring-processes/new',
@@ -74,7 +68,6 @@ export interface FileRoutesByFullPath {
   '/auth/signup': typeof AuthSignupRoute
   '/hiring-processes/$id': typeof AuthenticatedHiringProcessesIdRoute
   '/hiring-processes/new': typeof AuthenticatedHiringProcessesNewRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
   '/hiring-processes': typeof AuthenticatedHiringProcessesIndexRoute
   '/hiring-processes/$id/edit': typeof AuthenticatedHiringProcessesIdEditRoute
 }
@@ -84,7 +77,6 @@ export interface FileRoutesByTo {
   '/auth/signup': typeof AuthSignupRoute
   '/hiring-processes/$id': typeof AuthenticatedHiringProcessesIdRoute
   '/hiring-processes/new': typeof AuthenticatedHiringProcessesNewRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
   '/hiring-processes': typeof AuthenticatedHiringProcessesIndexRoute
   '/hiring-processes/$id/edit': typeof AuthenticatedHiringProcessesIdEditRoute
 }
@@ -96,7 +88,6 @@ export interface FileRoutesById {
   '/auth/signup': typeof AuthSignupRoute
   '/_authenticated/hiring-processes/$id': typeof AuthenticatedHiringProcessesIdRoute
   '/_authenticated/hiring-processes/new': typeof AuthenticatedHiringProcessesNewRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authenticated/hiring-processes/': typeof AuthenticatedHiringProcessesIndexRoute
   '/_authenticated/hiring-processes/$id_/edit': typeof AuthenticatedHiringProcessesIdEditRoute
 }
@@ -108,7 +99,6 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/hiring-processes/$id'
     | '/hiring-processes/new'
-    | '/api/auth/$'
     | '/hiring-processes'
     | '/hiring-processes/$id/edit'
   fileRoutesByTo: FileRoutesByTo
@@ -118,7 +108,6 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/hiring-processes/$id'
     | '/hiring-processes/new'
-    | '/api/auth/$'
     | '/hiring-processes'
     | '/hiring-processes/$id/edit'
   id:
@@ -129,7 +118,6 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/_authenticated/hiring-processes/$id'
     | '/_authenticated/hiring-processes/new'
-    | '/api/auth/$'
     | '/_authenticated/hiring-processes/'
     | '/_authenticated/hiring-processes/$id_/edit'
   fileRoutesById: FileRoutesById
@@ -139,7 +127,6 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -178,13 +165,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/hiring-processes'
       preLoaderRoute: typeof AuthenticatedHiringProcessesIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
-    }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/hiring-processes/new': {
       id: '/_authenticated/hiring-processes/new'
@@ -235,7 +215,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

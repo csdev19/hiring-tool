@@ -9,7 +9,6 @@ import { Toaster } from "@interviews-tool/web-ui";
 
 import Header from "../components/header";
 import appCss from "../index.css?url";
-import { getAuth } from "@/lib/auth/functions";
 
 export interface RouterAppContext {
   queryClient: QueryClient;
@@ -36,12 +35,8 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       },
     ],
   }),
+
   component: RootDocument,
-  staleTime: 10 * 60 * 1000, // 10 minutes
-  beforeLoad: async () => {
-    const session = await getAuth();
-    return { session, isAuthenticated: !!session };
-  },
 });
 
 // Critical inline styles to prevent flash of unstyled content

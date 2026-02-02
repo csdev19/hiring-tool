@@ -3,12 +3,14 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import z from "zod";
 
-import { authClient } from "@/lib/auth/auth-client";
+import { authClient } from "@/lib/auth-client";
 
+import Loader from "./loader";
 import { Button, Input, Label } from "@interviews-tool/web-ui";
 
 export default function SignUpForm() {
   const navigate = useNavigate();
+  const { isPending } = authClient.useSession();
 
   const form = useForm({
     defaultValues: {
@@ -44,6 +46,10 @@ export default function SignUpForm() {
       }),
     },
   });
+
+  if (isPending) {
+    return <Loader />;
+  }
 
   return (
     <>

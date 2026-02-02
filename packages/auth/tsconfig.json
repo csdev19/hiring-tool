@@ -6,6 +6,5 @@
     "sourceMap": true,
     "outDir": "dist",
     "composite": true
-  },
-  "include": ["src/**/*"]
+  }
 }
