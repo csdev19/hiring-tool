@@ -3,15 +3,18 @@ import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { useEffect, useState } from "react";
 
 import { Toaster } from "@interviews-tool/web-ui";
 
 import Header from "../components/header";
 import appCss from "../index.css?url";
+import { getAuthSession } from "@/lib/auth/get-auth-session";
+import type { AuthSession } from "@/lib/auth/types";
 
 export interface RouterAppContext {
   queryClient: QueryClient;
+  isAuthenticated: boolean;
+  session: AuthSession | null;
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
@@ -35,8 +38,15 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       },
     ],
   }),
-
   component: RootDocument,
+  staleTime: 10 * 60 * 1000, // 10 minutes
+  beforeLoad: async () => {
+    const session = await getAuthSession();
+    return {
+      session: session ?? null,
+      isAuthenticated: !!session,
+    };
+  },
 });
 
 // Critical inline styles to prevent flash of unstyled content
@@ -50,11 +60,8 @@ const criticalStyles = `
 `;
 
 function RootDocument() {
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    setIsReady(true);
-  }, []);
+  const context = Route.useRouteContext();
+  const { isAuthenticated, session } = context;
 
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
@@ -63,14 +70,12 @@ function RootDocument() {
         <HeadContent />
       </head>
       <body suppressHydrationWarning>
-        {!isReady && (
-          <div className="fixed inset-0 z-9999 flex items-center justify-center bg-neutral-950">
-            <h1 className="text-2xl font-semibold tracking-tight">Hiring Tool</h1>
-          </div>
-        )}
-
         <div className="min-h-svh">
-          <Header />
+          <Header
+            isAuthenticated={isAuthenticated}
+            userName={session?.user?.name ?? ""}
+            userEmail={session?.user?.email ?? ""}
+          />
           <main className="pt-12">
             <Outlet />
           </main>

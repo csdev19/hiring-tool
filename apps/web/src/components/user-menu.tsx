@@ -9,19 +9,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Button,
-  Skeleton,
 } from "@interviews-tool/web-ui";
-import { useSession, useSignOut } from "@/hooks/use-session";
+import { useSignOut } from "@/hooks/use-session";
+import type { AuthSession } from "@/lib/auth/types";
 
-export default function UserMenu() {
-  const { session, isPending } = useSession();
+interface UserMenuProps {
+  userName: AuthSession["user"]["name"];
+  userEmail: AuthSession["user"]["email"];
+  isAuthenticated: boolean;
+}
+
+export default function UserMenu({ userName, userEmail, isAuthenticated }: UserMenuProps) {
   const signOut = useSignOut();
 
-  if (isPending) {
-    return <Skeleton className="h-9 w-24" />;
-  }
-
-  if (!session) {
+  if (!isAuthenticated) {
     return (
       <Link to="/auth/login">
         <Button variant="outline">Sign In</Button>
@@ -31,14 +32,12 @@ export default function UserMenu() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" />}>
-        {session.user.name}
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger render={<Button variant="outline" />}>{userName}</DropdownMenuTrigger>
       <DropdownMenuContent className="bg-card min-w-[240px]">
         <DropdownMenuGroup>
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
+          <DropdownMenuItem>{userEmail}</DropdownMenuItem>
           <DropdownMenuItem variant="destructive" onClick={() => signOut.mutate()}>
             Sign Out
           </DropdownMenuItem>
