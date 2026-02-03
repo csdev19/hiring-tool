@@ -29,6 +29,16 @@ export interface PaginationParams {
 }
 
 /**
+ * Filter parameters for hiring process queries
+ */
+export interface HiringProcessFilterParams {
+  statuses?: string[];
+  salaryDeclared?: boolean;
+  salaryMin?: number;
+  salaryMax?: number;
+}
+
+/**
  * Calculated pagination values
  */
 export interface PaginationResult {

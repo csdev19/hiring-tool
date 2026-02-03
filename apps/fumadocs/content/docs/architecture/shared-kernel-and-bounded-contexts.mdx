@@ -1,0 +1,635 @@
+---
+title: Shared Kernel & Bounded Contexts
+description: Architectural guide for organizing code with shared primitives and bounded contexts
+---
+
+# Shared Kernel & Bounded Contexts
+
+This document outlines the strategy for organizing code between shared primitives (Shared Kernel) and context-specific code (Bounded Contexts) as the application grows.
+
+---
+
+## 🎯 Core Principles
+
+### Shared Kernel
+
+A **Shared Kernel** is a small, stable set of generic primitives shared across all bounded contexts.
+
+**Rules:**
+
+- ✅ Must be **truly generic** (no context-specific logic)
+- ✅ Must be **stable** (rarely changes)
+- ✅ Must be **agreed upon** by all contexts
+- ❌ Should be **small** (resist sharing everything)
+
+### Bounded Context
+
+A **Bounded Context** is a logical boundary where a particular domain model applies.
+
+**Rules:**
+
+- ✅ Has its own **domain model**
+- ✅ Has its own **business rules**
+- ✅ Has its own **repository interfaces**
+- ✅ Can **use** shared kernel primitives
+- ❌ Should **not** depend on other contexts directly
+
+---
+
+## 📊 Current Domain Analysis
+
+### ✅ Shared Kernel Candidates
+
+These should move to `@hiring-tool/shared-kernel`:
+
+#### 1. Currency (`currency.ts`)
+
+```typescript
+// packages/shared-kernel/src/currency.ts
+export const CURRENCIES = {
+  USD: "USD",
+  PEN: "PEN",
+} as const;
+
+export type Currency = typeof CURRENCIES[keyof typeof CURRENCIES];
+
+export const CURRENCY_INFO: Record<Currency, { label: string; symbol: string }> = {
+  USD: { label: "US Dollar", symbol: "$" },
+  PEN: { label: "Peruvian Sol", symbol: "S/" },
+};
+```
+
+**Reason:** Generic financial primitive, no business logic, used across contexts
+
+---
+
+#### 2. Result Pattern (`result.ts`)
+
+```typescript
+// packages/shared-kernel/src/result.ts
+export type Result<T, E = Error> = Success<T> | Failure<E>;
+
+export type Success<T> = { data: T; error: null };
+export type Failure<E> = { data: null; error: E };
+
+export async function tryCatch<T, E = Error>(promise: Promise<T>): Promise<Result<T, E>> {
+  try {
+    const data = await promise;
+    return { data, error: null };
+  } catch (error) {
+    return { data: null, error: error as E };
+  }
+}
+```
+
+**Reason:** Generic error handling pattern (like Rust's Result), applicable everywhere
+
+---
+
+#### 3. API Response Types (`api-response.ts`)
+
+```typescript
+// packages/shared-kernel/src/api.ts
+export interface ApiResponse<T> {
+  data: T | null;
+  error: { message: string } | null;
+  meta?: {
+    pagination?: PaginationMeta;
+  };
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+}
+```
+
+**Reason:** Standard API contract used by all HTTP endpoints
+
+---
+
+#### 4. TypeScript Utilities (`utils.ts`)
+
+```typescript
+// packages/shared-kernel/src/utils.ts
+/**
+ * Utility type to extract object property values
+ * Useful for creating type-safe constants
+ */
+export type ObjectProperties<T> = T[keyof T];
+```
+
+**Reason:** Generic TypeScript utility with no business logic
+
+---
+
+### ❌ Context-Specific (Stay in Hiring Context)
+
+These should remain in `@hiring-tool/domain` (or future `@hiring-tool/hiring`):
+
+#### 1. Hiring Process Status (`hiring-process-status.ts`)
+
+```typescript
+// packages/hiring-context/domain/constants/hiring-status.ts
+export const HIRING_PROCESS_STATUSES = {
+  FIRST_CONTACT: "first-contact",
+  ONGOING: "ongoing",
+  ON_HOLD: "on-hold",
+  REJECTED: "rejected",
+  DROPPED_OUT: "dropped-out",
+  HIRED: "hired",
+  OFFER_MADE: "offer-made",
+  OFFER_ACCEPTED: "offer-accepted",
+} as const;
+
+// Business logic - context-specific!
+export const STATUS_TRANSITIONS: Record<HiringProcessStatus, HiringProcessStatus[]> = {
+  // Workflow rules specific to hiring
+};
+
+export function isValidStatusTransition(from: HiringProcessStatus, to: HiringProcessStatus): boolean {
+  return STATUS_TRANSITIONS[from].includes(to);
+}
+```
+
+**Reason:**
+
+- ❌ Hiring-specific workflow
+- ❌ Contains business rules (status transitions)
+- ❌ Has domain logic (active vs terminal categorization)
+
+---
+
+#### 2. Interaction Type (`interaction-type.ts`)
+
+```typescript
+// packages/hiring-context/domain/constants/interaction-type.ts
+export const INTERACTION_TYPES = {
+  EMAIL: "email",
+  PHONE_CALL: "phone-call",
+  VIDEO_CALL: "video-call",
+  // ... hiring-specific communication types
+} as const;
+```
+
+**Reason:** Hiring-specific communication workflow
+
+---
+
+#### 3. Salary Rate Type (`salary-rate-type.ts`)
+
+```typescript
+// packages/hiring-context/domain/constants/salary-rate.ts
+export const SALARY_RATE_TYPES = {
+  MONTHLY: "monthly",
+  HOURLY: "hourly",
+} as const;
+```
+
+**Reason:** Currently hiring-specific (could become shared if billing needs it)
+
+---
+
+## 📦 Recommended Package Structure
+
+### Phase 1: Single Context with Shared Kernel (Current → Near Future)
+
+```bash
+packages/
+  shared-kernel/                    # Generic primitives
+    src/
+      api.ts                        # ApiResponse, Pagination types
+      currency.ts                   # CURRENCIES constant
+      result.ts                     # Result<T, E> pattern
+      utils.ts                      # ObjectProperties<T>
+      index.ts                      # Barrel exports
+    package.json
+    tsconfig.json
+
+  domain/                           # Hiring context (current name)
+    src/
+      constants/
+        hiring-process-status.ts    # Hiring-specific
+        interaction-type.ts         # Hiring-specific
+        salary-rate-type.ts         # Hiring-specific
+      repositories/
+        hiring-process.repository.ts
+      schemas/
+        hiring-process.ts
+        interaction.ts
+      index.ts
+    package.json
+
+  database/                         # Infrastructure
+    src/
+      schema/                       # Drizzle table definitions
+      repositories/                 # Repository implementations
+      mappers/                      # DB ↔ Domain mappers
+    package.json
+```
+
+---
+
+### Phase 2: Multiple Bounded Contexts (Future)
+
+```bash
+packages/
+  shared-kernel/                    # Shared primitives
+    src/
+      api.ts
+      currency.ts
+      result.ts
+      utils.ts
+
+  hiring/                           # Hiring bounded context
+    domain/
+      constants/
+        hiring-status.ts
+        interaction-type.ts
+      repositories/
+        hiring-process.repository.ts
+      entities/
+        hiring-process.entity.ts
+      value-objects/
+        salary.ts
+    infrastructure/
+      repositories/
+        hiring-process.repository.ts  # Drizzle implementation
+      mappers/
+        hiring-process.mapper.ts
+    package.json
+
+  analytics/                        # Analytics bounded context
+    domain/
+      repositories/
+        hiring-metrics.repository.ts
+      entities/
+        hiring-metric.entity.ts
+    infrastructure/
+      repositories/
+        hiring-metrics.repository.ts
+      mappers/
+        hiring-metrics.mapper.ts
+    package.json
+
+  database/                         # Shared database schemas
+    schema/
+      hiring-process.schema.ts      # Drizzle table definition
+      interaction.schema.ts
+    client/
+      index.ts
+    package.json
+```
+
+---
+
+## 🏷️ Package Naming Conventions
+
+### Shared Kernel Package Names
+
+**Recommended:** `@hiring-tool/shared-kernel`
+
+**Alternatives:**
+
+- `@hiring-tool/shared` - Shorter, still clear
+- `@hiring-tool/core` - Generic but semantic
+- `@hiring-tool/common` - Common in industry
+
+**Rationale:** "Shared Kernel" is explicit DDD terminology
+
+---
+
+### Context Package Names
+
+#### Single Context (Current State)
+
+```json
+{
+  "name": "@hiring-tool/domain"
+}
+```
+
+Keep generic until you add a second context.
+
+---
+
+#### Multiple Contexts (Future)
+
+```json
+{
+  "name": "@hiring-tool/hiring",
+  "name": "@hiring-tool/analytics",
+  "name": "@hiring-tool/billing"
+}
+```
+
+Be explicit about which bounded context each package represents.
+
+---
+
+## 📥 Import Strategies
+
+### Strategy 1: Direct Imports (Recommended)
+
+```typescript
+// Generic primitives from shared kernel
+import { CURRENCIES, Currency } from "@hiring-tool/shared-kernel/currency";
+import { Result } from "@hiring-tool/shared-kernel/result";
+import { ApiResponse } from "@hiring-tool/shared-kernel/api";
+
+// Context-specific from domain
+import { HIRING_PROCESS_STATUSES } from "@hiring-tool/domain/constants";
+```
+
+**Benefits:**
+
+- ✅ Clear what's shared vs context-specific
+- ✅ Better for tree-shaking
+- ✅ Explicit dependencies
+
+---
+
+### Strategy 2: Barrel Exports (Convenience)
+
+```typescript
+// packages/shared-kernel/src/index.ts
+export * from "./api";
+export * from "./currency";
+export * from "./result";
+export * from "./utils";
+
+// Usage
+import { CURRENCIES, Result, ApiResponse } from "@hiring-tool/shared-kernel";
+import { HIRING_PROCESS_STATUSES } from "@hiring-tool/domain";
+```
+
+**Benefits:**
+
+- ✅ Shorter imports
+- ✅ Single entry point
+- ⚠️ May import unused code
+
+---
+
+### Strategy 3: Context Re-exports (For Convenience)
+
+```typescript
+// packages/domain/src/index.ts
+// Re-export shared kernel types for convenience
+export { CURRENCIES, Currency, CURRENCY_INFO } from "@hiring-tool/shared-kernel/currency";
+export { Result, tryCatch } from "@hiring-tool/shared-kernel/result";
+
+// Export domain-specific
+export * from "./constants";
+export * from "./repositories";
+
+// Usage - everything from one place
+import { CURRENCIES, HIRING_PROCESS_STATUSES } from "@hiring-tool/domain";
+```
+
+**Benefits:**
+
+- ✅ Single import for context
+- ✅ Convenience for consumers
+- ⚠️ Hides shared kernel dependency
+
+---
+
+## 🔄 Migration Path
+
+### Step 1: Create Shared Kernel Package
+
+```bash
+# Create package structure
+mkdir -p packages/shared-kernel/src
+cd packages/shared-kernel
+
+# Create package.json
+cat > package.json << 'EOF'
+{
+  "name": "@hiring-tool/shared-kernel",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./api": "./src/api.ts",
+    "./currency": "./src/currency.ts",
+    "./result": "./src/result.ts",
+    "./utils": "./src/utils.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./api": "./dist/api.mjs",
+      "./currency": "./dist/currency.mjs",
+      "./result": "./dist/result.mjs",
+      "./utils": "./dist/utils.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "tsdown": "^0.18.2",
+    "typescript": "^5"
+  }
+}
+EOF
+```
+
+---
+
+### Step 2: Move Files
+
+```bash
+# Move generic types to shared kernel
+mv packages/domain/src/types/api-response.ts packages/shared-kernel/src/api.ts
+mv packages/domain/src/types/result.ts packages/shared-kernel/src/result.ts
+mv packages/domain/src/constants/currency.ts packages/shared-kernel/src/currency.ts
+
+# Create utils.ts with ObjectProperties
+cat > packages/shared-kernel/src/utils.ts << 'EOF'
+export type ObjectProperties<T> = T[keyof T];
+EOF
+
+# Create barrel export
+cat > packages/shared-kernel/src/index.ts << 'EOF'
+export * from "./api";
+export * from "./currency";
+export * from "./result";
+export * from "./utils";
+EOF
+```
+
+---
+
+### Step 3: Update Imports
+
+**Before:**
+
+```typescript
+import { CURRENCIES, Currency } from "@hiring-tool/domain/constants";
+import { Result } from "@hiring-tool/domain/types";
+import { ApiResponse } from "@hiring-tool/domain/types";
+```
+
+**After:**
+
+```typescript
+import { CURRENCIES, Currency } from "@hiring-tool/shared-kernel/currency";
+import { Result } from "@hiring-tool/shared-kernel/result";
+import { ApiResponse } from "@hiring-tool/shared-kernel/api";
+```
+
+---
+
+### Step 4: Update package.json Dependencies
+
+```json
+// packages/domain/package.json
+{
+  "dependencies": {
+    "@hiring-tool/shared-kernel": "workspace:*"
+  }
+}
+
+// packages/database/package.json
+{
+  "dependencies": {
+    "@hiring-tool/shared-kernel": "workspace:*",
+    "@hiring-tool/domain": "workspace:*"
+  }
+}
+
+// apps/web/package.json
+{
+  "dependencies": {
+    "@hiring-tool/shared-kernel": "workspace:*",
+    "@hiring-tool/domain": "workspace:*"
+  }
+}
+```
+
+---
+
+## 🎯 Decision Framework
+
+Use this to decide where code belongs:
+
+```
+┌─────────────────────────────────────────────┐
+│ Is it truly generic?                        │
+│ (e.g., ISO standard, no business rules)     │
+├─────────────────────────────────────────────┤
+│ Yes → shared-kernel/                        │
+│                                             │
+│ No → Has context-specific business rules?   │
+│   ├─ Yes → [context]/domain/                │
+│   │                                         │
+│   └─ No → Used for integration?             │
+│       ├─ Yes → integration/[context]-api/   │
+│       └─ No → Keep in context               │
+└─────────────────────────────────────────────┘
+```
+
+---
+
+## 📋 Checklist for Shared Kernel Items
+
+Before adding to shared kernel, verify:
+
+- [ ] Used by **multiple contexts** (or will be soon)
+- [ ] **No business logic** (pure data/utilities)
+- [ ] **Stable** (won't change often)
+- [ ] **Generic** (not domain-specific)
+- [ ] **Small** (resist over-sharing)
+- [ ] **Agreed upon** (all contexts accept it)
+
+---
+
+## 🚀 Future Context Examples
+
+### Example: Analytics Context
+
+```typescript
+// packages/analytics/domain/repositories/hiring-metrics.repository.ts
+import type { Currency } from "@hiring-tool/shared-kernel/currency";
+
+export interface IHiringMetricsRepository {
+  getAverageTimeToClosure(currency?: Currency): Promise<number>;
+  getSuccessRateByStatus(): Promise<StatusDistribution>;
+  getTotalProcessCount(): Promise<number>;
+}
+```
+
+**Notice:**
+
+- ✅ Uses `Currency` from shared kernel (same meaning)
+- ✅ Has its own repository interface (different concerns)
+- ✅ Same `hiring_process` table, different queries
+
+---
+
+### Example: Billing Context
+
+```typescript
+// packages/billing/domain/repositories/subscription.repository.ts
+import type { Currency } from "@hiring-tool/shared-kernel/currency";
+
+export interface ISubscriptionRepository {
+  getCurrentPlan(userId: string): Promise<SubscriptionPlan>;
+  calculateUsage(userId: string): Promise<UsageMetrics>;
+  getPaymentHistory(userId: string, currency: Currency): Promise<Payment[]>;
+}
+```
+
+**Notice:**
+
+- ✅ Uses same `Currency` type
+- ✅ Different domain model (Subscription vs HiringProcess)
+- ✅ Independent bounded context
+
+---
+
+## 🔗 Related Documentation
+
+- [Repository Pattern](/docs/architecture/repository-pattern) - Repository implementation guide
+- [Domain-Driven Design](/docs/domain-architecture-patterns) - DDD principles
+- [Monorepo Structure](/docs/architecture/monorepo-structure) - Package organization
+
+---
+
+## 💡 Key Takeaways
+
+1. **Shared Kernel = Small + Stable + Generic**
+   - Only primitives with no business logic
+   - Currency, Result pattern, API types
+
+2. **Context-Specific = Business Rules + Domain Logic**
+   - HiringProcessStatus with transitions
+   - InteractionType workflow
+   - Repository interfaces
+
+3. **Start Small, Refactor as Needed**
+   - Begin with `@hiring-tool/domain`
+   - Extract shared kernel when clear
+   - Split into contexts when you add 2nd domain
+
+4. **Resist Over-Sharing**
+   - Don't share just because code is similar
+   - Duplicate intentionally if meanings diverge
+   - Keep contexts independent
+
+---
+
+_Last Updated: {new Date().toISOString().split('T')[0]}_

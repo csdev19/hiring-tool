@@ -1,0 +1,424 @@
+---
+title: Repository Pattern Architecture
+description: Understanding the Repository pattern in our DDD architecture
+---
+
+# Repository Pattern Architecture
+
+This guide explains how we implement the Repository pattern following Domain-Driven Design principles.
+
+---
+
+## 🎯 Core Principle
+
+**Repositories are split between two packages:**
+
+1. **Interface (Contract)** → `packages/domain/` - What the repository can do
+2. **Implementation** → `packages/database/` - How it actually does it
+
+This follows the **Dependency Inversion Principle** and keeps our domain clean and independent of infrastructure concerns.
+
+---
+
+## 📦 Package Structure
+
+```bash
+packages/
+  domain/
+    hiring-process/
+      entities/
+        hiring-process.entity.ts           # Rich domain model
+      repositories/
+        hiring-process.repository.ts       # ← INTERFACE (contract)
+      value-objects/
+        salary.ts
+        company-name.ts
+
+  database/
+    hiring-process/
+      repositories/
+        hiring-process.repository.drizzle.ts  # ← IMPLEMENTATION
+      mappers/
+        hiring-process.mapper.ts              # Maps DB rows ↔ Domain entities
+    schema/
+      hiring-process.schema.ts                # Drizzle table definition
+
+  application/
+    hiring-process/
+      use-cases/
+        get-hiring-processes.service.ts       # Orchestrates business flow
+        create-hiring-process.service.ts
+```
+
+---
+
+## 🔑 Why This Separation?
+
+### Dependency Flow
+
+```
+┌─────────────────────────────────────────────┐
+│  packages/application/                      │
+│  (Use Cases / Orchestration)                │
+│    ↓ depends on                             │
+│  packages/domain/                           │
+│  (Repository Interface + Entities)          │
+└─────────────────────────────────────────────┘
+                    ↑
+                    │ implements
+                    │
+┌─────────────────────────────────────────────┐
+│  packages/database/                         │
+│  (Repository Implementation + Drizzle)      │
+└─────────────────────────────────────────────┘
+```
+
+### Benefits
+
+| Benefit                    | Why It Matters                                      |
+| -------------------------- | --------------------------------------------------- |
+| **Separation of Concerns** | Domain logic is independent of database             |
+| **Testability**            | Can test use cases without a real DB                |
+| **Flexibility**            | Can swap Drizzle for Prisma without touching domain |
+| **Clean Dependencies**     | Domain doesn't depend on infrastructure             |
+| **Rich Domain Model**      | Entities contain business logic, not just data      |
+
+---
+
+## 📝 Implementation Example
+
+### 1. Repository Interface (Domain Layer)
+
+```typescript
+// packages/domain/hiring-process/repositories/hiring-process.repository.ts
+
+import type { HiringProcess } from "../entities/hiring-process.entity";
+import type { PaginationParams, PaginatedResult } from "@interviews-tool/domain/types";
+
+export interface IHiringProcessRepository {
+  /**
+   * Find a hiring process by ID for a specific user
+   */
+  findById(id: string, userId: string): Promise<HiringProcess | null>;
+
+  /**
+   * Find paginated hiring processes for a user
+   */
+  findPaginated(
+    userId: string,
+    params: PaginationParams
+  ): Promise<PaginatedResult<HiringProcess>>;
+
+  /**
+   * Save a hiring process (create or update)
+   */
+  save(hiringProcess: HiringProcess): Promise<void>;
+
+  /**
+   * Soft delete a hiring process
+   */
+  delete(id: string, userId: string): Promise<void>;
+}
+```
+
+**Key Points:**
+
+- ✅ Works with **Domain Entities**, not raw DB data
+- ✅ Returns **rich domain objects** like `HiringProcess`
+- ✅ No SQL, no ORM references
+- ✅ Pure TypeScript interfaces
+
+---
+
+### 2. Repository Implementation (Database Layer)
+
+```typescript
+// packages/database/hiring-process/repositories/hiring-process.repository.drizzle.ts
+
+import { eq, and, desc, sql, isNull } from "drizzle-orm";
+import { hiringProcessTable } from "../../schema";
+import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
+import type { IHiringProcessRepository } from "@interviews-tool/domain/hiring-process/repositories";
+import type { HiringProcess } from "@interviews-tool/domain/hiring-process/entities";
+import type { PaginationParams, PaginatedResult } from "@interviews-tool/domain/types";
+import { HiringProcessMapper } from "../mappers/hiring-process.mapper";
+
+export class HiringProcessRepositoryDrizzle implements IHiringProcessRepository {
+  constructor(private readonly db: NeonHttpDatabase) {}
+
+  async findById(id: string, userId: string): Promise<HiringProcess | null> {
+    const row = await this.db.query.hiringProcessTable.findFirst({
+      where: and(
+        eq(hiringProcessTable.id, id),
+        eq(hiringProcessTable.userId, userId),
+        isNull(hiringProcessTable.deletedAt)
+      )
+    });
+
+    return row ? HiringProcessMapper.toDomain(row) : null;
+  }
+
+  async findPaginated(
+    userId: string,
+    params: PaginationParams
+  ): Promise<PaginatedResult<HiringProcess>> {
+    const offset = (params.page - 1) * params.limit;
+
+    const [processes, countResult] = await Promise.all([
+      this.db.select()
+        .from(hiringProcessTable)
+        .where(and(
+          eq(hiringProcessTable.userId, userId),
+          isNull(hiringProcessTable.deletedAt)
+        ))
+        .orderBy(desc(hiringProcessTable.updatedAt))
+        .limit(params.limit)
+        .offset(offset),
+      this.db.select({ count: sql<number>`count(*)` })
+        .from(hiringProcessTable)
+        .where(and(
+          eq(hiringProcessTable.userId, userId),
+          isNull(hiringProcessTable.deletedAt)
+        ))
+    ]);
+
+    const total = Number(countResult[0]?.count || 0);
+
+    return {
+      data: processes.map(row => HiringProcessMapper.toDomain(row)),
+      total,
+      page: params.page,
+      limit: params.limit,
+      totalPages: Math.ceil(total / params.limit)
+    };
+  }
+
+  async save(hiringProcess: HiringProcess): Promise<void> {
+    const persistence = HiringProcessMapper.toPersistence(hiringProcess);
+    await this.db.insert(hiringProcessTable).values(persistence);
+  }
+
+  async delete(id: string, userId: string): Promise<void> {
+    await this.db.update(hiringProcessTable)
+      .set({ deletedAt: new Date() })
+      .where(and(
+        eq(hiringProcessTable.id, id),
+        eq(hiringProcessTable.userId, userId)
+      ));
+  }
+}
+```
+
+**Key Points:**
+
+- ✅ Implements the domain interface
+- ✅ Uses Drizzle for actual DB operations
+- ✅ Uses **Mappers** to convert DB rows ↔ Domain entities
+- ✅ Encapsulates all SQL/ORM logic
+
+---
+
+### 3. Mapper (Database Layer)
+
+```typescript
+// packages/database/hiring-process/mappers/hiring-process.mapper.ts
+
+import type { HiringProcess } from "@interviews-tool/domain/hiring-process/entities";
+
+export class HiringProcessMapper {
+  /**
+   * Convert a database row to a domain entity
+   */
+  static toDomain(row: any): HiringProcess {
+    return {
+      id: row.id,
+      userId: row.userId,
+      companyName: row.companyName,
+      position: row.position,
+      status: row.status,
+      salary: row.salary,
+      currency: row.currency,
+      salaryRateType: row.salaryRateType,
+      location: row.location,
+      url: row.url,
+      notes: row.notes,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    };
+  }
+
+  /**
+   * Convert a domain entity to a database record
+   */
+  static toPersistence(hiringProcess: HiringProcess): any {
+    return {
+      id: hiringProcess.id,
+      userId: hiringProcess.userId,
+      companyName: hiringProcess.companyName,
+      position: hiringProcess.position,
+      status: hiringProcess.status,
+      salary: hiringProcess.salary,
+      currency: hiringProcess.currency,
+      salaryRateType: hiringProcess.salaryRateType,
+      location: hiringProcess.location,
+      url: hiringProcess.url,
+      notes: hiringProcess.notes,
+      createdAt: hiringProcess.createdAt,
+      updatedAt: hiringProcess.updatedAt,
+    };
+  }
+}
+```
+
+---
+
+### 4. Application Service (Use Case)
+
+```typescript
+// packages/application/hiring-process/use-cases/get-hiring-processes.service.ts
+
+import type { IHiringProcessRepository } from "@interviews-tool/domain/hiring-process/repositories";
+import type { PaginationParams, PaginatedResult } from "@interviews-tool/domain/types";
+import type { HiringProcess } from "@interviews-tool/domain/hiring-process/entities";
+
+export class GetHiringProcesses {
+  constructor(private readonly hiringProcessRepo: IHiringProcessRepository) {}
+
+  async execute(
+    userId: string,
+    params: PaginationParams
+  ): Promise<PaginatedResult<HiringProcess>> {
+    // Validate business rules here if needed
+    // For example: check user permissions, apply filters, etc.
+
+    return await this.hiringProcessRepo.findPaginated(userId, params);
+  }
+}
+```
+
+**Key Points:**
+
+- ✅ Depends only on the **interface**, not the implementation
+- ✅ Orchestrates business flow
+- ✅ Can add validation, authorization, etc.
+- ✅ Testable with mock repositories
+
+---
+
+### 5. Controller/Route (Infrastructure)
+
+```typescript
+// apps/server/src/routes/hiring-processes.ts
+
+import { Elysia } from "elysia";
+import { GetHiringProcesses } from "@interviews-tool/application/hiring-process";
+import { HiringProcessRepositoryDrizzle } from "@interviews-tool/database/hiring-process";
+
+export const hiringProcessRoutes = new Elysia({ prefix: "/hiring-processes" })
+  .decorate("db", createDatabaseClient(env.DATABASE_URL))
+  .decorate("getHiringProcesses", (db) => {
+    const repo = new HiringProcessRepositoryDrizzle(db);
+    return new GetHiringProcesses(repo);
+  })
+  .get("/", async ({ query, user, db, getHiringProcesses }) => {
+    const result = await getHiringProcesses(db).execute(user.id, query);
+    return successWithPaginationBody(result.data, result);
+  });
+```
+
+---
+
+## 🚫 What NOT to Do
+
+### ❌ Bad: Direct Queries in Routes
+
+```typescript
+// DON'T DO THIS
+export const hiringProcessRoutes = new Elysia()
+  .get("/", async ({ query, user, db }) => {
+    const processes = await db.select()
+      .from(hiringProcessTable)
+      .where(eq(hiringProcessTable.userId, user.id));
+
+    return { data: processes };
+  });
+```
+
+### ❌ Bad: Queries Folder in Database Package
+
+```typescript
+// DON'T DO THIS
+// packages/db/src/queries/hiring-process.ts
+export async function findPaginatedHiringProcesses(db, userId, params) {
+  // Raw query logic
+}
+```
+
+### ❌ Bad: Repository Returning Raw DB Data
+
+```typescript
+// DON'T DO THIS
+async findById(id: string): Promise<any> {
+  return await db.query.hiringProcessTable.findFirst({ where: eq(id) });
+}
+```
+
+---
+
+## ✅ Rules to Follow
+
+| Rule                                      | Why                                |
+| ----------------------------------------- | ---------------------------------- |
+| Repository interfaces in `domain/`        | Domain defines what it needs       |
+| Repository implementations in `database/` | Infrastructure provides how        |
+| Always return domain entities             | Never expose raw DB data           |
+| Use mappers for conversions               | Keep domain and DB layers separate |
+| Application services orchestrate          | Routes should be thin              |
+| No ORM references in domain               | Domain stays pure                  |
+
+---
+
+## 🧪 Testing Benefits
+
+With this architecture, you can easily test:
+
+```typescript
+// Mock repository for testing
+class MockHiringProcessRepository implements IHiringProcessRepository {
+  private processes: HiringProcess[] = [];
+
+  async findPaginated(userId: string, params: PaginationParams) {
+    return {
+      data: this.processes,
+      total: this.processes.length,
+      page: 1,
+      limit: 10,
+      totalPages: 1
+    };
+  }
+
+  // ... other methods
+}
+
+// Test your use case
+const mockRepo = new MockHiringProcessRepository();
+const useCase = new GetHiringProcesses(mockRepo);
+const result = await useCase.execute("user-123", { page: 1, limit: 10 });
+```
+
+---
+
+## 📚 Related Documentation
+
+- [Application Services](/docs/architecture/application-services)
+- [Domain Entities](/docs/architecture/domain-entities)
+- [Value Objects](/docs/architecture/value-objects)
+- [Dependency Injection](/docs/architecture/dependency-injection)
+
+---
+
+## 💡 Key Takeaway
+
+> **"From the domain's perspective, it's like having a list of objects, even though they're in a database."**
+
+The Repository pattern abstracts away data access concerns, allowing your domain to stay clean, testable, and independent of infrastructure decisions.

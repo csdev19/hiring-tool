@@ -11,6 +11,8 @@ export const HIRING_PROCESS_STATUSES = {
   REJECTED: "rejected",
   DROPPED_OUT: "dropped-out",
   HIRED: "hired",
+  OFFER_MADE: "offer-made",
+  OFFER_ACCEPTED: "offer-accepted",
 } as const;
 
 /**
@@ -25,12 +27,17 @@ export const HIRING_PROCESS_STATUS_VALUES = [
   HIRING_PROCESS_STATUSES.REJECTED,
   HIRING_PROCESS_STATUSES.DROPPED_OUT,
   HIRING_PROCESS_STATUSES.HIRED,
+  HIRING_PROCESS_STATUSES.OFFER_MADE,
+  HIRING_PROCESS_STATUSES.OFFER_ACCEPTED,
 ] as const;
 
 /**
  * Status metadata for UI display and business logic
  */
-export const HIRING_PROCESS_STATUS_INFO = {
+export const HIRING_PROCESS_STATUS_INFO: Record<
+  HiringProcessStatus,
+  { label: string; description: string; order: number; category: "active" | "terminal" }
+> = {
   [HIRING_PROCESS_STATUSES.FIRST_CONTACT]: {
     label: "First Contact",
     description: "Initial outreach via LinkedIn, email, or other channel",
@@ -67,6 +74,18 @@ export const HIRING_PROCESS_STATUS_INFO = {
     order: 6,
     category: "terminal" as const,
   },
+  [HIRING_PROCESS_STATUSES.OFFER_MADE]: {
+    label: "Offer Made",
+    description: "Company has made an offer to the candidate",
+    order: 7,
+    category: "active" as const,
+  },
+  [HIRING_PROCESS_STATUSES.OFFER_ACCEPTED]: {
+    label: "Offer Accepted",
+    description: "Candidate has accepted the offer",
+    order: 8,
+    category: "terminal" as const,
+  },
 } as const;
 
 /**
@@ -91,10 +110,13 @@ export const STATUS_TRANSITIONS: Record<HiringProcessStatus, HiringProcessStatus
     HIRING_PROCESS_STATUSES.REJECTED,
     HIRING_PROCESS_STATUSES.DROPPED_OUT,
     HIRING_PROCESS_STATUSES.HIRED,
+    HIRING_PROCESS_STATUSES.OFFER_MADE,
   ],
   [HIRING_PROCESS_STATUSES.REJECTED]: [], // Terminal status
   [HIRING_PROCESS_STATUSES.DROPPED_OUT]: [], // Terminal status
   [HIRING_PROCESS_STATUSES.HIRED]: [], // Terminal status
+  [HIRING_PROCESS_STATUSES.OFFER_MADE]: [], // Terminal status
+  [HIRING_PROCESS_STATUSES.OFFER_ACCEPTED]: [], // Terminal status
 };
 
 /**
