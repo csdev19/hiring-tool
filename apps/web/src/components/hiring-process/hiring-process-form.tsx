@@ -33,32 +33,15 @@ const contactedViaOptions = [
   { value: "Other", label: "Other" },
 ];
 
-const statusOptions: { value: HiringProcessStatus; label: string }[] = [
-  {
-    value: HIRING_PROCESS_STATUSES.FIRST_CONTACT,
-    label: HIRING_PROCESS_STATUS_INFO[HIRING_PROCESS_STATUSES.FIRST_CONTACT].label,
-  },
-  {
-    value: HIRING_PROCESS_STATUSES.ONGOING,
-    label: HIRING_PROCESS_STATUS_INFO[HIRING_PROCESS_STATUSES.ONGOING].label,
-  },
-  {
-    value: HIRING_PROCESS_STATUSES.ON_HOLD,
-    label: HIRING_PROCESS_STATUS_INFO[HIRING_PROCESS_STATUSES.ON_HOLD].label,
-  },
-  {
-    value: HIRING_PROCESS_STATUSES.REJECTED,
-    label: HIRING_PROCESS_STATUS_INFO[HIRING_PROCESS_STATUSES.REJECTED].label,
-  },
-  {
-    value: HIRING_PROCESS_STATUSES.DROPPED_OUT,
-    label: HIRING_PROCESS_STATUS_INFO[HIRING_PROCESS_STATUSES.DROPPED_OUT].label,
-  },
-  {
-    value: HIRING_PROCESS_STATUSES.HIRED,
-    label: HIRING_PROCESS_STATUS_INFO[HIRING_PROCESS_STATUSES.HIRED].label,
-  },
-];
+// Generate status options dynamically from HIRING_PROCESS_STATUS_INFO
+const statusOptions: { value: HiringProcessStatus; label: string; order: number }[] =
+  Object.entries(HIRING_PROCESS_STATUS_INFO)
+    .map(([key, info]) => ({
+      value: key as HiringProcessStatus,
+      label: info.label,
+      order: info.order,
+    }))
+    .sort((a, b) => a.order - b.order);
 
 const currencyOptions: { value: Currency; label: string; symbol: string }[] = [
   {

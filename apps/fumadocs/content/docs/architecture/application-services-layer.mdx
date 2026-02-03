@@ -1,0 +1,752 @@
+---
+title: Application Services Layer
+description: Complete guide to implementing the Application layer with Use Cases, Commands, Queries, and DTOs
+---
+
+# Application Services Layer
+
+The **Application Layer** (also called Application Services or Use Cases layer) orchestrates domain logic to fulfill specific user actions. It sits between the presentation layer (HTTP/UI) and the domain layer.
+
+---
+
+## 🎯 Purpose of Application Layer
+
+The Application Layer:
+
+- ✅ **Orchestrates** domain objects to complete a task
+- ✅ **Validates** input from external sources
+- ✅ **Manages** transactions and persistence
+- ✅ **Publishes** domain events
+- ✅ **Transforms** domain models to DTOs
+
+It does **NOT**:
+
+- ❌ Contain business rules (those go in domain)
+- ❌ Access database directly (uses repositories)
+- ❌ Handle HTTP concerns (that's infrastructure)
+
+---
+
+## 📦 Application Layer Structure
+
+```bash
+packages/hiring/application/
+├── use-cases/                    # Commands (writes)
+│   ├── create-hiring-process/
+│   │   ├── create-hiring-process.command.ts
+│   │   ├── create-hiring-process.handler.ts
+│   │   ├── create-hiring-process.validator.ts
+│   │   └── index.ts
+│   ├── update-status/
+│   │   ├── update-status.command.ts
+│   │   ├── update-status.handler.ts
+│   │   └── index.ts
+│   ├── add-interaction/
+│   └── delete-hiring-process/
+│
+├── queries/                      # Queries (reads)
+│   ├── get-hiring-process/
+│   │   ├── get-hiring-process.query.ts
+│   │   ├── get-hiring-process.handler.ts
+│   │   └── index.ts
+│   ├── list-hiring-processes/
+│   │   ├── list-hiring-processes.query.ts
+│   │   ├── list-hiring-processes.handler.ts
+│   │   └── index.ts
+│   └── get-hiring-stats/
+│
+├── dto/                          # Data Transfer Objects
+│   ├── hiring-process.dto.ts
+│   ├── create-hiring-process.dto.ts
+│   ├── update-hiring-process.dto.ts
+│   └── index.ts
+│
+├── services/                     # Application services (if needed)
+│   └── hiring-process.service.ts
+│
+├── events/                       # Application event handlers
+│   └── hiring-process-created.handler.ts
+│
+└── index.ts                      # Barrel exports
+```
+
+---
+
+## 🔀 CQRS Pattern (Commands and Queries)
+
+We use **CQRS** (Command Query Responsibility Segregation) to separate writes from reads:
+
+### Commands (Write Operations)
+
+**Change system state, no return value (or just ID)**
+
+```typescript
+// packages/hiring/application/use-cases/create-hiring-process/create-hiring-process.command.ts
+
+/**
+ * Command to create a new hiring process
+ *
+ * Commands represent user intentions to change system state
+ */
+export class CreateHiringProcessCommand {
+  constructor(
+    public readonly userId: string,
+    public readonly companyName: string,
+    public readonly position: string,
+    public readonly salary?: number,
+    public readonly currency?: string,
+    public readonly salaryRateType?: string,
+  ) {}
+}
+```
+
+**Command Handler:**
+
+```typescript
+// packages/hiring/application/use-cases/create-hiring-process/create-hiring-process.handler.ts
+
+import type { IHiringProcessRepository } from "@hiring-tool/hiring/domain/repositories";
+import type { IEventPublisher } from "@hiring-tool/shared-kernel/events";
+import { HiringProcess } from "@hiring-tool/hiring/domain/entities";
+import { Salary } from "@hiring-tool/hiring/domain/value-objects";
+import type { CreateHiringProcessCommand } from "./create-hiring-process.command";
+import { Result, tryCatch } from "@hiring-tool/shared-kernel/result";
+
+export class CreateHiringProcessHandler {
+  constructor(
+    private readonly hiringProcessRepo: IHiringProcessRepository,
+    private readonly eventPublisher: IEventPublisher,
+  ) {}
+
+  async execute(command: CreateHiringProcessCommand): Promise<Result<string, Error>> {
+    // 1. Validate business rules (if not in domain)
+    // Already validated by Zod at API boundary
+
+    // 2. Create domain entity with business logic
+    const salary = command.salary
+      ? Salary.create({
+          amount: command.salary,
+          currency: command.currency || "USD",
+          rateType: command.salaryRateType || "monthly",
+        })
+      : null;
+
+    const hiringProcess = HiringProcess.create({
+      userId: command.userId,
+      companyName: command.companyName,
+      position: command.position,
+      salary,
+    });
+
+    // 3. Persist using repository
+    const saveResult = await tryCatch(
+      this.hiringProcessRepo.save(hiringProcess)
+    );
+
+    if (saveResult.error) {
+      return saveResult;
+    }
+
+    // 4. Publish domain events
+    const events = hiringProcess.getDomainEvents();
+    await this.eventPublisher.publishAll(events);
+
+    // 5. Return success with ID
+    return { data: hiringProcess.id, error: null };
+  }
+}
+```
+
+---
+
+### Queries (Read Operations)
+
+**Read system state, no side effects**
+
+```typescript
+// packages/hiring/application/queries/get-hiring-process/get-hiring-process.query.ts
+
+/**
+ * Query to get a single hiring process
+ *
+ * Queries fetch data without changing system state
+ */
+export class GetHiringProcessQuery {
+  constructor(
+    public readonly hiringProcessId: string,
+    public readonly userId: string,
+  ) {}
+}
+```
+
+**Query Handler:**
+
+```typescript
+// packages/hiring/application/queries/get-hiring-process/get-hiring-process.handler.ts
+
+import type { IHiringProcessRepository } from "@hiring-tool/hiring/domain/repositories";
+import type { GetHiringProcessQuery } from "./get-hiring-process.query";
+import type { HiringProcessDTO } from "../../dto/hiring-process.dto";
+import { HiringProcessMapper } from "../../mappers/hiring-process-dto.mapper";
+import { Result } from "@hiring-tool/shared-kernel/result";
+
+export class GetHiringProcessHandler {
+  constructor(
+    private readonly hiringProcessRepo: IHiringProcessRepository,
+  ) {}
+
+  async execute(query: GetHiringProcessQuery): Promise<Result<HiringProcessDTO, Error>> {
+    // 1. Fetch from repository
+    const hiringProcess = await this.hiringProcessRepo.findById(
+      query.hiringProcessId,
+      query.userId,
+    );
+
+    if (!hiringProcess) {
+      return {
+        data: null,
+        error: new Error("Hiring process not found"),
+      };
+    }
+
+    // 2. Transform domain entity to DTO
+    const dto = HiringProcessMapper.toDTO(hiringProcess);
+
+    // 3. Return DTO
+    return { data: dto, error: null };
+  }
+}
+```
+
+---
+
+## 📋 Data Transfer Objects (DTOs)
+
+DTOs are simple data containers for transferring data between layers:
+
+```typescript
+// packages/hiring/application/dto/hiring-process.dto.ts
+
+import type { Currency, SalaryRateType } from "@hiring-tool/shared-kernel";
+import type { HiringProcessStatus } from "@hiring-tool/hiring/domain";
+
+/**
+ * DTO for hiring process representation
+ *
+ * DTOs are:
+ * - Plain objects (no methods)
+ * - Framework-agnostic
+ * - Easy to serialize/deserialize
+ * - Different from domain entities
+ */
+export interface HiringProcessDTO {
+  id: string;
+  userId: string;
+  companyName: string;
+  position: string;
+  status: HiringProcessStatus;
+  salary: number | null;
+  currency: Currency;
+  salaryRateType: SalaryRateType;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * DTO for creating a hiring process
+ */
+export interface CreateHiringProcessDTO {
+  companyName: string;
+  position: string;
+  salary?: number;
+  currency?: Currency;
+  salaryRateType?: SalaryRateType;
+}
+
+/**
+ * DTO for updating a hiring process
+ */
+export interface UpdateHiringProcessDTO {
+  companyName?: string;
+  position?: string;
+  status?: HiringProcessStatus;
+  salary?: number;
+  currency?: Currency;
+  salaryRateType?: SalaryRateType;
+}
+
+/**
+ * DTO for hiring process list item (simplified)
+ */
+export interface HiringProcessListItemDTO {
+  id: string;
+  companyName: string;
+  position: string;
+  status: HiringProcessStatus;
+  createdAt: Date;
+}
+```
+
+---
+
+## 🗺️ DTO Mappers
+
+Mappers convert between domain entities and DTOs:
+
+```typescript
+// packages/hiring/application/mappers/hiring-process-dto.mapper.ts
+
+import type { HiringProcess } from "@hiring-tool/hiring/domain/entities";
+import type {
+  HiringProcessDTO,
+  HiringProcessListItemDTO,
+} from "../dto/hiring-process.dto";
+
+export class HiringProcessDTOMapper {
+  /**
+   * Convert domain entity to full DTO
+   */
+  static toDTO(entity: HiringProcess): HiringProcessDTO {
+    return {
+      id: entity.id,
+      userId: entity.userId,
+      companyName: entity.companyName,
+      position: entity.position,
+      status: entity.status.value,
+      salary: entity.salary?.amount ?? null,
+      currency: entity.salary?.currency ?? "USD",
+      salaryRateType: entity.salary?.rateType ?? "monthly",
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    };
+  }
+
+  /**
+   * Convert domain entity to list item DTO (simplified)
+   */
+  static toListItemDTO(entity: HiringProcess): HiringProcessListItemDTO {
+    return {
+      id: entity.id,
+      companyName: entity.companyName,
+      position: entity.position,
+      status: entity.status.value,
+      createdAt: entity.createdAt,
+    };
+  }
+
+  /**
+   * Convert array of entities to list DTOs
+   */
+  static toListDTOs(entities: HiringProcess[]): HiringProcessListItemDTO[] {
+    return entities.map(entity => this.toListItemDTO(entity));
+  }
+}
+```
+
+---
+
+## 🏗️ Application Service (Alternative Pattern)
+
+Instead of separate Commands/Queries, you can use an Application Service class:
+
+```typescript
+// packages/hiring/application/services/hiring-process.service.ts
+
+import type { IHiringProcessRepository } from "@hiring-tool/hiring/domain/repositories";
+import type { IEventPublisher } from "@hiring-tool/shared-kernel/events";
+import { HiringProcess } from "@hiring-tool/hiring/domain/entities";
+import type {
+  CreateHiringProcessDTO,
+  UpdateHiringProcessDTO,
+  HiringProcessDTO,
+} from "../dto";
+import { HiringProcessDTOMapper } from "../mappers/hiring-process-dto.mapper";
+import { Result, tryCatch } from "@hiring-tool/shared-kernel/result";
+
+export class HiringProcessService {
+  constructor(
+    private readonly hiringProcessRepo: IHiringProcessRepository,
+    private readonly eventPublisher: IEventPublisher,
+  ) {}
+
+  async create(
+    userId: string,
+    dto: CreateHiringProcessDTO,
+  ): Promise<Result<string, Error>> {
+    // Create domain entity
+    const hiringProcess = HiringProcess.create({
+      userId,
+      ...dto,
+    });
+
+    // Save
+    const result = await tryCatch(
+      this.hiringProcessRepo.save(hiringProcess)
+    );
+
+    if (result.error) {
+      return result;
+    }
+
+    // Publish events
+    await this.eventPublisher.publishAll(hiringProcess.getDomainEvents());
+
+    return { data: hiringProcess.id, error: null };
+  }
+
+  async update(
+    id: string,
+    userId: string,
+    dto: UpdateHiringProcessDTO,
+  ): Promise<Result<HiringProcessDTO, Error>> {
+    // Fetch entity
+    const hiringProcess = await this.hiringProcessRepo.findById(id, userId);
+
+    if (!hiringProcess) {
+      return {
+        data: null,
+        error: new Error("Hiring process not found"),
+      };
+    }
+
+    // Update entity (business logic in domain)
+    if (dto.companyName) {
+      hiringProcess.updateCompanyName(dto.companyName);
+    }
+
+    if (dto.status) {
+      hiringProcess.updateStatus(dto.status);
+    }
+
+    // Save
+    const result = await tryCatch(
+      this.hiringProcessRepo.update(hiringProcess)
+    );
+
+    if (result.error) {
+      return { data: null, error: result.error };
+    }
+
+    // Return DTO
+    return {
+      data: HiringProcessDTOMapper.toDTO(hiringProcess),
+      error: null,
+    };
+  }
+
+  async getById(
+    id: string,
+    userId: string,
+  ): Promise<Result<HiringProcessDTO, Error>> {
+    const hiringProcess = await this.hiringProcessRepo.findById(id, userId);
+
+    if (!hiringProcess) {
+      return {
+        data: null,
+        error: new Error("Hiring process not found"),
+      };
+    }
+
+    return {
+      data: HiringProcessDTOMapper.toDTO(hiringProcess),
+      error: null,
+    };
+  }
+
+  async list(userId: string): Promise<Result<HiringProcessDTO[], Error>> {
+    const result = await tryCatch(
+      this.hiringProcessRepo.findByUserId(userId)
+    );
+
+    if (result.error) {
+      return { data: null, error: result.error };
+    }
+
+    return {
+      data: result.data.map(HiringProcessDTOMapper.toDTO),
+      error: null,
+    };
+  }
+}
+```
+
+---
+
+## 🔌 Wiring in Infrastructure (HTTP Layer)
+
+The application layer is called from HTTP routes:
+
+```typescript
+// apps/server/src/routes/hiring-processes.ts
+
+import { Elysia } from "elysia";
+import { CreateHiringProcessHandler } from "@hiring-tool/hiring/application";
+import { CreateHiringProcessCommand } from "@hiring-tool/hiring/application";
+import { HiringProcessRepositoryDrizzle } from "@hiring-tool/hiring/infrastructure";
+
+export const hiringProcessRoutes = new Elysia({ prefix: "/hiring-processes" })
+  .derive(({ db }) => ({
+    // Dependency injection
+    hiringProcessRepo: new HiringProcessRepositoryDrizzle(db),
+    createHiringProcessHandler: new CreateHiringProcessHandler(
+      new HiringProcessRepositoryDrizzle(db),
+      eventPublisher,
+    ),
+  }))
+  .post(
+    "/",
+    async ({ body, user, createHiringProcessHandler, status }) => {
+      // Create command from HTTP body
+      const command = new CreateHiringProcessCommand(
+        user.id,
+        body.companyName,
+        body.position,
+        body.salary,
+        body.currency,
+        body.salaryRateType,
+      );
+
+      // Execute use case
+      const result = await createHiringProcessHandler.execute(command);
+
+      // Handle result
+      if (result.error) {
+        return status(400, {
+          data: null,
+          error: { message: result.error.message },
+        });
+      }
+
+      return status(201, {
+        data: { id: result.data },
+        error: null,
+      });
+    },
+    {
+      body: createHiringProcessSchema,
+      isAuth: true,
+    },
+  );
+```
+
+---
+
+## 🧪 Testing Application Layer
+
+Application layer is easy to test with mocks:
+
+```typescript
+// packages/hiring/application/use-cases/create-hiring-process/__tests__/create-hiring-process.handler.test.ts
+
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { CreateHiringProcessHandler } from "../create-hiring-process.handler";
+import { CreateHiringProcessCommand } from "../create-hiring-process.command";
+import type { IHiringProcessRepository } from "@hiring-tool/hiring/domain/repositories";
+import type { IEventPublisher } from "@hiring-tool/shared-kernel/events";
+
+describe("CreateHiringProcessHandler", () => {
+  let handler: CreateHiringProcessHandler;
+  let mockRepo: IHiringProcessRepository;
+  let mockEventPublisher: IEventPublisher;
+
+  beforeEach(() => {
+    // Mock repository
+    mockRepo = {
+      save: vi.fn().mockResolvedValue(undefined),
+      findById: vi.fn(),
+    };
+
+    // Mock event publisher
+    mockEventPublisher = {
+      publishAll: vi.fn().mockResolvedValue(undefined),
+    };
+
+    handler = new CreateHiringProcessHandler(mockRepo, mockEventPublisher);
+  });
+
+  it("should create hiring process successfully", async () => {
+    // Arrange
+    const command = new CreateHiringProcessCommand(
+      "user-123",
+      "ACME Corp",
+      "Senior Developer",
+      100000,
+      "USD",
+      "monthly",
+    );
+
+    // Act
+    const result = await handler.execute(command);
+
+    // Assert
+    expect(result.error).toBeNull();
+    expect(result.data).toBeDefined();
+    expect(mockRepo.save).toHaveBeenCalledOnce();
+    expect(mockEventPublisher.publishAll).toHaveBeenCalledOnce();
+  });
+
+  it("should return error when repository fails", async () => {
+    // Arrange
+    mockRepo.save = vi.fn().mockRejectedValue(new Error("DB Error"));
+    const command = new CreateHiringProcessCommand(
+      "user-123",
+      "ACME Corp",
+      "Senior Developer",
+    );
+
+    // Act
+    const result = await handler.execute(command);
+
+    // Assert
+    expect(result.error).toBeDefined();
+    expect(result.data).toBeNull();
+  });
+});
+```
+
+---
+
+## 📐 Application Layer Patterns
+
+### Pattern 1: Command/Query Handlers (Recommended)
+
+**Structure:**
+
+```
+use-cases/create-hiring-process/
+  - command.ts      ← Command definition
+  - handler.ts      ← Command handler
+  - validator.ts    ← Optional validation
+```
+
+**Benefits:**
+
+- ✅ Single Responsibility
+- ✅ Easy to test
+- ✅ Clear separation
+- ✅ Scalable
+
+---
+
+### Pattern 2: Application Service Class
+
+**Structure:**
+
+```
+services/
+  - hiring-process.service.ts  ← All operations in one class
+```
+
+**Benefits:**
+
+- ✅ Grouped related operations
+- ✅ Less boilerplate
+- ✅ Familiar pattern
+
+**Drawbacks:**
+
+- ⚠️ Can become large (God class)
+- ⚠️ Mixed responsibilities
+
+---
+
+### Pattern 3: Feature Folders (Vertical Slices)
+
+**Structure:**
+
+```
+features/create-hiring-process/
+  - command.ts
+  - handler.ts
+  - validator.ts
+  - dto.ts
+  - route.ts
+```
+
+**Benefits:**
+
+- ✅ Everything related to feature in one place
+- ✅ Easy to find code
+- ✅ Can be moved to separate package
+
+---
+
+## 🎯 Best Practices
+
+### 1. Keep Application Layer Thin
+
+```typescript
+// ❌ Bad - Business logic in application layer
+async create(dto: CreateDTO) {
+  if (dto.salary < 0) {  // Business rule!
+    throw new Error("Salary must be positive");
+  }
+  // ...
+}
+
+// ✅ Good - Business logic in domain
+async create(dto: CreateDTO) {
+  const process = HiringProcess.create(dto);  // Validation in entity
+  await this.repo.save(process);
+}
+```
+
+---
+
+### 2. Use DTOs for External Communication
+
+```typescript
+// ✅ Good - Return DTO, not domain entity
+async getById(id: string): Promise<HiringProcessDTO> {
+  const entity = await this.repo.findById(id);
+  return HiringProcessDTOMapper.toDTO(entity);
+}
+
+// ❌ Bad - Exposing domain entity
+async getById(id: string): Promise<HiringProcess> {
+  return await this.repo.findById(id);  // Domain leaks out!
+}
+```
+
+---
+
+### 3. Use Result Pattern for Error Handling
+
+```typescript
+// ✅ Good - Explicit error handling
+async execute(command: Command): Promise<Result<string, Error>> {
+  const result = await tryCatch(this.repo.save(entity));
+  return result;
+}
+
+// ❌ Bad - Throwing exceptions
+async execute(command: Command): Promise<string> {
+  await this.repo.save(entity);  // Exception can be thrown
+  return entity.id;
+}
+```
+
+---
+
+### 4. Publish Domain Events
+
+```typescript
+// ✅ Good - Events published by application layer
+async execute(command: Command) {
+  const entity = Entity.create(command);
+  await this.repo.save(entity);
+  await this.eventPublisher.publishAll(entity.getDomainEvents());
+}
+```
+
+---
+
+## 🔗 Related Documentation
+
+- [Bounded Contexts Complete Guide](/docs/architecture/bounded-contexts-complete-guide)
+- [Repository Pattern](/docs/architecture/repository-pattern)
+- [Domain Entities & Value Objects](/docs/architecture/domain-entities)
+
+---
+
+_Last Updated: {new Date().toISOString().split('T')[0]}_

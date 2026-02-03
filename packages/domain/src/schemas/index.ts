@@ -33,4 +33,11 @@ export {
 } from "./interaction";
 
 // Pagination schemas
-export { paginationQuerySchema, type PaginationQuery } from "./pagination";
+export {
+  paginationQuerySchema,
+  hiringProcessFilterSchema,
+  hiringProcessQuerySchema,
+  type PaginationQuery,
+  type HiringProcessFilter,
+  type HiringProcessQuery,
+} from "./pagination";
