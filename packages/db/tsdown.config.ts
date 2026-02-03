@@ -5,6 +5,8 @@ export default defineConfig({
   entry: {
     schemas: "src/schema/index.ts",
     client: "src/client/index.ts",
+    repositories: "src/repositories/index.ts",
+    queries: "src/queries/index.ts",
   },
 
   exports: {
