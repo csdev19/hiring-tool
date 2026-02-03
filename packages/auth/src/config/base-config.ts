@@ -1,10 +1,8 @@
 import { db } from "@interviews-tool/db/client";
 import { userTable, accountTable, sessionTable } from "@interviews-tool/db/schemas";
-import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
+import type { BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { customSession } from "better-auth/plugins";
 import { randomBytes, scryptSync } from "node:crypto";
-import { getCustomSession } from "./functions";
 
 export const baseConfig: BetterAuthOptions = {
   appName: "Hiring Tool",

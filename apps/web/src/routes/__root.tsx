@@ -9,9 +9,12 @@ import { Toaster } from "@interviews-tool/web-ui";
 import Header from "../components/header";
 import appCss from "../index.css?url";
 import { getAuthSession } from "@/lib/auth/get-auth-session";
+import type { AuthSession } from "@/lib/auth/types";
 
 export interface RouterAppContext {
   queryClient: QueryClient;
+  isAuthenticated: boolean;
+  session: AuthSession | null;
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
@@ -39,7 +42,10 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   staleTime: 10 * 60 * 1000, // 10 minutes
   beforeLoad: async () => {
     const session = await getAuthSession();
-    return { session, isAuthenticated: !!session };
+    return {
+      session: session ?? null,
+      isAuthenticated: !!session,
+    };
   },
 });
 
