@@ -4,17 +4,12 @@
   "exports": {
     "./client": "./src/client/index.ts",
     "./schemas": "./src/schema/index.ts",
-    "./queries": "./src/queries/index.ts",
-    "./repositories": "./src/repositories/index.ts",
-    "./mappers": "./src/mappers/index.ts",
     "./package.json": "./package.json"
   },
   "publishConfig": {
     "exports": {
       "./client": "./dist/client.mjs",
       "./schemas": "./dist/schemas.mjs",
-      "./repositories": "./dist/repositories.mjs",
-      "./mappers": "./dist/mappers.mjs",
       "./package.json": "./package.json"
     }
   },

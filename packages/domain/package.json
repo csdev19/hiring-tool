@@ -23,7 +23,6 @@
     "./constants": "./src/constants/index.ts",
     "./schemas": "./src/schemas/index.ts",
     "./types": "./src/types/index.ts",
-    "./repositories": "./src/repositories/index.ts",
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -32,7 +31,6 @@
       "./constants": "./dist/constants.mjs",
       "./schemas": "./dist/schemas.mjs",
       "./types": "./dist/types.mjs",
-      "./repositories": "./dist/repositories.mjs",
       "./package.json": "./package.json"
     }
   },
