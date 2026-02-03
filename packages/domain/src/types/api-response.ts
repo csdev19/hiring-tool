@@ -1,3 +1,5 @@
+import type { HiringProcessStatus } from "../constants";
+
 /**
  * Standard API response structure
  * All API responses follow this format for consistency
@@ -32,7 +34,7 @@ export interface PaginationParams {
  * Filter parameters for hiring process queries
  */
 export interface HiringProcessFilterParams {
-  statuses?: string[];
+  statuses?: HiringProcessStatus[];
   salaryDeclared?: boolean;
   salaryMin?: number;
   salaryMax?: number;
