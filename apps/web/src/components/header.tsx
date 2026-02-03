@@ -1,12 +1,15 @@
 import { Link } from "@tanstack/react-router";
 
-import { useSession } from "@/hooks/use-session";
 import UserMenu from "./user-menu";
+import type { AuthSession } from "@/lib/auth/types";
 
-export default function Header() {
-  const { session } = useSession();
-  const isAuthenticated = !!session;
+interface HeaderProps {
+  isAuthenticated: boolean;
+  userName: AuthSession["user"]["name"];
+  userEmail: AuthSession["user"]["email"];
+}
 
+export default function Header({ isAuthenticated, userName, userEmail }: HeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b">
       <div className="flex flex-row items-center justify-between px-4 py-2">
@@ -24,7 +27,7 @@ export default function Header() {
           )}
         </nav>
         <div className="flex items-center gap-2">
-          <UserMenu />
+          <UserMenu userName={userName} userEmail={userEmail} isAuthenticated={isAuthenticated} />
         </div>
       </div>
     </header>

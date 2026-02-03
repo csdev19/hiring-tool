@@ -4,5 +4,5 @@ import { baseConfig } from "@interviews-tool/auth";
 
 export const auth = betterAuth({
   ...baseConfig,
-  plugins: [tanstackStartCookies()],
+  plugins: [...(baseConfig.plugins ?? []), tanstackStartCookies()],
 });
