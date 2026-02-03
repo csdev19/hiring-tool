@@ -16,6 +16,9 @@
     "check-types": {
       "dependsOn": ["transit"]
     },
+    "test": {
+      "dependsOn": ["^build"]
+    },
     "dev": {
       "cache": false,
       "persistent": true
