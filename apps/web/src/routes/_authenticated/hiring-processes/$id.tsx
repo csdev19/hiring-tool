@@ -31,8 +31,10 @@ import {
   Building2,
   User,
   MessageSquare,
+  DollarSign,
+  Briefcase,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/hiring-processes/$id")({
@@ -48,6 +50,23 @@ function HiringProcessDetailPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editingInteraction, setEditingInteraction] = useState<Interaction | null>(null);
   const [deletingInteractionId, setDeletingInteractionId] = useState<string | null>(null);
+  const [showStickyHeader, setShowStickyHeader] = useState(false);
+  const headerCardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowStickyHeader(!entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: "-64px 0px 0px 0px" },
+    );
+
+    if (headerCardRef.current) {
+      observer.observe(headerCardRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [data]);
 
   const handleDelete = async () => {
     try {
@@ -62,7 +81,7 @@ function HiringProcessDetailPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-8">
+      <div className="container mx-auto max-w-5xl px-4 py-8">
         <Card>
           <CardContent className="py-8 text-center">
             <p className="text-destructive">Error loading hiring process: {error.message}</p>
@@ -83,7 +102,7 @@ function HiringProcessDetailPage() {
 
   if (!hiringProcess) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-8">
+      <div className="container mx-auto max-w-5xl px-4 py-8">
         <Card>
           <CardContent className="py-8 text-center">
             <p className="text-muted-foreground">Hiring process not found</p>
@@ -134,7 +153,66 @@ function HiringProcessDetailPage() {
   const companyDetails = companyDetailsData?.data;
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
+    <div className="container mx-auto max-w-5xl px-4 py-8">
+      {/* Sticky contextual header */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-40 border-b border-border/50 bg-background/95 backdrop-blur-sm transition-all duration-300 ${
+          showStickyHeader
+            ? "translate-y-0 opacity-100"
+            : "-translate-y-full opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="container mx-auto max-w-5xl px-4">
+          <div className="flex h-14 items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <Link to="/hiring-processes">
+                <Button variant="ghost" size="icon-sm" className="shrink-0">
+                  <ArrowLeft className="size-4" />
+                </Button>
+              </Link>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="font-semibold text-sm truncate">{hiringProcess.companyName}</span>
+                {hiringProcess.jobTitle && (
+                  <>
+                    <span className="text-muted-foreground text-xs hidden sm:inline">/</span>
+                    <span className="text-muted-foreground text-xs truncate hidden sm:inline">
+                      {hiringProcess.jobTitle}
+                    </span>
+                  </>
+                )}
+              </div>
+              <StatusBadge status={hiringProcess.status} />
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <span className="text-xs text-muted-foreground hidden md:flex items-center gap-1">
+                <DollarSign className="size-3" />
+                {formatSalary(
+                  hiringProcess.salary,
+                  hiringProcess.currency,
+                  hiringProcess.salaryRateType as SalaryRateType | undefined,
+                )}
+              </span>
+              <div className="flex gap-1">
+                <Link to="/hiring-processes/$id/edit" params={{ id }}>
+                  <Button size="icon-sm" variant="ghost">
+                    <Pencil className="size-3.5" />
+                  </Button>
+                </Link>
+                <Button
+                  size="icon-sm"
+                  variant="ghost"
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <Trash2 className="size-3.5" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Back button */}
       <div className="mb-6">
         <Link to="/hiring-processes">
           <Button variant="ghost" size="sm">
@@ -144,14 +222,17 @@ function HiringProcessDetailPage() {
         </Link>
       </div>
 
-      {/* Core Information & Complementary Information Card */}
-      <Card>
+      {/* Core Information Card */}
+      <Card ref={headerCardRef}>
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
               <CardTitle className="text-2xl">{hiringProcess.companyName}</CardTitle>
               {hiringProcess.jobTitle && (
-                <p className="text-muted-foreground mt-1">{hiringProcess.jobTitle}</p>
+                <p className="text-muted-foreground mt-1 flex items-center gap-1.5">
+                  <Briefcase className="size-3.5" />
+                  {hiringProcess.jobTitle}
+                </p>
               )}
               <div className="mt-2">
                 <StatusBadge status={hiringProcess.status} />
@@ -159,12 +240,17 @@ function HiringProcessDetailPage() {
             </div>
             <div className="flex gap-2">
               <Link to="/hiring-processes/$id/edit" params={{ id }}>
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="ghost">
                   <Pencil className="mr-2 size-4" />
                   Edit
                 </Button>
               </Link>
-              <Button size="sm" variant="destructive" onClick={() => setShowDeleteDialog(true)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowDeleteDialog(true)}
+                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              >
                 <Trash2 className="mr-2 size-4" />
                 Delete
               </Button>
@@ -172,24 +258,10 @@ function HiringProcessDetailPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">Company Name</h3>
-              <p className="text-sm">{hiringProcess.companyName}</p>
-            </div>
-            {hiringProcess.jobTitle && (
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Job Title</h3>
-                <p className="text-sm">{hiringProcess.jobTitle}</p>
-              </div>
-            )}
-            <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">Status</h3>
-              <StatusBadge status={hiringProcess.status} />
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">Salary</h3>
-              <p className="text-sm">
+              <h3 className="text-xs font-medium text-muted-foreground mb-1">Salary</h3>
+              <p className="text-sm font-medium">
                 {formatSalary(
                   hiringProcess.salary,
                   hiringProcess.currency,
@@ -198,11 +270,15 @@ function HiringProcessDetailPage() {
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">Created</h3>
+              <h3 className="text-xs font-medium text-muted-foreground mb-1">Status</h3>
+              <StatusBadge status={hiringProcess.status} />
+            </div>
+            <div>
+              <h3 className="text-xs font-medium text-muted-foreground mb-1">Created</h3>
               <p className="text-sm">{formatDate(hiringProcess.createdAt)}</p>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">Last Updated</h3>
+              <h3 className="text-xs font-medium text-muted-foreground mb-1">Last Updated</h3>
               <p className="text-sm">{formatDate(hiringProcess.updatedAt)}</p>
             </div>
           </div>
@@ -294,21 +370,31 @@ function HiringProcessDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Interactions Card */}
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="text-lg">Interaction History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <InteractionForm hiringProcessId={id} />
-        </CardContent>
-      </Card>
-      <div className="mt-6 h-[50vh] overflow-y-auto pr-2">
-        <InteractionTimeline
-          hiringProcessId={id}
-          onEdit={(interaction) => setEditingInteraction(interaction)}
-          onDelete={(interaction) => setDeletingInteractionId(interaction.id)}
-        />
+      {/* Interaction Section: Two-column layout */}
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold mb-4">Interaction History</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,5fr)] gap-6">
+          {/* Left column: Sticky interaction form */}
+          <div className="lg:self-start lg:sticky lg:top-20">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">New Interaction</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <InteractionForm hiringProcessId={id} />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right column: Timeline */}
+          <div className="min-h-[50vh]">
+            <InteractionTimeline
+              hiringProcessId={id}
+              onEdit={(interaction) => setEditingInteraction(interaction)}
+              onDelete={(interaction) => setDeletingInteractionId(interaction.id)}
+            />
+          </div>
+        </div>
       </div>
 
       {showDeleteDialog && (

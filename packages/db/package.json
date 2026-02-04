@@ -3,7 +3,6 @@
   "type": "module",
   "exports": {
     "./client": "./src/client/index.ts",
-    "./queries": "./src/queries/index.ts",
     "./repositories": "./src/repositories/index.ts",
     "./schemas": "./src/schema/index.ts",
     "./package.json": "./package.json"
@@ -11,7 +10,6 @@
   "publishConfig": {
     "exports": {
       "./client": "./dist/client.mjs",
-      "./queries": "./dist/queries.mjs",
       "./repositories": "./dist/repositories.mjs",
       "./schemas": "./dist/schemas.mjs",
       "./package.json": "./package.json"

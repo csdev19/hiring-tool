@@ -50,30 +50,30 @@ export const authMacro = new Elysia({ name: "auth-macro" }).error({ Unauthorized
    * - Check against session user
    * - Throw ForbiddenError if role doesn't match
    */
-  role(role: "user" | "admin" | {}) {
-    return {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      beforeHandle(context: any) {
-        // Example implementation - replace with actual role checking logic
-        // Access user from context (added by isAuth macro's resolve)
-        const user = context.user as { id: string; role?: string } | undefined;
+  // role(role: "user" | "admin" | {}) {
+  //   return {
+  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //     beforeHandle(context: any) {
+  //       // Example implementation - replace with actual role checking logic
+  //       // Access user from context (added by isAuth macro's resolve)
+  //       const user = context.user as { id: string; role?: string } | undefined;
 
-        // Option 1: Check role from session user
-        // if (user?.role !== role) {
-        //   throw new ForbiddenError(`Requires ${role} role`);
-        // }
-        //
-        // Option 2: Fetch from database
-        // const userWithRoles = await db.query.users.findFirst({
-        //   where: eq(users.id, user.id),
-        //   with: { roles: true }
-        // });
-        // if (!userWithRoles?.roles.some(r => r.name === role)) {
-        //   throw new ForbiddenError(`Requires ${role} role`);
-        // }
+  //       // Option 1: Check role from session user
+  //       // if (user?.role !== role) {
+  //       //   throw new ForbiddenError(`Requires ${role} role`);
+  //       // }
+  //       //
+  //       // Option 2: Fetch from database
+  //       // const userWithRoles = await db.query.users.findFirst({
+  //       //   where: eq(users.id, user.id),
+  //       //   with: { roles: true }
+  //       // });
+  //       // if (!userWithRoles?.roles.some(r => r.name === role)) {
+  //       //   throw new ForbiddenError(`Requires ${role} role`);
+  //       // }
 
-        // Remove this and add actual implementation when ready
-      },
-    };
-  },
+  //       // Remove this and add actual implementation when ready
+  //     },
+  //   };
+  // },
 });
