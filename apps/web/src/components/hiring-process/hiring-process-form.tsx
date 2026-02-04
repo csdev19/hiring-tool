@@ -4,7 +4,6 @@ import { Button, Input, Label, Textarea } from "@interviews-tool/web-ui";
 import type { CreateHiringProcessInput } from "@/hooks/use-hiring-processes";
 import type { CreateCompanyDetailsInput } from "@/hooks/use-company-details";
 import {
-  HIRING_PROCESS_STATUSES,
   HIRING_PROCESS_STATUS_INFO,
   DEFAULT_HIRING_PROCESS_STATUS,
   CURRENCIES,
