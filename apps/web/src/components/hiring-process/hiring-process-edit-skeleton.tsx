@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle, Skeleton } from "@interviews-tool/web-ui";
+import { Card, CardContent, CardHeader, Skeleton } from "@interviews-tool/web-ui";
 
 export function HiringProcessEditSkeleton() {
   return (

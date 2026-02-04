@@ -3,6 +3,9 @@
     "**/routeTree.gen.ts",
     "**/*routeTree.gen.ts",
     "routeTree.gen.ts",
-    "apps/web/src/routeTree.gen.ts"
+    "apps/web/src/routeTree.gen.ts",
+    "**/.next/**",
+    "**/.wrangler/**",
+    "**/.source/**"
   ]
 }
