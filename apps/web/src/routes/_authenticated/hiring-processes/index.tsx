@@ -26,6 +26,7 @@ import {
   type HiringProcessStatus,
 } from "@interviews-tool/domain/constants";
 import { InterviewTable } from "@/components/hiring-process/hiring-process-table";
+import { StatusBadge } from "@/components/hiring-process/status-badge";
 import { HiringProcessTableSkeleton } from "@/components/hiring-process/hiring-process-table-skeleton";
 import {
   useHiringProcesses,
@@ -117,16 +118,27 @@ function HiringProcessesComponent() {
         </CardHeader>
         <CardContent>
           {/* Filters */}
-          <div className="mb-4 flex flex-wrap items-end gap-3">
+          <div className="mb-4 flex flex-wrap items-end gap-x-4 gap-y-3">
             {/* Status multi-select */}
-            <div className="space-y-1">
+            <div className="flex flex-col gap-1.5">
               <Label className="text-xs text-muted-foreground">Status</Label>
               <DropdownMenu>
-                <DropdownMenuTrigger className="border-input dark:bg-input/30 dark:hover:bg-input/50 focus-visible:border-ring focus-visible:ring-ring/50 inline-flex h-8 items-center gap-1.5 rounded-md border bg-transparent px-2.5 text-xs transition-colors focus-visible:ring-1">
-                  <Filter className="size-3.5" />
-                  {filters.statuses && filters.statuses.length > 0
-                    ? `${filters.statuses.length} selected`
-                    : "All statuses"}
+                <DropdownMenuTrigger className="border-input dark:bg-input/30 dark:hover:bg-input/50 focus-visible:border-ring focus-visible:ring-ring/50 inline-flex h-8 min-w-32 items-center gap-1.5 rounded-md border bg-transparent px-2.5 text-xs transition-colors focus-visible:ring-1">
+                  <Filter className="size-3.5 shrink-0" />
+                  {filters.statuses && filters.statuses.length > 0 ? (
+                    <span className="flex flex-1 flex-wrap items-center gap-1">
+                      {filters.statuses.slice(0, 3).map((status) => (
+                        <StatusBadge key={status} status={status} />
+                      ))}
+                      {filters.statuses.length > 3 && (
+                        <span className="text-muted-foreground text-xs">
+                          +{filters.statuses.length - 3}
+                        </span>
+                      )}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">All statuses</span>
+                  )}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-48">
                   <DropdownMenuGroup>
@@ -147,7 +159,7 @@ function HiringProcessesComponent() {
             </div>
 
             {/* Salary declared filter */}
-            <div className="space-y-1">
+            <div className="flex flex-col gap-1.5">
               <Label className="text-xs text-muted-foreground">Salary</Label>
               <Select
                 value={
@@ -174,7 +186,7 @@ function HiringProcessesComponent() {
                   }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-8 w-30">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -188,13 +200,13 @@ function HiringProcessesComponent() {
             {/* Salary range (only when salaryDeclared === true) */}
             {filters.salaryDeclared === true && (
               <>
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1.5">
                   <Label className="text-xs text-muted-foreground">Min salary</Label>
                   <Input
                     type="number"
                     min={0}
                     placeholder="Min"
-                    className="w-28"
+                    className="h-8 w-28"
                     value={filters.salaryMin ?? ""}
                     onChange={(e) => {
                       const val = e.target.value;
@@ -204,13 +216,13 @@ function HiringProcessesComponent() {
                     }}
                   />
                 </div>
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1.5">
                   <Label className="text-xs text-muted-foreground">Max salary</Label>
                   <Input
                     type="number"
                     min={0}
                     placeholder="Max"
-                    className="w-28"
+                    className="h-8 w-28"
                     value={filters.salaryMax ?? ""}
                     onChange={(e) => {
                       const val = e.target.value;
@@ -225,7 +237,7 @@ function HiringProcessesComponent() {
 
             {/* Clear filters */}
             {hasActiveFilters && (
-              <Button variant="ghost" size="sm" onClick={clearFilters}>
+              <Button variant="ghost" size="sm" className="h-8" onClick={clearFilters}>
                 <X className="mr-1 size-3.5" />
                 Clear filters
               </Button>

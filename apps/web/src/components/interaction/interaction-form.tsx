@@ -67,43 +67,50 @@ export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormP
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="title">Title (Optional)</Label>
-          <Input
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g., Technical Interview Round 2"
-            maxLength={100}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="type">Type</Label>
-          <Select value={type} onValueChange={(value) => setType(value as InteractionType)}>
-            <SelectTrigger id="type">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(interactionTypeLabels).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="space-y-2">
+        <Label htmlFor="title" className="text-xs">
+          Title (Optional)
+        </Label>
+        <Input
+          id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="e.g., Technical Interview Round 2"
+          maxLength={100}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="type" className="text-xs">
+          Type
+        </Label>
+        <Select value={type} onValueChange={(value) => setType(value as InteractionType)}>
+          <SelectTrigger id="type">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(interactionTypeLabels).map(([value, label]) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      <div>
-        <Label htmlFor="content">Content (Markdown supported)</Label>
+      <div className="space-y-2">
+        <Label htmlFor="content" className="text-xs">
+          Content
+        </Label>
         <div data-color-mode="light" className="dark:data-[color-mode=light]:hidden">
           <MDEditor
             value={content}
             onChange={(val) => setContent(val || "")}
             preview="edit"
-            height={200}
+            height={150}
+            textareaProps={{
+              placeholder: "What happened in this meeting?",
+            }}
           />
         </div>
         <div data-color-mode="dark" className="data-[color-mode=dark]:hidden dark:block">
@@ -111,15 +118,23 @@ export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormP
             value={content}
             onChange={(val) => setContent(val || "")}
             preview="edit"
-            height={200}
+            height={150}
+            textareaProps={{
+              placeholder: "What happened in this meeting?",
+            }}
           />
         </div>
-        <p className="text-xs text-muted-foreground mt-1">
-          {content.length} / 10000 characters (minimum 10)
+        <p className="text-xs text-muted-foreground/60">
+          {content.length} / 10,000 characters (min 10)
         </p>
       </div>
 
-      <Button type="submit" disabled={createMutation.isPending || content.length < 10}>
+      <Button
+        type="submit"
+        disabled={createMutation.isPending || content.length < 10}
+        className="w-full"
+        size="sm"
+      >
         {createMutation.isPending ? "Adding..." : "Add Interaction"}
       </Button>
     </form>
