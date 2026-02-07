@@ -1,5 +1,5 @@
 import { defineConfig } from "drizzle-kit";
-import { INTERVIEWS_TOOL_TABLE_PREFIX } from "@interviews-tool/domain/config";
+import { INTERVIEWS_TOOL_TABLE_PREFIX } from "./src/config";
 import { config } from "dotenv";
 
 config({

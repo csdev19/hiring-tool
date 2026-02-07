@@ -28,9 +28,13 @@ export async function apiFetch<T>(endpoint: string, options: FetchOptions = {}):
 
   // Get cookies from better-auth expo client for authenticated requests
   const cookies = authClient.getCookie();
-  const headers = {
+  const headers: Record<string, string> = {
     Cookie: cookies,
   };
+
+  if (body) {
+    headers["Content-Type"] = "application/json";
+  }
 
   const response = await fetch(url, {
     method,

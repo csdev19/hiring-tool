@@ -1,5 +1,5 @@
 {
-  "name": "@interviews-tool/auth",
+  "name": "@interviews-tool/infra-auth",
   "type": "module",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
@@ -23,8 +23,8 @@
     "lint:fix": "oxlint --fix src"
   },
   "dependencies": {
-    "@interviews-tool/db": "workspace:*",
     "@interviews-tool/domain": "workspace:*",
+    "@interviews-tool/infra-db": "workspace:*",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:"

@@ -1,4 +1,4 @@
-import { baseConfig, getCustomSession } from "@interviews-tool/auth";
+import { baseConfig, getCustomSession } from "@interviews-tool/infra-auth";
 import { betterAuth } from "better-auth";
 import { customSession } from "better-auth/plugins";
 import { expo } from "@better-auth/expo";

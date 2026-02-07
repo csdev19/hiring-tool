@@ -50,7 +50,8 @@
       "dependencies": {
         "@better-auth/expo": "catalog:",
         "@expo/vector-icons": "^15.0.3",
-        "@interviews-tool/auth": "workspace:*",
+        "@interviews-tool/domain": "workspace:*",
+        "@interviews-tool/infra-auth": "workspace:*",
         "@react-navigation/bottom-tabs": "^7.4.0",
         "@react-navigation/elements": "^2.6.3",
         "@react-navigation/native": "^7.1.8",
@@ -93,8 +94,10 @@
       "version": "1.0.0",
       "dependencies": {
         "@elysiajs/cors": "^1.3.3",
-        "@interviews-tool/auth": "workspace:*",
-        "@interviews-tool/db": "workspace:*",
+        "@interviews-tool/application": "workspace:*",
+        "@interviews-tool/domain": "workspace:*",
+        "@interviews-tool/infra-auth": "workspace:*",
+        "@interviews-tool/infra-db": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:",
         "drizzle-orm": "^0.45.1",
@@ -103,7 +106,6 @@
       },
       "devDependencies": {
         "@interviews-tool/config": "workspace:*",
-        "@interviews-tool/domain": "workspace:*",
         "@types/bun": "catalog:",
         "tsdown": "^0.16.5",
         "typescript": "^5",
@@ -114,8 +116,10 @@
       "dependencies": {
         "@base-ui/react": "^1.0.0",
         "@elysiajs/eden": "^1.4.5",
-        "@interviews-tool/auth": "workspace:*",
-        "@interviews-tool/db": "workspace:*",
+        "@interviews-tool/application": "workspace:*",
+        "@interviews-tool/domain": "workspace:*",
+        "@interviews-tool/infra-auth": "workspace:*",
+        "@interviews-tool/infra-db": "workspace:*",
         "@tailwindcss/vite": "^4.1.8",
         "@tanstack/react-form": "^1.23.5",
         "@tanstack/react-query": "^5.90.12",
@@ -146,7 +150,6 @@
       "devDependencies": {
         "@cloudflare/vite-plugin": "^1.20.1",
         "@interviews-tool/config": "workspace:*",
-        "@interviews-tool/domain": "workspace:*",
         "@interviews-tool/web-ui": "workspace:*",
         "@tanstack/react-query-devtools": "^5.91.1",
         "@tanstack/react-router-devtools": "^1.141.1",
@@ -162,11 +165,40 @@
         "web-vitals": "^5.0.3",
       },
     },
-    "packages/auth": {
-      "name": "@interviews-tool/auth",
+    "packages/application": {
+      "name": "@interviews-tool/application",
+      "version": "1.0.0",
       "dependencies": {
-        "@interviews-tool/db": "workspace:*",
+        "zod": "catalog:",
+      },
+      "devDependencies": {
         "@interviews-tool/domain": "workspace:*",
+        "@types/node": "^22.14.1",
+        "tsdown": "^0.18.2",
+        "typescript": "^5",
+      },
+    },
+    "packages/config": {
+      "name": "@interviews-tool/config",
+      "version": "0.0.0",
+    },
+    "packages/domain": {
+      "name": "@interviews-tool/domain",
+      "version": "1.0.0",
+      "dependencies": {
+        "zod": "catalog:",
+      },
+      "devDependencies": {
+        "@types/node": "^22.14.1",
+        "tsdown": "^0.18.2",
+        "typescript": "^5",
+      },
+    },
+    "packages/infra-auth": {
+      "name": "@interviews-tool/infra-auth",
+      "dependencies": {
+        "@interviews-tool/domain": "workspace:*",
+        "@interviews-tool/infra-db": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:",
         "zod": "catalog:",
@@ -177,12 +209,8 @@
         "typescript": "^5",
       },
     },
-    "packages/config": {
-      "name": "@interviews-tool/config",
-      "version": "0.0.0",
-    },
-    "packages/db": {
-      "name": "@interviews-tool/db",
+    "packages/infra-db": {
+      "name": "@interviews-tool/infra-db",
       "dependencies": {
         "@neondatabase/serverless": "^1.0.2",
         "dotenv": "catalog:",
@@ -195,18 +223,6 @@
         "@interviews-tool/domain": "workspace:*",
         "@types/ws": "^8.18.1",
         "drizzle-kit": "^0.31.8",
-        "tsdown": "^0.18.2",
-        "typescript": "^5",
-      },
-    },
-    "packages/domain": {
-      "name": "@interviews-tool/domain",
-      "version": "1.0.0",
-      "dependencies": {
-        "zod": "catalog:",
-      },
-      "devDependencies": {
-        "@types/node": "^22.14.1",
         "tsdown": "^0.18.2",
         "typescript": "^5",
       },
@@ -824,13 +840,15 @@
 
     "@inquirer/type": ["@inquirer/type@3.0.10", "", { "peerDependencies": { "@types/node": ">=18" }, "optionalPeers": ["@types/node"] }, "sha512-BvziSRxfz5Ov8ch0z/n3oijRSEcEsHnhggm4xFZe93DHcUCTlutlq9Ox4SVENAfcRD22UQq7T/atg9Wr3k09eA=="],
 
-    "@interviews-tool/auth": ["@interviews-tool/auth@workspace:packages/auth"],
+    "@interviews-tool/application": ["@interviews-tool/application@workspace:packages/application"],
 
     "@interviews-tool/config": ["@interviews-tool/config@workspace:packages/config"],
 
-    "@interviews-tool/db": ["@interviews-tool/db@workspace:packages/db"],
-
     "@interviews-tool/domain": ["@interviews-tool/domain@workspace:packages/domain"],
+
+    "@interviews-tool/infra-auth": ["@interviews-tool/infra-auth@workspace:packages/infra-auth"],
+
+    "@interviews-tool/infra-db": ["@interviews-tool/infra-db@workspace:packages/infra-db"],
 
     "@interviews-tool/web-ui": ["@interviews-tool/web-ui@workspace:packages/web-ui"],
 
@@ -4642,8 +4660,6 @@
 
     "vite/esbuild": ["esbuild@0.27.2", "", { "optionalDependencies": { "@esbuild/aix-ppc64": "0.27.2", "@esbuild/android-arm": "0.27.2", "@esbuild/android-arm64": "0.27.2", "@esbuild/android-x64": "0.27.2", "@esbuild/darwin-arm64": "0.27.2", "@esbuild/darwin-x64": "0.27.2", "@esbuild/freebsd-arm64": "0.27.2", "@esbuild/freebsd-x64": "0.27.2", "@esbuild/linux-arm": "0.27.2", "@esbuild/linux-arm64": "0.27.2", "@esbuild/linux-ia32": "0.27.2", "@esbuild/linux-loong64": "0.27.2", "@esbuild/linux-mips64el": "0.27.2", "@esbuild/linux-ppc64": "0.27.2", "@esbuild/linux-riscv64": "0.27.2", "@esbuild/linux-s390x": "0.27.2", "@esbuild/linux-x64": "0.27.2", "@esbuild/netbsd-arm64": "0.27.2", "@esbuild/netbsd-x64": "0.27.2", "@esbuild/openbsd-arm64": "0.27.2", "@esbuild/openbsd-x64": "0.27.2", "@esbuild/openharmony-arm64": "0.27.2", "@esbuild/sunos-x64": "0.27.2", "@esbuild/win32-arm64": "0.27.2", "@esbuild/win32-ia32": "0.27.2", "@esbuild/win32-x64": "0.27.2" }, "bin": { "esbuild": "bin/esbuild" } }, "sha512-HyNQImnsOC7X9PMNaCIeAm4ISCQXs5a5YasTXVliKv4uuBo1dKrG0A+uQS8M5eXjVMnLg3WgXaKvprHlFJQffw=="],
 
-    "web/@tanstack/react-query": ["@tanstack/react-query@5.90.12", "", { "dependencies": { "@tanstack/query-core": "5.90.12" }, "peerDependencies": { "react": "^18 || ^19" } }, "sha512-graRZspg7EoEaw0a8faiUASCyJrqjKPdqJ9EwuDRUF9mEYJ1YPczI9H+/agJ0mOJkPCJDk0lsz5QTrLZ/jQ2rg=="],
-
     "whatwg-url-without-unicode/webidl-conversions": ["webidl-conversions@5.0.0", "", {}, "sha512-VlZwKPCkYKxQgeSbH5EyngOmRp7Ww7I9rQLERETtf5ofd9pGeswWiOtogpEO850jziPRarreGxn5QIiTqpb2wA=="],
 
     "which-builtin-type/isarray": ["isarray@2.0.5", "", {}, "sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw=="],
@@ -5297,8 +5313,6 @@
     "vite/esbuild/@esbuild/win32-ia32": ["@esbuild/win32-ia32@0.27.2", "", { "os": "win32", "cpu": "ia32" }, "sha512-Iuws0kxo4yusk7sw70Xa2E2imZU5HoixzxfGCdxwBdhiDgt9vX9VUCBhqcwY7/uh//78A1hMkkROMJq9l27oLQ=="],
 
     "vite/esbuild/@esbuild/win32-x64": ["@esbuild/win32-x64@0.27.2", "", { "os": "win32", "cpu": "x64" }, "sha512-sRdU18mcKf7F+YgheI/zGf5alZatMUTKj/jNS6l744f9u3WFu4v7twcUI9vu4mknF4Y9aDlblIie0IM+5xxaqQ=="],
-
-    "web/@tanstack/react-query/@tanstack/query-core": ["@tanstack/query-core@5.90.12", "", {}, "sha512-T1/8t5DhV/SisWjDnaiU2drl6ySvsHj1bHBCWNXd+/T+Hh1cf6JodyEYMd5sgwm+b/mETT4EV3H+zCVczCU5hg=="],
 
     "wrangler/esbuild/@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@0.27.0", "", { "os": "aix", "cpu": "ppc64" }, "sha512-KuZrd2hRjz01y5JK9mEBSD3Vj3mbCvemhT466rSuJYeE/hjuBrHfjjcjMdTm/sz7au+++sdbJZJmuBwQLuw68A=="],
 

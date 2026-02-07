@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 
-interface HiringProcess {
+export interface HiringProcess {
   id: string;
   companyName: string;
   jobTitle: string;
@@ -29,18 +29,22 @@ interface HiringProcessesResponse {
 }
 
 interface UseHiringProcessesParams {
-  page?: number;
   limit?: number;
 }
 
 export function useHiringProcesses(params: UseHiringProcessesParams = {}) {
-  const { page = 1, limit = 10 } = params;
+  const { limit = 10 } = params;
 
-  return useQuery({
-    queryKey: ["hiring-processes", { page, limit }],
-    queryFn: () =>
+  return useInfiniteQuery({
+    queryKey: ["hiring-processes", { limit }],
+    queryFn: ({ pageParam }) =>
       apiFetch<HiringProcessesResponse>("/api/v1/hiring-processes", {
-        params: { page, limit },
+        params: { page: pageParam, limit },
       }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.meta.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
   });
 }

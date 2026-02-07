@@ -36,10 +36,10 @@
     "dev:native": "turbo run dev -F native",
     "dev:web": "turbo run dev -F web",
     "dev:server": "turbo run dev -F server",
-    "db:push": "turbo run db:push -F @interviews-tool/db",
-    "db:studio": "turbo run db:studio -F @interviews-tool/db",
-    "db:generate": "turbo run db:generate -F @interviews-tool/db",
-    "db:migrate": "turbo run db:migrate -F @interviews-tool/db"
+    "db:push": "turbo run db:push -F @interviews-tool/infra-db",
+    "db:studio": "turbo run db:studio -F @interviews-tool/infra-db",
+    "db:generate": "turbo run db:generate -F @interviews-tool/infra-db",
+    "db:migrate": "turbo run db:migrate -F @interviews-tool/infra-db"
   },
   "dependencies": {
     "dotenv": "catalog:",
