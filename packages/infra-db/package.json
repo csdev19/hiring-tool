@@ -1,5 +1,5 @@
 {
-  "name": "@interviews-tool/db",
+  "name": "@interviews-tool/infra-db",
   "type": "module",
   "exports": {
     "./client": "./src/client/index.ts",

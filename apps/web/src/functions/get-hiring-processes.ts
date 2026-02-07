@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getAuthSession } from "@/lib/auth/get-auth-session";
-import { createDatabaseClient } from "@interviews-tool/db/client";
-import { HiringProcessRepository } from "@interviews-tool/db/repositories";
+import { createDatabaseClient } from "@interviews-tool/infra-db/client";
+import { HiringProcessRepository } from "@interviews-tool/infra-db/repositories";
 import type { ApiResponse, HiringProcessFilterParams } from "@interviews-tool/domain/types";
 import type { HiringProcessBase } from "@interviews-tool/domain/schemas";
 

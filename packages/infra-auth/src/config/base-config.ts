@@ -1,5 +1,5 @@
-import { db } from "@interviews-tool/db/client";
-import { userTable, accountTable, sessionTable } from "@interviews-tool/db/schemas";
+import { db } from "@interviews-tool/infra-db/client";
+import { userTable, accountTable, sessionTable } from "@interviews-tool/infra-db/schemas";
 import type { BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { randomBytes, scryptSync } from "node:crypto";
@@ -72,6 +72,7 @@ export const baseConfig: BetterAuthOptions = {
       secure: true,
       httpOnly: true,
     },
+    disableOriginCheck: true,
   },
   // plugins: [customSession(getCustomSession)],
   plugins: [],

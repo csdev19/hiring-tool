@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
-import { createDatabaseClient } from "@interviews-tool/db/client";
-import { HiringProcessRepository } from "@interviews-tool/db/repositories";
+import { createDatabaseClient } from "@interviews-tool/infra-db/client";
+import { HiringProcessRepository } from "@interviews-tool/infra-db/repositories";
 import { CURRENCIES, SALARY_RATE_TYPES } from "@interviews-tool/domain/constants";
 import {
   createHiringProcessSchema,
