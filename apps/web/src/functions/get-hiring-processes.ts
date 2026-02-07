@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getAuthSession } from "@/lib/auth/get-auth-session";
 import { createDatabaseClient } from "@interviews-tool/infra-db/client";
 import { HiringProcessRepository } from "@interviews-tool/infra-db/repositories";
+import { listHiringProcesses } from "@interviews-tool/application/hiring";
 import type { ApiResponse, HiringProcessFilterParams } from "@interviews-tool/domain/types";
 import type { HiringProcessBase } from "@interviews-tool/domain/schemas";
 
@@ -21,22 +22,27 @@ export const getHiringProcesses = createServerFn({ method: "GET" })
     }
 
     const db = createDatabaseClient(process.env.DATABASE_URL!);
-    const repository = new HiringProcessRepository(db);
-    const result = await repository.findPaginated(
-      session.user.id,
-      { page, limit },
-      { statuses, salaryDeclared, salaryMin, salaryMax },
-    );
+    const repo = new HiringProcessRepository(db);
+    const result = await listHiringProcesses({
+      repo,
+      userId: session.user.id,
+      pagination: { page, limit },
+      filters: { statuses, salaryDeclared, salaryMin, salaryMax },
+    });
+
+    if (result.error) {
+      return { data: null, error: { message: result.error.message } };
+    }
 
     return {
-      data: result.data,
+      data: result.data.data,
       error: null,
       meta: {
         pagination: {
-          page: result.page,
-          limit: result.limit,
-          total: result.total,
-          totalPages: result.totalPages,
+          page: result.data.page,
+          limit: result.data.limit,
+          total: result.data.total,
+          totalPages: result.data.totalPages,
         },
       },
     };
