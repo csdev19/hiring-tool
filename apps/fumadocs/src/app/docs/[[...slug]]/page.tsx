@@ -1,19 +1,29 @@
 import { getPageImage, source } from "@/lib/source";
+import type { InferPageType } from "fumadocs-core/source";
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/layouts/docs/page";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/mdx-components";
 import type { Metadata } from "next";
 import { createRelativeLink } from "fumadocs-ui/mdx";
+import { TableOfContents } from "fumadocs-core/toc";
+
+/** Page type including MDX plugin fields (body, toc, full) added by fumadocs-mdx at runtime */
+type DocsPageData = InferPageType<typeof source>["data"] & {
+  body: React.ComponentType<Record<string, unknown>>;
+  toc: TableOfContents;
+  full?: boolean;
+};
 
 export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
-  const MDX = page.data.body;
+  const data = page.data as DocsPageData;
+  const MDX = data.body;
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}>
+    <DocsPage toc={data.toc} full={data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
