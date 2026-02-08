@@ -16,12 +16,9 @@
     "cf:whoami": "wrangler whoami"
   },
   "dependencies": {
-    "@better-auth/expo": "catalog:",
     "@elysiajs/cors": "^1.3.3",
-    "@interviews-tool/application": "workspace:*",
-    "@interviews-tool/domain": "workspace:*",
-    "@interviews-tool/infra-auth": "workspace:*",
-    "@interviews-tool/infra-db": "workspace:*",
+    "@interviews-tool/auth": "workspace:*",
+    "@interviews-tool/db": "workspace:*",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "drizzle-orm": "^0.45.1",
@@ -30,6 +27,7 @@
   },
   "devDependencies": {
     "@interviews-tool/config": "workspace:*",
+    "@interviews-tool/domain": "workspace:*",
     "@types/bun": "catalog:",
     "tsdown": "^0.16.5",
     "typescript": "^5"

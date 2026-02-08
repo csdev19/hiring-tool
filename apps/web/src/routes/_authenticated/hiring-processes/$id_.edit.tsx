@@ -29,6 +29,7 @@ function EditHiringProcessPage() {
     companyDetails?: CreateCompanyDetailsInput,
   ) => {
     try {
+      console.log("formData", formData);
       await updateMutation.mutateAsync({ id, data: formData });
 
       // Handle company details
