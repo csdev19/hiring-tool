@@ -18,8 +18,14 @@ export function getPageImage(page: InferPageType<typeof source>) {
   };
 }
 
+/** Page data including MDX plugin methods (e.g. getText) added by fumadocs-mdx at runtime */
+type PageDataWithMDX = InferPageType<typeof source>["data"] & {
+  getText: (format: string) => Promise<string>;
+};
+
 export async function getLLMText(page: InferPageType<typeof source>) {
-  const processed = await page.data.getText("processed");
+  const data = page.data as PageDataWithMDX;
+  const processed = await data.getText("processed");
 
   return `# ${page.data.title}
 

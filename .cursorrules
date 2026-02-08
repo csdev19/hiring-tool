@@ -455,11 +455,11 @@ import { type ApiResponse } from "@interviews-tool/domain/types";
 import { updateHiringProcessSchema } from "@interviews-tool/domain/schemas";
 
 // From database
-import { db } from "@interviews-tool/db";
-import { hiringProcess } from "@interviews-tool/db/schema";
+import { db } from "@interviews-tool/infra-db";
+import { hiringProcess } from "@interviews-tool/infra-db/schema";
 
 // From auth
-import { auth } from "@interviews-tool/auth";
+import { auth } from "@interviews-tool/infra-auth";
 
 // From web-ui
 import { Button, Card } from "@interviews-tool/web-ui";
@@ -531,7 +531,7 @@ If complexity grows:
 
 1. Create constants in `packages/domain/src/constants/`
 2. Create schemas in `packages/domain/src/schemas/`
-3. Create database schema in `packages/db/src/schema/`
+3. Create database schema in `packages/infra-db/src/schema/`
 4. Run migrations
 5. Create backend routes in `apps/server/src/routes/`
 6. Create frontend hooks in `apps/web/src/hooks/`
