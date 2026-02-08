@@ -1,48 +1,49 @@
 import { Elysia, t } from "elysia";
-import { createDatabaseClient } from "@interviews-tool/infra-db/client";
+import { db } from "@interviews-tool/db/client";
 import {
-  HiringProcessRepository,
-  InteractionRepository,
-} from "@interviews-tool/infra-db/repositories";
+  hiringProcessTable,
+  interactionTable,
+  type NewInteraction,
+} from "@interviews-tool/db/schemas";
+import { eq, and, desc, isNull } from "drizzle-orm";
 import { createInteractionSchema, updateInteractionSchema } from "@interviews-tool/domain/schemas";
-import {
-  listInteractions,
-  createInteraction,
-  updateInteraction,
-  deleteInteraction,
-} from "@interviews-tool/application/interactions";
 import { NotFoundError } from "../utils/errors";
 import { successBody, createdBody } from "../utils/response-helpers";
 import { errorHandlerPlugin } from "../utils/error-handler-plugin";
-import { env } from "cloudflare:workers";
 import { authMacro } from "@/plugins/auth.plugin";
 
 export const interactionRoutes = new Elysia({
   prefix: "/hiring-processes/:id/interactions",
 })
   .use(errorHandlerPlugin)
-  .decorate("db", createDatabaseClient(env.DATABASE_URL))
-  .derive(({ db }) => ({
-    hiringProcessRepo: new HiringProcessRepository(db),
-    interactionRepo: new InteractionRepository(db),
-  }))
   .use(authMacro)
   // List interactions
   .get(
     "/",
-    async ({ params, user, hiringProcessRepo, interactionRepo }) => {
-      const result = await listInteractions({
-        hiringProcessRepo,
-        interactionRepo,
-        hiringProcessId: params.id,
-        userId: user.id,
-      });
+    async ({ params, user }) => {
+      const [hiringProcessRecord] = await db
+        .select()
+        .from(hiringProcessTable)
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
-      if (result.error) {
-        throw new NotFoundError("Hiring process");
-      }
+      if (!hiringProcessRecord) throw new NotFoundError("Hiring process");
 
-      return successBody(result.data);
+      const interactions = await db
+        .select()
+        .from(interactionTable)
+        .where(
+          and(eq(interactionTable.hiringProcessId, params.id), isNull(interactionTable.deletedAt)),
+        )
+        .orderBy(desc(interactionTable.createdAt));
+
+      // Always return an array, even if empty
+      return successBody(interactions || []);
     },
     {
       params: t.Object({
@@ -54,20 +55,31 @@ export const interactionRoutes = new Elysia({
   // Create interaction
   .post(
     "/",
-    async ({ params, body, status, user, hiringProcessRepo, interactionRepo }) => {
-      const result = await createInteraction({
-        hiringProcessRepo,
-        interactionRepo,
+    async ({ params, body, status, user }) => {
+      const [hiringProcessRecord] = await db
+        .select()
+        .from(hiringProcessTable)
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
+
+      if (!hiringProcessRecord) throw new NotFoundError("Hiring process");
+
+      const id = crypto.randomUUID();
+      const newInteraction: NewInteraction = {
+        id,
         hiringProcessId: params.id,
-        userId: user.id,
-        input: body,
-      });
+        title: body.title,
+        content: body.content,
+        type: body.type,
+      };
 
-      if (result.error) {
-        throw new NotFoundError("Hiring process");
-      }
-
-      return status(201, createdBody(result.data));
+      const [created] = await db.insert(interactionTable).values(newInteraction).returning();
+      return status(201, createdBody(created));
     },
     {
       params: t.Object({
@@ -80,24 +92,41 @@ export const interactionRoutes = new Elysia({
   // Update interaction
   .put(
     "/:interactionId",
-    async ({ params, body, user, hiringProcessRepo, interactionRepo }) => {
-      const result = await updateInteraction({
-        hiringProcessRepo,
-        interactionRepo,
-        hiringProcessId: params.id,
-        interactionId: params.interactionId,
-        userId: user.id,
-        input: body,
-      });
+    async ({ params, body, user }) => {
+      const [hiringProcessRecord] = await db
+        .select()
+        .from(hiringProcessTable)
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
-      if (result.error) {
-        if (result.error.message === "Interaction not found") {
-          throw new NotFoundError("Interaction");
-        }
-        throw new NotFoundError("Hiring process");
-      }
+      if (!hiringProcessRecord) throw new NotFoundError("Hiring process");
 
-      return successBody(result.data);
+      const [existing] = await db
+        .select()
+        .from(interactionTable)
+        .where(
+          and(eq(interactionTable.id, params.interactionId), isNull(interactionTable.deletedAt)),
+        );
+
+      if (!existing) throw new NotFoundError("Interaction");
+
+      const [updated] = await db
+        .update(interactionTable)
+        .set({
+          title: body.title,
+          content: body.content,
+          type: body.type,
+          updatedAt: new Date(),
+        })
+        .where(eq(interactionTable.id, params.interactionId))
+        .returning();
+
+      return successBody(updated);
     },
     {
       params: t.Object({
@@ -111,21 +140,34 @@ export const interactionRoutes = new Elysia({
   // Delete interaction
   .delete(
     "/:interactionId",
-    async ({ params, status, user, hiringProcessRepo, interactionRepo }) => {
-      const result = await deleteInteraction({
-        hiringProcessRepo,
-        interactionRepo,
-        hiringProcessId: params.id,
-        interactionId: params.interactionId,
-        userId: user.id,
-      });
+    async ({ params, status, user }) => {
+      const [hiringProcessRecord] = await db
+        .select()
+        .from(hiringProcessTable)
+        .where(
+          and(
+            eq(hiringProcessTable.id, params.id),
+            eq(hiringProcessTable.userId, user.id),
+            isNull(hiringProcessTable.deletedAt),
+          ),
+        );
 
-      if (result.error) {
-        if (result.error.message === "Interaction not found") {
-          throw new NotFoundError("Interaction");
-        }
-        throw new NotFoundError("Hiring process");
-      }
+      if (!hiringProcessRecord) throw new NotFoundError("Hiring process");
+
+      const [existing] = await db
+        .select()
+        .from(interactionTable)
+        .where(
+          and(eq(interactionTable.id, params.interactionId), isNull(interactionTable.deletedAt)),
+        );
+
+      if (!existing) throw new NotFoundError("Interaction");
+
+      // Soft delete by setting deletedAt timestamp
+      await db
+        .update(interactionTable)
+        .set({ deletedAt: new Date() })
+        .where(eq(interactionTable.id, params.interactionId));
 
       return status(204);
     },

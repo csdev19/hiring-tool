@@ -1,10 +1,10 @@
 import { Elysia, t } from "elysia";
-import { db } from "@interviews-tool/infra-db/client";
+import { db } from "@interviews-tool/db/client";
 import {
   companyDetailsTable,
   type NewCompanyDetails,
   hiringProcessTable,
-} from "@interviews-tool/infra-db/schemas";
+} from "@interviews-tool/db/schemas";
 import { eq, and, isNull } from "drizzle-orm";
 import {
   createCompanyDetailsSchema,
