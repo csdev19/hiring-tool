@@ -8,7 +8,7 @@ import { Toaster } from "@interviews-tool/web-ui";
 
 import Header from "../components/header";
 import appCss from "../index.css?url";
-import { getAuthSession } from "@/lib/auth/get-auth-session";
+import { getAuthSession, getNewAuthSession } from "@/lib/auth/get-auth-session";
 import type { AuthSession } from "@/lib/auth/types";
 
 export interface RouterAppContext {
@@ -41,11 +41,22 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   component: RootDocument,
   staleTime: 10 * 60 * 1000, // 10 minutes
   beforeLoad: async () => {
-    const session = await getAuthSession();
-    return {
-      session: session ?? null,
-      isAuthenticated: !!session,
-    };
+    try {
+      const session = await getAuthSession();
+      const newSession = await getNewAuthSession();
+      console.log("------> newSession", newSession);
+
+      return {
+        session: session ?? null,
+        isAuthenticated: !!session,
+      };
+    } catch (error) {
+      console.error("Error getting auth session:", error);
+      return {
+        session: null,
+        isAuthenticated: false,
+      };
+    }
   },
 });
 
