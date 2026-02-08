@@ -1,18 +1,12 @@
 import { Elysia, t } from "elysia";
-import { createDatabaseClient } from "@interviews-tool/infra-db/client";
-import { HiringProcessRepository } from "@interviews-tool/infra-db/repositories";
+import { createDatabaseClient } from "@interviews-tool/db/client";
+import { HiringProcessRepository } from "@interviews-tool/db/repositories";
+import { CURRENCIES, SALARY_RATE_TYPES } from "@interviews-tool/domain/constants";
 import {
   createHiringProcessSchema,
   updateHiringProcessSchema,
   hiringProcessQuerySchema,
 } from "@interviews-tool/domain/schemas";
-import {
-  createHiringProcess,
-  getHiringProcess,
-  listHiringProcesses,
-  updateHiringProcess,
-  deleteHiringProcess,
-} from "@interviews-tool/application/hiring";
 import { NotFoundError } from "../utils/errors";
 import { successBody, createdBody, successWithPaginationBody } from "../utils/response-helpers";
 import { errorHandlerPlugin } from "../utils/error-handler-plugin";
@@ -29,35 +23,27 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/hiring-processes" })
   .get(
     "/",
     async ({ query, status, hiringProcessRepo, user }) => {
-      const result = await listHiringProcesses({
-        repo: hiringProcessRepo,
-        userId: user.id,
-        pagination: {
+      const result = await hiringProcessRepo.findPaginated(
+        user.id,
+        {
           page: query.page || 1,
           limit: query.limit || 10,
         },
-        filters: {
+        {
           statuses: query.statuses,
           salaryDeclared: query.salaryDeclared,
           salaryMin: query.salaryMin,
           salaryMax: query.salaryMax,
         },
-      });
-
-      if (result.error) {
-        throw result.error;
-      }
+      );
 
       const paginationResult = {
-        page: result.data.page,
-        limit: result.data.limit,
-        offset: (result.data.page - 1) * result.data.limit,
+        page: result.page,
+        limit: result.limit,
+        offset: (result.page - 1) * result.limit,
       };
 
-      return status(
-        200,
-        successWithPaginationBody(result.data.data, paginationResult, result.data.total),
-      );
+      return status(200, successWithPaginationBody(result.data, paginationResult, result.total));
     },
     {
       query: hiringProcessQuerySchema,
@@ -68,17 +54,13 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/hiring-processes" })
   .get(
     "/:id",
     async ({ params, hiringProcessRepo, user }) => {
-      const result = await getHiringProcess({
-        repo: hiringProcessRepo,
-        id: params.id,
-        userId: user.id,
-      });
+      const result = await hiringProcessRepo.findById(params.id, user.id);
 
-      if (result.error) {
+      if (!result) {
         throw new NotFoundError("Hiring process");
       }
 
-      return successBody(result.data);
+      return successBody(result);
     },
     {
       params: t.Object({
@@ -91,17 +73,26 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/hiring-processes" })
   .post(
     "/",
     async ({ body, status, hiringProcessRepo, user }) => {
-      const result = await createHiringProcess({
-        repo: hiringProcessRepo,
-        input: body,
+      // Generate UUID for new hiring process
+      const id = crypto.randomUUID();
+
+      const newHiringProcess = {
+        id,
+        companyName: body.companyName,
+        jobTitle: body.jobTitle,
+        status: body.status,
+        salary: body.salary ?? null,
+        currency: body.currency || CURRENCIES.USD,
+        salaryRateType: body.salaryRateType || SALARY_RATE_TYPES.MONTHLY,
         userId: user.id,
-      });
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      };
 
-      if (result.error) {
-        throw result.error;
-      }
+      await hiringProcessRepo.save(newHiringProcess);
 
-      return status(201, createdBody(result.data));
+      return status(201, createdBody(newHiringProcess));
     },
     {
       body: createHiringProcessSchema,
@@ -112,18 +103,23 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/hiring-processes" })
   .put(
     "/:id",
     async ({ params, body, hiringProcessRepo, user }) => {
-      const result = await updateHiringProcess({
-        repo: hiringProcessRepo,
-        id: params.id,
-        userId: user.id,
-        input: body,
-      });
+      // Check if hiring process exists and belongs to user
+      const existing = await hiringProcessRepo.findById(params.id, user.id);
 
-      if (result.error) {
+      if (!existing) {
         throw new NotFoundError("Hiring process");
       }
 
-      return successBody(result.data);
+      const updated = await hiringProcessRepo.update(params.id, user.id, {
+        companyName: body.companyName,
+        jobTitle: body.jobTitle,
+        status: body.status,
+        salary: body.salary,
+        currency: body.currency || existing.currency || CURRENCIES.USD,
+        salaryRateType: body.salaryRateType ?? existing.salaryRateType,
+      });
+
+      return successBody(updated);
     },
     {
       params: t.Object({
@@ -137,15 +133,15 @@ export const hiringProcessRoutes = new Elysia({ prefix: "/hiring-processes" })
   .delete(
     "/:id",
     async ({ params, status, hiringProcessRepo, user }) => {
-      const result = await deleteHiringProcess({
-        repo: hiringProcessRepo,
-        id: params.id,
-        userId: user.id,
-      });
+      // Check if hiring process exists and belongs to user
+      const existing = await hiringProcessRepo.findById(params.id, user.id);
 
-      if (result.error) {
+      if (!existing) {
         throw new NotFoundError("Hiring process");
       }
+
+      // Soft delete by setting deletedAt timestamp
+      await hiringProcessRepo.delete(params.id, user.id);
 
       return status(204);
     },

@@ -8,11 +8,8 @@ import { env } from "cloudflare:workers";
 import { auth } from "./lib/auth";
 
 // Configure CORS once at the app level
-// Split CORS_ORIGIN by comma to support multiple origins
-const allowedOrigins = env.CORS_ORIGIN?.split(",").map((o) => o.trim()) || [];
-
 const corsConfig = {
-  origin: [...allowedOrigins, "exp://", "mobile://"],
+  origin: env.CORS_ORIGIN || "*", // Use "*" as fallback for development
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   credentials: true,
