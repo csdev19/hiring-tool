@@ -1,6 +1,5 @@
 import { authClient } from "./auth-client";
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+import { env } from "./env";
 
 type FetchOptions = {
   params?: Record<string, string | number | boolean | undefined>;
@@ -12,7 +11,7 @@ export async function apiFetch<T>(endpoint: string, options: FetchOptions = {}):
   const { params, method = "GET", body } = options;
 
   // Build URL with query params
-  let url = `${API_URL}${endpoint}`;
+  let url = `${env.EXPO_PUBLIC_API_URL}${endpoint}`;
   if (params) {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {

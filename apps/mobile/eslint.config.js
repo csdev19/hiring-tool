@@ -23,6 +23,11 @@ module.exports = defineConfig([
                 "Do not import DB infrastructure into the mobile app. Use @interviews-tool/domain for shared types/constants.",
             },
             {
+              group: ["@interviews-tool/infra-auth", "@interviews-tool/infra-auth/*"],
+              message:
+                "Do not import server-side auth into the mobile app. Use @interviews-tool/domain for shared types/constants.",
+            },
+            {
               group: ["@interviews-tool/application", "@interviews-tool/application/*"],
               message:
                 "Do not import server-side use cases into the mobile app. The mobile app should call the API instead.",

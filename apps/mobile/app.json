@@ -10,13 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hiringtool.mobile",
-      "infoPlist": {
-        "NSAppTransportSecurity": {
-          "NSAllowsArbitraryLoads": true,
-          "NSAllowsLocalNetworking": true
-        }
-      }
+      "bundleIdentifier": "com.hiringtool.mobile"
     },
     "android": {
       "adaptiveIcon": {

@@ -5,11 +5,12 @@ import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/mdx-components";
 import type { Metadata } from "next";
 import { createRelativeLink } from "fumadocs-ui/mdx";
+import { TableOfContents } from "fumadocs-core/toc";
 
 /** Page type including MDX plugin fields (body, toc, full) added by fumadocs-mdx at runtime */
 type DocsPageData = InferPageType<typeof source>["data"] & {
   body: React.ComponentType<Record<string, unknown>>;
-  toc: Array<{ title: string; url: string; depth: number }>;
+  toc: TableOfContents;
   full?: boolean;
 };
 
