@@ -72,7 +72,8 @@ export const baseConfig: BetterAuthOptions = {
       secure: true,
       httpOnly: true,
     },
-    disableOriginCheck: true,
+    // Test the origin check
+    // disableOriginCheck: true,
   },
   // plugins: [customSession(getCustomSession)],
   plugins: [],
