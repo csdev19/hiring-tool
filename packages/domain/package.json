@@ -15,7 +15,11 @@
     "src"
   ],
   "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/constants.d.mts",
   "exports": {
+    "./config": "./src/config/index.ts",
     "./constants": "./src/constants/index.ts",
     "./repositories": "./src/repositories/index.ts",
     "./schemas": "./src/schemas/index.ts",
@@ -24,6 +28,7 @@
   },
   "publishConfig": {
     "exports": {
+      "./config": "./dist/config.mjs",
       "./constants": "./dist/constants.mjs",
       "./repositories": "./dist/repositories.mjs",
       "./schemas": "./dist/schemas.mjs",
