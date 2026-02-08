@@ -39,7 +39,8 @@ export const getNewAuthSession = createServerFn({ method: "GET" }).handler(async
   try {
     const authClient2 = createAuthClient({
       // basePath: "/api/auth",
-      baseURL: import.meta.env.VITE_APP_URL || "http://localhost:3001",
+      // baseURL: import.meta.env.VITE_APP_URL || "http://localhost:3001",
+      baseURL: "https://hiring-tool-api.cristiansotomayor-dev.workers.dev",
       fetchOptions: {
         credentials: "include",
       },
