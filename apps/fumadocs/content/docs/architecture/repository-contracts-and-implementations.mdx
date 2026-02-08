@@ -219,12 +219,12 @@ While slightly more structured than a quick MVP, it avoids long-term coupling an
 
 ## Rules of Thumb
 
-| Rule                                                        | Reason                                                                          |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Domain **never** imports infrastructure                     | Keeps domain pure and stable.                                                   |
-| Contracts live **only** in `packages/domain`                | Single place that defines “what” is needed.                                     |
-| Implementations live in infrastructure (e.g. `packages/db`) | “How” is isolated and replaceable.                                              |
-| If an abstraction feels speculative                         | Don’t add it yet; add it when you have a second implementation or a clear need. |
+| Rule                                                              | Reason                                                                          |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Domain **never** imports infrastructure                           | Keeps domain pure and stable.                                                   |
+| Contracts live **only** in `packages/domain`                      | Single place that defines “what” is needed.                                     |
+| Implementations live in infrastructure (e.g. `packages/infra-db`) | “How” is isolated and replaceable.                                              |
+| If an abstraction feels speculative                               | Don’t add it yet; add it when you have a second implementation or a clear need. |
 
 ---
 
@@ -245,11 +245,11 @@ If you have existing repository interfaces named with an `I` prefix (e.g. `IHiri
 
 1. **Domain** (`packages/domain/src/repositories/<entity>.repository.ts`): Rename the interface to `<Entity>RepositoryContract` and update the JSDoc to state it is the contract only (no implementation). Example: `IHiringProcessRepository` → `HiringProcessRepositoryContract`.
 
-2. **DB package** (`packages/db/src/repositories/<entity>.repository.ts`): Update the import from the domain to use the new contract name, and change the class `implements` clause and class JSDoc to reference the new name.
+2. **DB package** (`packages/infra-db/src/repositories/<entity>.repository.ts`): Update the import from the domain to use the new contract name, and change the class `implements` clause and class JSDoc to reference the new name.
 
 3. **Docs**: In `apps/fumadocs/content/docs/architecture/*.mdx`, replace any remaining references to the old interface name (e.g. `IHiringProcessRepository`) with the new one (`HiringProcessRepositoryContract`).
 
-Application code that uses the **concrete class** (e.g. `HiringProcessRepository` from `@interviews-tool/db/repositories`) does not need to change; only the interface name in the domain and the implementation’s `implements` clause change.
+Application code that uses the **concrete class** (e.g. `HiringProcessRepository` from `@interviews-tool/infra-db/repositories`) does not need to change; only the interface name in the domain and the implementation’s `implements` clause change.
 
 ---
 

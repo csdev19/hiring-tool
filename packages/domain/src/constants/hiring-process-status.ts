@@ -36,55 +36,69 @@ export const HIRING_PROCESS_STATUS_VALUES = [
  */
 export const HIRING_PROCESS_STATUS_INFO: Record<
   HiringProcessStatus,
-  { label: string; description: string; order: number; category: "active" | "terminal" }
+  {
+    label: string;
+    description: string;
+    order: number;
+    category: "active" | "terminal";
+    color: string;
+  }
 > = {
   [HIRING_PROCESS_STATUSES.FIRST_CONTACT]: {
     label: "First Contact",
     description: "Initial outreach via LinkedIn, email, or other channel",
     order: 1,
     category: "active" as const,
+    color: "#8b5cf6",
   },
   [HIRING_PROCESS_STATUSES.ONGOING]: {
     label: "Ongoing",
     description: "Active interview process",
     order: 2,
     category: "active" as const,
+    color: "#3b82f6",
   },
   [HIRING_PROCESS_STATUSES.ON_HOLD]: {
     label: "On Hold",
     description: "Position is cold, stopped, or no recent updates",
     order: 3,
     category: "active" as const,
+    color: "#f59e0b",
   },
   [HIRING_PROCESS_STATUSES.REJECTED]: {
     label: "Rejected",
     description: "Application or interview was rejected",
     order: 4,
     category: "terminal" as const,
+    color: "#ef4444",
   },
   [HIRING_PROCESS_STATUSES.DROPPED_OUT]: {
     label: "Dropped Out",
     description: "Candidate withdrew from the process",
     order: 5,
     category: "terminal" as const,
+    color: "#6b7280",
   },
   [HIRING_PROCESS_STATUSES.HIRED]: {
     label: "Hired",
     description: "Successfully hired",
     order: 6,
     category: "terminal" as const,
+    color: "#22c55e",
   },
   [HIRING_PROCESS_STATUSES.OFFER_MADE]: {
     label: "Offer Made",
     description: "Company has made an offer to the candidate",
     order: 7,
     category: "active" as const,
+    color: "#06b6d4",
   },
   [HIRING_PROCESS_STATUSES.OFFER_ACCEPTED]: {
     label: "Offer Accepted",
     description: "Candidate has accepted the offer",
     order: 8,
     category: "terminal" as const,
+    color: "#10b981",
   },
 } as const;
 

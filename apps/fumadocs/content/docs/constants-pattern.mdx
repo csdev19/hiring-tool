@@ -295,8 +295,37 @@ This utility is essential for the pattern to work correctly.
 - `HiringProcessStatus` - Type for status values
 - `HIRING_PROCESS_STATUS_VALUES` - Array of all statuses (deprecated, use `Object.values(HIRING_PROCESS_STATUSES)`)
 - `isValidHiringProcessStatus()` - Validation function
-- `HIRING_PROCESS_STATUS_INFO` - Display metadata (label, description, order, category)
+- `HIRING_PROCESS_STATUS_INFO` - Display metadata (label, description, order, category, color)
 - `STATUS_TRANSITIONS` - Valid status transition rules
+
+#### Cross-Platform Status Colors
+
+The `color` property in `HIRING_PROCESS_STATUS_INFO` provides a single source of truth for status colors across both the web and mobile apps. Each hex value corresponds to the Tailwind color-500 family used by the web app:
+
+| Status         | Color Family | Hex       |
+| -------------- | ------------ | --------- |
+| first-contact  | purple       | `#8b5cf6` |
+| ongoing        | blue         | `#3b82f6` |
+| on-hold        | yellow       | `#f59e0b` |
+| rejected       | red          | `#ef4444` |
+| dropped-out    | gray         | `#6b7280` |
+| hired          | green        | `#22c55e` |
+| offer-made     | cyan         | `#06b6d4` |
+| offer-accepted | emerald      | `#10b981` |
+
+**Web app** uses Tailwind classes that map to these color families. **Mobile app** uses the `color` hex values directly for badge backgrounds:
+
+```typescript
+import { HIRING_PROCESS_STATUS_INFO } from "@interviews-tool/domain/constants";
+import type { HiringProcessStatus } from "@interviews-tool/domain/constants";
+
+// Mobile usage
+const statusInfo = HIRING_PROCESS_STATUS_INFO[status as HiringProcessStatus];
+const backgroundColor = statusInfo.color;  // e.g. "#8b5cf6"
+const label = statusInfo.label;            // e.g. "First Contact"
+```
+
+When adding a new status, always add both the Tailwind class in the web app and the matching hex `color` in the domain info object to keep both platforms in sync.
 
 ## Best Practices
 
@@ -317,7 +346,7 @@ This utility is essential for the pattern to work correctly.
    type Status = "ongoing" | "rejected";
 
    // ✅ Good
-   import type { InterviewStatus } from "@interviews-tool/db";
+   import type { InterviewStatus } from "@interviews-tool/infra-db";
    ```
 
 3. **Use validation functions for runtime checks**
