@@ -8,7 +8,3 @@ export const auth = betterAuth({
   // plugins: [...(baseConfig.plugins ?? []), tanstackStartCookies()],
   plugins: [...(baseConfig.plugins ?? [])],
 });
-
-// export const auth = betterAuth({
-//   baseURL: import.meta.env.VITE_BETTER_AUTH_URL,
-// });
