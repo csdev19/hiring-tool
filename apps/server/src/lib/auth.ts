@@ -8,7 +8,6 @@ import { env } from "cloudflare:workers";
 export const auth = betterAuth({
   ...baseConfig,
   baseURL: env.BETTER_AUTH_URL,
-  // Include null for Android native apps which send null/missing origin
   trustedOrigins: [env.CORS_ORIGIN, "exp://", "mobile://", "exp://*"],
   plugins: [...(baseConfig.plugins ?? []), customSession(getCustomSession, baseConfig), expo()],
 });
