@@ -4,7 +4,7 @@ import { baseConfig } from "@interviews-tool/infra-auth";
 
 export const auth = betterAuth({
   ...baseConfig,
-  baseURL: process.env.BETTER_AUTH_URL,
+  // baseURL: process.env.BETTER_AUTH_URL,
   plugins: [...(baseConfig.plugins ?? []), tanstackStartCookies()],
   // plugins: [...(baseConfig.plugins ?? [])],
 });
