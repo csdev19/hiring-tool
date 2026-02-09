@@ -4,8 +4,7 @@ on:
   # just to testing
   pull_request:
     branches:
-      - main
-      - production
+      - hotfix
   push:
     branches:
       - production
