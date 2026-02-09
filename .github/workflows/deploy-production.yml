@@ -2,9 +2,10 @@ name: Deploy Backend and Frontend to Production
 
 on:
   # just to testing
-  # pull_request:
-  #   branches:
-  #     - production
+  pull_request:
+    branches:
+      - main
+      - production
   push:
     branches:
       - production
