@@ -9,10 +9,10 @@ import { auth } from "./lib/auth";
 
 // Configure CORS once at the app level
 // Split CORS_ORIGIN by comma to support multiple origins
-const allowedOrigins = env.CORS_ORIGIN?.split(",").map((o) => o.trim()) || [];
+// const allowedOrigins = env.CORS_ORIGIN?.split(",").map((o) => o.trim()) || [];
 
 const corsConfig = {
-  origin: [...allowedOrigins, "exp://", "mobile://"],
+  origin: ["exp://", "mobile://", env.CORS_ORIGIN || "*"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   credentials: true,
@@ -33,14 +33,15 @@ const apiRoutes = new Elysia({
     timestamp: new Date().toISOString(),
   }));
 
-const app = new Elysia({
+const baseApp = new Elysia({
   adapter: CloudflareAdapter,
 })
   .use(authRoutes)
-  .use(apiRoutes)
-  .compile();
+  .use(apiRoutes);
 
-export type App = typeof app;
+export type App = typeof baseApp;
+
+const app = baseApp.compile();
 
 export default {
   fetch: (request: Request, env: CloudflareBindings, ctx: ExecutionContext) => {

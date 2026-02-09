@@ -100,7 +100,9 @@ export function useCreateHiringProcess() {
 
   return useMutation<HiringProcess, Error, CreateHiringProcessInput>({
     mutationFn: async (data: CreateHiringProcessInput): Promise<HiringProcess> => {
+      // const result = await clientTreaty.api.v1["hiring-processes"].post(data);
       const result = await clientTreaty.api.v1["hiring-processes"].post(data);
+      // const result = await apiFetch("/api/v1/hiring-processes", { method: "POST", body: data });
       if (result.error) {
         throw new Error(getErrorMessage(result.error));
       }
