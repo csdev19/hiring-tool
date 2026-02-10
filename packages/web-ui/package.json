@@ -43,6 +43,7 @@
     "vite-tsconfig-paths": "^5.1.4"
   },
   "devDependencies": {
+    "@interviews-tool/config": "workspace:*",
     "@tailwindcss/vite": "catalog:",
     "@types/react": "^19.2.7",
     "@vitejs/plugin-react": "catalog:",

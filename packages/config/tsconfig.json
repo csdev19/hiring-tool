@@ -1,12 +1,11 @@
 {
-  "extends": "@interviews-tool/config/tsconfig.base.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true,
-    "types": ["bun", "@cloudflare/workers-types"]
+    "sourceMap": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

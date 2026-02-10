@@ -4,11 +4,12 @@
     "composite": false,
     "outDir": "dist",
     "baseUrl": ".",
-    "moduleResolution": "bundler",
+    // "moduleResolution": "bundler",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["bun", "@cloudflare/workers-types"]
   },
   "include": ["src/**/*", "worker-configuration.d.ts"]
 }

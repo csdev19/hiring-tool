@@ -1,24 +1,15 @@
 {
+  "extends": "@interviews-tool/config/tsconfig.base.json",
   "include": ["**/*.ts", "**/*.tsx"],
   "compilerOptions": {
+    "rootDir": "./src",
     "target": "ES2022",
-    "jsx": "react-jsx",
-    "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["vite/client"],
-
-    /* Bundler mode */
     "moduleResolution": "bundler",
+    "jsx": "react-jsx",
     "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
     "noEmit": true,
-
-    /* Linting */
-    "skipLibCheck": true,
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {

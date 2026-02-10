@@ -5,6 +5,7 @@ import { HiringProcessRepository } from "@interviews-tool/infra-db/repositories"
 import { listHiringProcesses } from "@interviews-tool/application/hiring";
 import type { ApiResponse, HiringProcessFilterParams } from "@interviews-tool/domain/types";
 import type { HiringProcessBase } from "@interviews-tool/domain/schemas";
+import { env } from "@/config/server";
 
 interface GetHiringProcessesInput extends HiringProcessFilterParams {
   page: number;
@@ -21,7 +22,7 @@ export const getHiringProcesses = createServerFn({ method: "GET" })
       return { data: null, error: { message: "Unauthorized" } };
     }
 
-    const db = createDatabaseClient(process.env.DATABASE_URL!);
+    const db = createDatabaseClient(env.DATABASE_URL);
     const repo = new HiringProcessRepository(db);
     const result = await listHiringProcesses({
       repo,
