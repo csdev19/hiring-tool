@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@better-auth/expo": "catalog:",
-    "@elysiajs/cors": "^1.3.3",
+    "@elysiajs/cors": "catalog:",
     "@interviews-tool/application": "workspace:*",
     "@interviews-tool/domain": "workspace:*",
     "@interviews-tool/infra-auth": "workspace:*",
