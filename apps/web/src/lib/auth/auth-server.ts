@@ -4,5 +4,6 @@ import { baseConfig } from "@interviews-tool/infra-auth";
 
 export const auth = betterAuth({
   ...baseConfig,
+  trustedOrigins: [process.env.CORS_ORIGIN ?? ""],
   plugins: [...(baseConfig.plugins ?? []), tanstackStartCookies()],
 });

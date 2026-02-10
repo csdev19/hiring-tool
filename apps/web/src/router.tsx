@@ -3,9 +3,10 @@ import { routerWithQueryClient } from "@tanstack/react-router-with-query";
 
 import Loader from "./components/loader";
 import { routeTree } from "./routeTree.gen";
-import { queryClient } from "./lib/query-client";
+import { createQueryClient } from "./lib/query-client";
 
 export const getRouter = () => {
+  const queryClient = createQueryClient();
   const router = routerWithQueryClient(
     createTanStackRouter({
       routeTree,
