@@ -39,6 +39,7 @@ jobs:
           VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          CORS_ORIGIN: ${{ vars.CORS_ORIGIN }}
         run: bun run build
 
       - name: Deploy Frontend to Cloudflare Workers 🚀
@@ -53,6 +54,7 @@ jobs:
             CLOUDFLARE_ACCOUNT_ID
             DATABASE_URL
             BETTER_AUTH_SECRET
+            CORS_ORIGIN
         env:
           ENVIRONMENT: production
           VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
@@ -60,6 +62,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          CORS_ORIGIN: ${{ vars.CORS_ORIGIN }}
 
       - name: Deploy Backend to Cloudflare Workers 🚀
         uses: cloudflare/wrangler-action@v3.14.1
