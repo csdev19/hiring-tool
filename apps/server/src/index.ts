@@ -4,15 +4,11 @@ import { hiringProcessRoutes } from "./routes/hiring-processes";
 import { companyDetailsRoutes } from "./routes/company-details";
 import { interactionRoutes } from "./routes/interactions";
 import { CloudflareAdapter } from "elysia/adapter/cloudflare-worker";
-import { env } from "cloudflare:workers";
+import { env } from "./env";
 import { auth } from "./lib/auth";
 
-// Configure CORS once at the app level
-// Split CORS_ORIGIN by comma to support multiple origins
-const allowedOrigins = env.CORS_ORIGIN?.split(",").map((o) => o.trim()) || [];
-
 const corsConfig = {
-  origin: [...allowedOrigins, "exp://", "mobile://"],
+  origin: [...env.CORS_ORIGIN, "exp://", "mobile://"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   credentials: true,
