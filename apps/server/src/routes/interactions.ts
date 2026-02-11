@@ -14,7 +14,7 @@ import {
 import { NotFoundError } from "../utils/errors";
 import { successBody, createdBody } from "../utils/response-helpers";
 import { errorHandlerPlugin } from "../utils/error-handler-plugin";
-import { env } from "cloudflare:workers";
+import { env } from "../env";
 import { authMacro } from "@/plugins/auth.plugin";
 
 export const interactionRoutes = new Elysia({
