@@ -13,6 +13,7 @@ import { env } from "@/env/server";
 async function proxyToBackend(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const targetUrl = `${env.VITE_SERVER_URL}${url.pathname}${url.search}`;
+  console.log("Proxying auth request to backend:", targetUrl);
 
   const headers = new Headers();
   headers.set("cookie", request.headers.get("cookie") ?? "");
@@ -27,12 +28,11 @@ async function proxyToBackend(request: Request): Promise<Response> {
   if (referer) headers.set("referer", referer);
 
   const hasBody = request.method !== "GET" && request.method !== "HEAD";
+  const body = hasBody ? await request.text() : undefined;
   const response = await fetch(targetUrl, {
     method: request.method,
     headers,
-    body: hasBody ? request.body : undefined,
-    // @ts-expect-error - duplex is required for body streaming in Node
-    duplex: hasBody ? "half" : undefined,
+    body,
   });
 
   const responseHeaders = new Headers(response.headers);
