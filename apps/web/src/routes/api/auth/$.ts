@@ -59,7 +59,7 @@ async function proxyToBackend(request: Request): Promise<Response> {
       }
     }
 
-    console.log("[proxy] 8. Returning response");
+    console.log("[proxy] 8. Returning response", response.body);
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
