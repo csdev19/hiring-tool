@@ -4,7 +4,6 @@ import { hiringProcessRoutes } from "./routes/hiring-processes";
 import { companyDetailsRoutes } from "./routes/company-details";
 import { interactionRoutes } from "./routes/interactions";
 import { CloudflareAdapter } from "elysia/adapter/cloudflare-worker";
-import { env } from "./env";
 import { auth } from "./lib/auth";
 
 // CORS only needed for mobile apps — web requests come through
