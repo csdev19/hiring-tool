@@ -6,21 +6,17 @@
  * without going through public DNS (which breaks on *.workers.dev).
  */
 export async function apiFetch(request: Request | string, init?: RequestInit): Promise<Response> {
+  const req = request instanceof Request ? request : new Request(request, init);
+
   try {
     // In Cloudflare Workers, "cloudflare:workers" provides access to bindings
     const { env } = await import("cloudflare:workers");
     if (env.API_SERVICE) {
-      console.log("[apiFetch] Using Service Binding (API_SERVICE)");
-      const req = typeof request === "string" ? new Request(request, init) : request;
       return env.API_SERVICE.fetch(req);
     }
-    console.log("[apiFetch] API_SERVICE binding not found, falling back to fetch()");
-  } catch (error) {
-    console.log(
-      "[apiFetch] cloudflare:workers not available, using regular fetch()",
-      error instanceof Error ? error.message : error,
-    );
+  } catch {
+    // cloudflare:workers not available (local dev), fall through to fetch()
   }
 
-  return fetch(request, init);
+  return fetch(req);
 }

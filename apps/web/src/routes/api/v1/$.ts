@@ -14,19 +14,9 @@ async function proxyToBackend(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const targetUrl = `${env.VITE_SERVER_URL}${url.pathname}${url.search}`;
 
-    const headers = new Headers();
-    headers.set("cookie", request.headers.get("cookie") ?? "");
-    headers.set("content-type", request.headers.get("content-type") ?? "application/json");
-    headers.set("accept", request.headers.get("accept") ?? "application/json");
+    const proxiedRequest = new Request(targetUrl, request);
 
-    const hasBody = request.method !== "GET" && request.method !== "HEAD";
-    const body = hasBody ? await request.text() : undefined;
-
-    const response = await apiFetch(targetUrl, {
-      method: request.method,
-      headers,
-      body,
-    });
+    const response = await apiFetch(proxiedRequest);
 
     const responseHeaders = new Headers(response.headers);
 
