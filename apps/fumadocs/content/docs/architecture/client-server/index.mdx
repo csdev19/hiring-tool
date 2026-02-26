@@ -1,0 +1,39 @@
+---
+title: Client-Server Architecture
+description: Proxy pattern and Cloudflare Service Bindings for Worker-to-Worker communication
+---
+
+# Client-Server Architecture
+
+## Architecture Overview
+
+- Domain: N/A (infrastructure-level feature)
+- Infrastructure: `apps/web/src/lib/api-fetch.ts`, `apps/web/src/routes/api/`
+- Web UI: `apps/web/src/lib/client-treaty.ts`
+- Mobile: N/A (mobile talks directly to the API server)
+
+## Sub-Features
+
+| Feature                              | Status | Date       | Summary                                                             |
+| ------------------------------------ | ------ | ---------- | ------------------------------------------------------------------- |
+| [Auth Proxy](auth-proxy)             | ✅     | 2026-02-25 | Proxies `/api/auth/*` to backend, rewrites cookies to client domain |
+| [Service Bindings](service-bindings) | ✅     | 2026-02-25 | Direct Worker-to-Worker communication bypassing public DNS          |
+| [API Proxy](api-proxy)               | ✅     | 2026-02-25 | Proxies `/api/v1/*` so browser cookies are always included          |
+
+## Shared Decisions
+
+| Decision                                        | Why                                                                                                      |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Proxy all requests through web Worker           | Cookies are set on the web domain; browser won't send them to a different API domain                     |
+| Use Cloudflare Service Bindings in production   | Worker-to-Worker `fetch()` on `*.workers.dev` returns 404/1042 errors due to Cloudflare internal routing |
+| Regular `fetch()` fallback in local development | Service Bindings are only available in Cloudflare Workers runtime, not in local dev                      |
+| Remove CORS for web, keep only for mobile       | Web requests go through same-origin proxy, so CORS is unnecessary; mobile still needs it                 |
+| Removed local Better Auth from web Worker       | Web Worker no longer needs its own auth instance; it proxies to the backend's Better Auth                |
+| Strip `domain=` from Set-Cookie headers         | Backend sets cookies on its own domain; stripping lets the browser assign them to the client domain      |
+
+## Shared Gotchas
+
+- Worker-to-Worker `fetch()` on `*.workers.dev` fails with 404 or error 1042. Always use Service Bindings in production.
+- Cloudflare Workers don't support `duplex: "half"` streaming. Read the request body as text before forwarding.
+- Better Auth needs `trustedOrigins` on the server to include the web Worker's origin, because the proxy forwards the browser's `origin` header.
+- The web Worker still needs `VITE_SERVER_URL` to construct target URLs for the Service Binding (the binding routes the request, but the URL path matters).

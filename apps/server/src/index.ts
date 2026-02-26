@@ -4,11 +4,12 @@ import { hiringProcessRoutes } from "./routes/hiring-processes";
 import { companyDetailsRoutes } from "./routes/company-details";
 import { interactionRoutes } from "./routes/interactions";
 import { CloudflareAdapter } from "elysia/adapter/cloudflare-worker";
-import { env } from "./env";
 import { auth } from "./lib/auth";
 
+// CORS only needed for mobile apps — web requests come through
+// the web Worker proxy via Service Bindings (same-origin, no CORS needed)
 const corsConfig = {
-  origin: [...env.CORS_ORIGIN, "exp://", "mobile://"],
+  origin: ["exp://", "mobile://", "exp://*"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   credentials: true,

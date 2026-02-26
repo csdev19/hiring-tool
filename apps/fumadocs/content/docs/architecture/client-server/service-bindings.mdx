@@ -1,0 +1,78 @@
+---
+title: Service Bindings
+description: Cloudflare Service Bindings for direct Worker-to-Worker communication
+---
+
+# Service Bindings
+
+## Status
+
+| Field          | Value                               |
+| -------------- | ----------------------------------- |
+| Status         | ✅ Complete                         |
+| Completed      | 2026-02-25                          |
+| Author         | Cristian Sotomayor                  |
+| Parent Feature | [Client-Server Architecture](index) |
+| Related Issues | N/A                                 |
+
+## What It Does
+
+Enables direct Worker-to-Worker communication in Cloudflare without going through public DNS. The web Worker uses a Service Binding to call the API Worker internally, bypassing the `*.workers.dev` routing issue where Worker-to-Worker `fetch()` returns 404 or error 1042.
+
+## Implementation
+
+### Files Changed
+
+| Path                                 | Purpose                                                                   |
+| ------------------------------------ | ------------------------------------------------------------------------- |
+| `apps/web/src/lib/api-fetch.ts`      | Wrapper that tries Service Binding first, falls back to regular `fetch()` |
+| `apps/web/wrangler.jsonc`            | Declares the `API_SERVICE` binding pointing to `hiring-tool-api`          |
+| `apps/web/worker-configuration.d.ts` | Regenerated types including `API_SERVICE: Fetcher`                        |
+
+### Domain Model
+
+N/A — infrastructure-level feature.
+
+### Key Logic
+
+`apiFetch()` dynamically imports `cloudflare:workers` to access the `env.API_SERVICE` binding. If available, it creates a `Request` object and calls `env.API_SERVICE.fetch(req)` for direct Worker-to-Worker routing. If the import fails (local development), it falls back to regular `fetch()`. The wrangler.jsonc config declares the service binding as `{ "binding": "API_SERVICE", "service": "hiring-tool-api" }`.
+
+## Decisions
+
+| Decision                                              | Why                                                                                   | Alternatives Considered                                           |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Dynamic `import("cloudflare:workers")` with try/catch | Graceful fallback in local dev where the module doesn't exist                         | Static import (crashes in local dev), environment check (fragile) |
+| Single `apiFetch()` wrapper used everywhere           | One place to change the fetch strategy; both proxy routes and `getAuthSession` use it | Separate binding logic in each route (duplication)                |
+| Binding name `API_SERVICE`                            | Clear intent — it's the API service                                                   | `BACKEND`, `SERVER` (less descriptive)                            |
+
+## Gotchas & Warnings
+
+- `cloudflare:workers` is only available inside Cloudflare Workers runtime. Local dev (wrangler dev) may or may not have it depending on the version — the try/catch handles both cases.
+- The URL passed to `env.API_SERVICE.fetch()` still matters for routing within the target Worker. The binding handles where to send it, but the path/query determine which route the API Worker matches.
+- After modifying `wrangler.jsonc`, run `wrangler types` to regenerate `worker-configuration.d.ts`.
+- Service Bindings only work between Workers in the same Cloudflare account.
+
+## Dependencies
+
+- Cloudflare Service Bindings (no new packages — built into the Workers runtime)
+- The `hiring-tool-api` Worker must be deployed in the same Cloudflare account
+
+## Testing
+
+```bash
+# Verify Service Binding works in production
+1. Deploy both workers (web + API)
+2. Open web app on *.workers.dev domain
+3. Sign in — check Cloudflare logs for "[apiFetch] Using Service Binding (API_SERVICE)"
+4. If you see "[apiFetch] API_SERVICE binding not found", the binding isn't configured
+
+# Verify fallback works locally
+1. Run `bun run dev:web` and `bun run dev:server`
+2. Sign in — check terminal for "[apiFetch] cloudflare:workers not available, using regular fetch()"
+3. Auth should work via regular fetch to localhost
+```
+
+## Related
+
+- [Auth Proxy](auth-proxy) — Uses `apiFetch()` to proxy auth requests
+- [API Proxy](api-proxy) — Uses `apiFetch()` to proxy all API requests

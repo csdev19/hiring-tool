@@ -1,0 +1,79 @@
+---
+title: API Proxy
+description: General API proxy that routes all /api/v1/* requests through the web Worker
+---
+
+# API Proxy
+
+## Status
+
+| Field          | Value                               |
+| -------------- | ----------------------------------- |
+| Status         | ✅ Complete                         |
+| Completed      | 2026-02-25                          |
+| Author         | Cristian Sotomayor                  |
+| Parent Feature | [Client-Server Architecture](index) |
+| Related Issues | N/A                                 |
+
+## What It Does
+
+Proxies all `/api/v1/*` requests from the browser through the web Worker to the backend API. This ensures auth cookies (set on the web domain) are automatically included in every API request. The Eden Treaty client uses `window.location.origin` (same-origin) instead of the API server URL (cross-origin), so all API calls go through this proxy.
+
+## Implementation
+
+### Files Changed
+
+| Path                                | Purpose                                                                            |
+| ----------------------------------- | ---------------------------------------------------------------------------------- |
+| `apps/web/src/routes/api/v1/$.ts`   | Catch-all route that proxies API requests to the backend                           |
+| `apps/web/src/lib/client-treaty.ts` | Changed Treaty client to use `window.location.origin` instead of `VITE_SERVER_URL` |
+| `apps/server/src/index.ts`          | Removed web origins from CORS config (kept only mobile origins)                    |
+
+### Domain Model
+
+N/A — infrastructure-level feature.
+
+### Key Logic
+
+The API proxy route catches all HTTP methods on `/api/v1/$`. Like the auth proxy, it reads the body as text, constructs a request to `${VITE_SERVER_URL}${pathname}`, and forwards cookies. It uses `apiFetch()` for Service Binding routing. The Treaty client was changed from `treaty<App>(env.VITE_SERVER_URL)` to `treaty<App>(window.location.origin)` so all Eden Treaty requests hit the web domain (proxied) instead of the API domain directly.
+
+CORS was removed for web because all web requests are now same-origin (browser to web Worker). CORS is kept only for mobile apps (`exp://`, `mobile://`).
+
+## Decisions
+
+| Decision                                    | Why                                                                                          | Alternatives Considered                                                                        |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Proxy all API routes, not just auth         | After auth worked, API calls returned unauthorized because cookies weren't sent cross-origin | Only proxy auth (cookies still missing on API calls)                                           |
+| Treaty client uses `window.location.origin` | Makes all API requests same-origin through the proxy                                         | Keep cross-origin with `credentials: "include"` (requires CORS, cookies still on wrong domain) |
+| Remove CORS for web                         | Same-origin requests don't need CORS; simplifies server config                               | Keep CORS (unnecessary overhead and config)                                                    |
+| `"http://localhost:3001"` fallback for SSR  | Treaty client runs during SSR where `window` is undefined; localhost is the dev server       | Check for `typeof window` in each call (repetitive)                                            |
+
+## Gotchas & Warnings
+
+- The Treaty client's SSR fallback (`http://localhost:3001`) is only for server-side rendering during development. In production, SSR should use `apiFetch` or server functions, not the Treaty client.
+- If a new API route prefix is added (e.g., `/api/v2/`), a new proxy route file must be created for it.
+- The proxy adds a small latency hop (web Worker to API Worker), but Service Bindings make this negligible in production.
+
+## Dependencies
+
+None new — reuses the `apiFetch()` wrapper from the Service Bindings sub-feature.
+
+## Testing
+
+```bash
+# Manual testing
+1. Open web app, sign in
+2. Navigate to a page that fetches data (e.g., hiring processes list)
+3. Open browser DevTools Network tab
+4. Verify API requests go to the web domain (same-origin), NOT the API domain
+5. Verify data loads correctly (no unauthorized errors)
+
+# Verify CORS removal
+1. Check that no CORS headers appear on web API responses
+2. Mobile app should still work with CORS headers
+```
+
+## Related
+
+- [Auth Proxy](auth-proxy) — Same proxy pattern for auth routes
+- [Service Bindings](service-bindings) — The transport layer used by this proxy
