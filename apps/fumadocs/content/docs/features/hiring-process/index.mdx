@@ -1,0 +1,33 @@
+---
+title: Hiring Process
+description: Core hiring process management features including CRUD, salary tracking, and interview management
+---
+
+# Hiring Process
+
+## Architecture Overview
+
+- Domain: `packages/domain/src/schemas/hiring-process.ts`, `packages/domain/src/constants/`
+- Infrastructure: `packages/infra-db/src/schema/hiring-process.ts`, `packages/infra-db/src/repositories/`
+- Web UI: `apps/web/src/routes/hiring-processes/`, `apps/web/src/components/hiring-process/`
+- Mobile: N/A (not yet implemented)
+
+## Sub-Features
+
+| Feature                                          | Status | Date       | Summary                                                   |
+| ------------------------------------------------ | ------ | ---------- | --------------------------------------------------------- |
+| [Implementation Summary](implementation-summary) | ✅     | 2025-12-22 | Epic 1: Full CRUD for interview/hiring process management |
+| [Salary Rate Type](salary-rate-type)             | ✅     | 2025-12-29 | Added monthly/hourly rate type to salary tracking         |
+
+## Shared Decisions
+
+| Decision                           | Why                                                             |
+| ---------------------------------- | --------------------------------------------------------------- |
+| Domain constants pattern for enums | Type-safe values shared between domain, database, and UI layers |
+| Zod schemas as source of truth     | Single definition drives validation, types, and API contracts   |
+| Eden Treaty for API type safety    | End-to-end type safety from Elysia backend to React frontend    |
+
+## Shared Gotchas
+
+- Database enums must use domain constant values arrays (`SALARY_RATE_TYPE_VALUES`) to stay in sync.
+- Form default values must match database defaults for backward compatibility when adding new fields.

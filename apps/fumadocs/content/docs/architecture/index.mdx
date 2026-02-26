@@ -113,6 +113,58 @@ Summary of the repository pattern refactoring work completed.
 
 ---
 
+### Patterns & Conventions
+
+#### [Application Layer](/docs/architecture/application-layer)
+
+DDD + Hexagonal Architecture with layer-first package structure (domain, application, infra-db).
+
+---
+
+#### [Domain Architecture Patterns](/docs/architecture/domain-architecture-patterns)
+
+Entity-Based (DDD) vs Schema-Based architectures — when to use each approach.
+
+---
+
+#### [Constants Pattern](/docs/architecture/constants-pattern)
+
+Type-safe 4-part constants pattern (constant object, type, values array, validation).
+
+---
+
+#### [Schemas Implementation](/docs/architecture/schemas-implementation)
+
+How to use Zod v4 schemas from the domain package across backend and frontend.
+
+---
+
+#### [Infrastructure Naming](/docs/architecture/infrastructure-naming)
+
+Why infrastructure packages use the `infra-<capability>` naming convention.
+
+---
+
+### System & Infrastructure
+
+#### [System Overview](/docs/architecture/system-overview)
+
+High-level system architecture showing applications, shared packages, database choices, and communication flow diagrams.
+
+---
+
+#### [Client-Server Architecture](/docs/architecture/client-server)
+
+Proxy pattern and Cloudflare Service Bindings for Worker-to-Worker communication.
+
+**Topics covered:**
+
+- [Auth Proxy](/docs/architecture/client-server/auth-proxy) — Proxies `/api/auth/*` with cookie rewriting
+- [Service Bindings](/docs/architecture/client-server/service-bindings) — Direct Worker-to-Worker communication
+- [API Proxy](/docs/architecture/client-server/api-proxy) — Proxies `/api/v1/*` for same-origin cookie handling
+
+---
+
 ## 🎯 Architecture Principles
 
 ### 1. **Separation of Concerns**
@@ -220,7 +272,7 @@ Each bounded context is independent, sharing only primitives from the shared ker
 ### Related Documentation
 
 - [Authentication Architecture](/docs/authentication/overview)
-- [Domain Architecture Patterns](/docs/domain-architecture-patterns)
+- [Domain Architecture Patterns](/docs/architecture/domain-architecture-patterns)
 - [Backend Response Helpers](/docs/backend/response-helpers)
 
 ### External References

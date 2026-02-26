@@ -34,7 +34,7 @@ Currently imported:
 - `@interviews-tool/domain/constants` — `HIRING_PROCESS_STATUS_INFO`, status labels, colors, currency/salary constants
 - `@interviews-tool/domain/schemas` — `createHiringProcessSchema` for client-side form validation
 
-The mobile app **must never** import from `@interviews-tool/db` or `@interviews-tool/application`. These are server-only packages. An ESLint `no-restricted-imports` rule enforces this — see [Application Layer & Package Architecture](/docs/application-layer) for details.
+The mobile app **must never** import from `@interviews-tool/db` or `@interviews-tool/application`. These are server-only packages. An ESLint `no-restricted-imports` rule enforces this — see [Application Layer & Package Architecture](/docs/architecture/application-layer) for details.
 
 This ensures hiring process statuses are displayed consistently across the web and mobile apps, while keeping server code out of the mobile JS bundle.
 
