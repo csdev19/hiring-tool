@@ -1,0 +1,82 @@
+---
+title: Auth Proxy
+description: Proxy pattern that forwards auth requests to the backend API with cookie rewriting
+---
+
+# Auth Proxy
+
+## Status
+
+| Field          | Value                               |
+| -------------- | ----------------------------------- |
+| Status         | ✅ Complete                         |
+| Completed      | 2026-02-25                          |
+| Author         | Cristian Sotomayor                  |
+| Parent Feature | [Client-Server Architecture](index) |
+| Related Issues | N/A                                 |
+
+## What It Does
+
+The web Worker proxies all `/api/auth/*` requests to the backend API server. When the backend sets cookies, the proxy strips the `domain=` attribute so the browser assigns cookies to the web domain instead of the API domain. This means SSR can read auth cookies because they live on the same domain as the web Worker.
+
+## Implementation
+
+### Files Changed
+
+| Path                                        | Purpose                                                                          |
+| ------------------------------------------- | -------------------------------------------------------------------------------- |
+| `apps/web/src/routes/api/auth/$.ts`         | Catch-all route that proxies auth requests to the backend                        |
+| `apps/web/src/lib/auth/get-auth-session.ts` | Server function that fetches session via `apiFetch` instead of local Better Auth |
+| `apps/web/src/lib/auth/auth-server.ts`      | Deleted — web Worker no longer runs its own Better Auth instance                 |
+| `apps/web/package.json`                     | Removed `@interviews-tool/infra-auth` dependency                                 |
+| `packages/infra-env/src/web-server.ts`      | Simplified to only `DATABASE_URL` and `VITE_SERVER_URL`                          |
+| `.github/workflows/deploy-production.yml`   | Removed `BETTER_AUTH_SECRET` and `CORS_ORIGIN` from web deploy                   |
+
+### Domain Model
+
+N/A — this is an infrastructure-level feature, no domain entities involved.
+
+### Key Logic
+
+The proxy route catches all HTTP methods on `/api/auth/$`. It reads the request body (if present) as text, constructs a new request to `${VITE_SERVER_URL}/api/auth/...` preserving cookies, content-type, origin, and referer headers. It uses `apiFetch()` which routes through Service Bindings in production. On the response, it strips `domain=` from all `Set-Cookie` headers using a regex replace.
+
+`getAuthSession` was rewritten from calling `auth.api.getSession()` (local Better Auth) to fetching `${VITE_SERVER_URL}/api/auth/get-session` via `apiFetch`, forwarding the cookie header from the incoming request.
+
+## Decisions
+
+| Decision                                  | Why                                                                                                       | Alternatives Considered                                                |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Remove local Better Auth from web Worker  | Eliminates duplicate auth instances and removes need for `BETTER_AUTH_SECRET` and DB access on web Worker | Keep dual auth instances (rejected: two sources of truth for sessions) |
+| Read body as text, not stream             | Cloudflare Workers don't support `duplex: "half"`                                                         | Stream with duplex (failed with error 1042)                            |
+| Forward `origin` and `referer` headers    | Better Auth validates CSRF using origin; the proxy must pass the browser's real origin                    | Strip origin (would break CSRF validation)                             |
+| Strip `domain=` from Set-Cookie via regex | Simple, reliable; backend may set domain to its own `*.workers.dev`                                       | Parse and reconstruct cookies (over-engineered)                        |
+
+## Gotchas & Warnings
+
+- Better Auth's `trustedOrigins` on the server must include the web Worker's origin, otherwise CSRF validation rejects proxied requests.
+- The body must be read with `await request.text()` before forwarding. Using `request.body` stream with `duplex: "half"` throws error 1042 on Cloudflare.
+- `getAuthSession` depends on `apiFetch` working correctly — if Service Bindings aren't configured, it falls back to regular fetch which may fail in production on `*.workers.dev`.
+
+## Dependencies
+
+None new — removed `@interviews-tool/infra-auth` from web, removed `BETTER_AUTH_SECRET` env var.
+
+## Testing
+
+```bash
+# Manual testing — sign in flow
+1. Open web app, click sign in
+2. Verify cookies are set on the web domain (not the API domain)
+3. Refresh page — SSR should have the session (no flash of unauthenticated state)
+4. Check Cloudflare Workers logs for "[proxy]" debug lines
+
+# Manual testing — sign out
+1. Click sign out
+2. Verify cookies are cleared
+3. Refresh — should be unauthenticated
+```
+
+## Related
+
+- [Service Bindings](service-bindings) — How the proxy communicates with the backend in production
+- [API Proxy](api-proxy) — Same pattern applied to all API routes, not just auth
