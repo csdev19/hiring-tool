@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthenticatedHiringProcessesIndexRouteImport } from './routes/_authenticated/hiring-processes/index'
+import { Route as ApiV1SplatRouteImport } from './routes/api/v1/$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthenticatedHiringProcessesNewRouteImport } from './routes/_authenticated/hiring-processes/new'
 import { Route as AuthenticatedHiringProcessesIdRouteImport } from './routes/_authenticated/hiring-processes/$id'
@@ -44,6 +45,11 @@ const AuthenticatedHiringProcessesIndexRoute =
     path: '/hiring-processes/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
+  id: '/api/v1/$',
+  path: '/api/v1/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/hiring-processes/$id': typeof AuthenticatedHiringProcessesIdRoute
   '/hiring-processes/new': typeof AuthenticatedHiringProcessesNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/v1/$': typeof ApiV1SplatRoute
   '/hiring-processes': typeof AuthenticatedHiringProcessesIndexRoute
   '/hiring-processes/$id/edit': typeof AuthenticatedHiringProcessesIdEditRoute
 }
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/hiring-processes/$id': typeof AuthenticatedHiringProcessesIdRoute
   '/hiring-processes/new': typeof AuthenticatedHiringProcessesNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/v1/$': typeof ApiV1SplatRoute
   '/hiring-processes': typeof AuthenticatedHiringProcessesIndexRoute
   '/hiring-processes/$id/edit': typeof AuthenticatedHiringProcessesIdEditRoute
 }
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/_authenticated/hiring-processes/$id': typeof AuthenticatedHiringProcessesIdRoute
   '/_authenticated/hiring-processes/new': typeof AuthenticatedHiringProcessesNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/v1/$': typeof ApiV1SplatRoute
   '/_authenticated/hiring-processes/': typeof AuthenticatedHiringProcessesIndexRoute
   '/_authenticated/hiring-processes/$id_/edit': typeof AuthenticatedHiringProcessesIdEditRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/hiring-processes/$id'
     | '/hiring-processes/new'
     | '/api/auth/$'
+    | '/api/v1/$'
     | '/hiring-processes'
     | '/hiring-processes/$id/edit'
   fileRoutesByTo: FileRoutesByTo
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/hiring-processes/$id'
     | '/hiring-processes/new'
     | '/api/auth/$'
+    | '/api/v1/$'
     | '/hiring-processes'
     | '/hiring-processes/$id/edit'
   id:
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/_authenticated/hiring-processes/$id'
     | '/_authenticated/hiring-processes/new'
     | '/api/auth/$'
+    | '/api/v1/$'
     | '/_authenticated/hiring-processes/'
     | '/_authenticated/hiring-processes/$id_/edit'
   fileRoutesById: FileRoutesById
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiV1SplatRoute: typeof ApiV1SplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/hiring-processes'
       preLoaderRoute: typeof AuthenticatedHiringProcessesIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/v1/$': {
+      id: '/api/v1/$'
+      path: '/api/v1/$'
+      fullPath: '/api/v1/$'
+      preLoaderRoute: typeof ApiV1SplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -236,6 +256,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiV1SplatRoute: ApiV1SplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
