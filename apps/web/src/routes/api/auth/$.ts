@@ -1,14 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { env } from "@/env/server";
+import { apiFetch } from "@/lib/api-fetch";
 
 /**
  * Proxy handler that forwards auth requests to the backend API.
  *
- * Responsibilities:
- * 1. Forward the request to the real backend
- * 2. Forward relevant headers (cookie, content-type, etc.)
- * 3. Rewrite Set-Cookie headers to remove the backend domain
- *    so cookies are assigned to the client domain
+ * Uses Cloudflare Service Bindings in production for direct Worker-to-Worker
+ * communication, and regular fetch() in local development.
  */
 async function proxyToBackend(request: Request): Promise<Response> {
   try {
@@ -23,6 +21,7 @@ async function proxyToBackend(request: Request): Promise<Response> {
     headers.set("x-forwarded-host", url.host);
     headers.set("x-forwarded-proto", url.protocol.replace(":", ""));
 
+    // Forward origin and referer for Better Auth CSRF validation
     const origin = request.headers.get("origin");
     if (origin) headers.set("origin", origin);
     const referer = request.headers.get("referer");
@@ -39,8 +38,8 @@ async function proxyToBackend(request: Request): Promise<Response> {
       console.log("[proxy] 4. No body (GET/HEAD)");
     }
 
-    console.log("[proxy] 5. Sending fetch...");
-    const response = await fetch(targetUrl, {
+    console.log("[proxy] 5. Sending apiFetch (Service Binding or fallback)...");
+    const response = await apiFetch(targetUrl, {
       method: request.method,
       headers,
       body,
@@ -49,6 +48,8 @@ async function proxyToBackend(request: Request): Promise<Response> {
 
     const responseHeaders = new Headers(response.headers);
 
+    // Rewrite Set-Cookie headers: remove backend domain so the browser
+    // assigns cookies to the client domain instead
     const setCookies = response.headers.getSetCookie?.() ?? [];
     console.log("[proxy] 7. Set-Cookie count:", setCookies.length);
     if (setCookies.length > 0) {
@@ -59,7 +60,7 @@ async function proxyToBackend(request: Request): Promise<Response> {
       }
     }
 
-    console.log("[proxy] 8. Returning response", response.body);
+    console.log("[proxy] 8. Returning response");
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
