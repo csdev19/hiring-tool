@@ -18,6 +18,7 @@
     "@interviews-tool/domain": "workspace:*",
     "@interviews-tool/infra-db": "workspace:*",
     "@interviews-tool/infra-env": "workspace:*",
+    "@interviews-tool/infra-prisma-db": "workspace:*",
     "@tanstack/react-form": "^1.23.5",
     "@tanstack/react-query": "^5.90.12",
     "@tanstack/react-router": "^1.141.1",
