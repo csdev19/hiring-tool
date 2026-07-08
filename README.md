@@ -17,6 +17,7 @@ A modern web application for tracking job interviews and managing hiring process
 - [Bun](https://bun.sh) (v1.3.4 or higher)
 - PostgreSQL database
 - Node.js 18+ (if not using Bun)
+- [dotenvx](https://dotenvx.com) CLI installed globally — used to sync environment variables (`curl -sfS https://dotenvx.sh | sh` or `brew install dotenvx/brew/dotenvx`)
 
 ### Installation
 
@@ -34,9 +35,20 @@ bun install
 ```
 
 3. Set up environment variables:
-   - Copy `.env.example` to `.env` in `apps/server/` (if available)
-   - Configure your PostgreSQL connection string
-   - Set up authentication secrets
+
+   Environment variables are managed with [dotenvx Ops](https://dotenvx.com). The committed `.env.x` file links this repo to the shared dotenvx project (via `DOTENVX_PROJECT_ID`), so you don't copy `.env.example` files by hand — you pull the real values from the cloud.
+
+   ```bash
+   # 1. Authenticate with dotenvx Ops (opens a browser to log in)
+   dotenvx ops login
+
+   # 2. Sync all .env files for the project (apps/server, apps/web, apps/mobile)
+   dotenvx ops sync
+   ```
+
+   After syncing, the `.env` files are populated locally and the app is ready to run. Re-run `dotenvx ops sync` whenever the shared secrets change.
+
+   > If you're not a member of the dotenvx project, fall back to copying each `.env.example` to `.env` (in `apps/server/`, `apps/web/`, `apps/mobile/`) and filling in your own PostgreSQL connection string and auth secrets.
 
 4. Set up the database:
 
@@ -61,14 +73,21 @@ The application will be available at:
 hiring-tool/
 ├── apps/
 │   ├── web/              # Frontend application (React + TanStack Start)
-│   ├── server/            # Backend API (Elysia)
+│   ├── server/           # Backend API (Elysia)
+│   ├── mobile/           # Mobile application (React Native + Expo)
 │   └── fumadocs/         # Documentation site
 ├── packages/
-│   ├── auth/             # Authentication configuration
-│   ├── db/                # Database schema & Drizzle ORM
-│   ├── domain/            # Domain types, constants, and utilities
-│   └── config/            # Shared TypeScript configuration
+│   ├── domain/           # Domain layer — constants, schemas, types, interfaces (pure, mobile-safe)
+│   ├── application/      # Application layer — use cases depending only on domain interfaces
+│   ├── infra-db/         # Infrastructure — Drizzle repositories, mappers, DB schema
+│   ├── infra-prisma-db/  # Infrastructure — Prisma client over the SAME tables (demo: Drizzle or Prisma)
+│   ├── infra-auth/       # Infrastructure — Better-Auth configuration
+│   ├── infra-env/        # Infrastructure — environment/config loading
+│   ├── web-ui/           # Shared UI components (shadcn/ui, TailwindCSS)
+│   └── config/           # Shared TypeScript configuration
 ```
+
+The codebase follows **DDD + Hexagonal Architecture** with a layer-first package layout. The dependency rule is strict: `domain <- application <- infra-*`, and only the apps wire the layers together. See [ARCHITECTURE.md](ARCHITECTURE.md) and [CLAUDE.md](CLAUDE.md) for details.
 
 ## 🛠️ Available Scripts
 
@@ -77,6 +96,7 @@ hiring-tool/
 - `bun run dev` - Start all applications in development mode
 - `bun run dev:web` - Start only the web application
 - `bun run dev:server` - Start only the server
+- `bun run dev:native` - Start only the mobile application (Expo)
 
 ### Building
 
@@ -88,6 +108,16 @@ hiring-tool/
 - `bun run db:studio` - Open Drizzle Studio (database GUI)
 - `bun run db:generate` - Generate migration files
 - `bun run db:migrate` - Run database migrations
+
+### Prisma (parallel ORM demo)
+
+`@interviews-tool/infra-prisma-db` exposes a Prisma client over the **same** Neon tables, to
+show Drizzle and Prisma coexisting without changing anything. See its
+[README](packages/infra-prisma-db/README.md).
+
+- `bun run prisma:pull` - Introspect existing tables into `schema.prisma`
+- `bun run prisma:generate` - Generate the typed Prisma client
+- `bun run prisma:example` - Read the same rows via Drizzle and Prisma, side by side
 
 ### Code Quality
 
@@ -144,6 +174,12 @@ This project was built using the [Better-T-Stack](https://github.com/AmanVarshne
 - **PostgreSQL** - Relational database
 - **Better-Auth** - Authentication library
 
+### Mobile
+
+- **React Native** - Cross-platform mobile framework
+- **Expo** - React Native tooling and runtime (with Expo Router)
+- **Better-Auth (Expo)** - Shared authentication on mobile
+
 ### Development Tools
 
 - **TypeScript** - Type safety
@@ -152,6 +188,7 @@ This project was built using the [Better-T-Stack](https://github.com/AmanVarshne
 - **Oxfmt** - Code formatter
 - **Husky** - Git hooks
 - **Drizzle Studio** - Database GUI
+- **dotenvx** - Encrypted, cloud-synced environment variables
 
 ### Architecture
 
