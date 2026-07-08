@@ -43,7 +43,12 @@
     "db:push": "dotenvx run -f apps/server/.env -- turbo run db:push -F @interviews-tool/infra-db",
     "db:studio": "dotenvx run -f apps/server/.env -- turbo run db:studio -F @interviews-tool/infra-db",
     "db:generate": "dotenvx run -f apps/server/.env -- turbo run db:generate -F @interviews-tool/infra-db",
-    "db:migrate": "dotenvx run -f apps/server/.env -- turbo run db:migrate -F @interviews-tool/infra-db"
+    "db:migrate": "dotenvx run -f apps/server/.env -- turbo run db:migrate -F @interviews-tool/infra-db",
+    "prisma:pull": "dotenvx run -f apps/server/.env -- turbo run prisma:pull -F @interviews-tool/infra-prisma-db",
+    "prisma:generate": "turbo run prisma:generate -F @interviews-tool/infra-prisma-db",
+    "prisma:studio": "dotenvx run -f apps/server/.env -- turbo run prisma:studio -F @interviews-tool/infra-prisma-db",
+    "prisma:example": "dotenvx run -f apps/server/.env -- turbo run example -F @interviews-tool/infra-prisma-db",
+    "prisma:example:repo": "dotenvx run -f apps/server/.env -- turbo run example:repo -F @interviews-tool/infra-prisma-db"
   },
   "dependencies": {
     "dotenv": "catalog:",

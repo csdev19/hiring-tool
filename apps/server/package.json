@@ -23,6 +23,7 @@
     "@interviews-tool/infra-auth": "workspace:*",
     "@interviews-tool/infra-db": "workspace:*",
     "@interviews-tool/infra-env": "workspace:*",
+    "@interviews-tool/infra-prisma-db": "workspace:*",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "drizzle-orm": "^0.45.1",

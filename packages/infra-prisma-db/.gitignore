@@ -1,0 +1,25 @@
+# dependencies (bun install)
+node_modules
+
+# output
+out
+dist
+*.tgz
+
+# NOTE: src/generated (Prisma client) is committed so app builds/deploys always have it.
+# It is pure TypeScript (no engine binaries) and is regenerated via `bun run prisma:generate`.
+
+# code coverage
+coverage
+*.lcov
+
+# caches
+.cache
+*.tsbuildinfo
+
+# dotenv environment variable files
+.env
+.env.local
+
+# Finder (MacOS) folder config
+.DS_Store
