@@ -1,10 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getAuthSession } from "@/lib/auth/get-auth-session";
-import { createDatabaseClient } from "@interviews-tool/infra-db/client";
-import { HiringProcessRepository } from "@interviews-tool/infra-db/repositories";
+import { createPrismaClient } from "@interviews-tool/infra-prisma-db/client";
+import { PrismaHiringProcessRepository } from "@interviews-tool/infra-prisma-db/repositories";
 import { listHiringProcesses } from "@interviews-tool/application/hiring";
 import type { ApiResponse, HiringProcessFilterParams } from "@interviews-tool/domain/types";
 import type { HiringProcessBase } from "@interviews-tool/domain/schemas";
+import { env } from "@/env/server";
 
 interface GetHiringProcessesInput extends HiringProcessFilterParams {
   page: number;
@@ -21,8 +22,10 @@ export const getHiringProcesses = createServerFn({ method: "GET" })
       return { data: null, error: { message: "Unauthorized" } };
     }
 
-    const db = createDatabaseClient(process.env.DATABASE_URL!);
-    const repo = new HiringProcessRepository(db);
+    // This server function (the hiring-processes LIST page) is served by Prisma.
+    const repo = new PrismaHiringProcessRepository(createPrismaClient(env.DATABASE_URL));
+    // TEMP proof — remove once verified. Prints in the web dev-server terminal on each load.
+    console.log("🟢 [get-hiring-processes] LIST served via PRISMA");
     const result = await listHiringProcesses({
       repo,
       userId: session.user.id,

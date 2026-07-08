@@ -6,10 +6,10 @@
 bun install
 ```
 
-We have to create a `.dev.vars` file in the root of the project.
+We have to create a `.env` file in the root of the project.
 
 ```
-cp .dev.vars-example .dev.vars
+cp .env.example .env
 ```
 
 If we want to deploy to Cloudflare Workers from local machine, we have to set up the environment variables.

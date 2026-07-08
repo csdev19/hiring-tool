@@ -14,6 +14,9 @@ build
 .env
 .env*.local
 .env.keys
+.env.*
+!.env.example
+!.env.x
 
 # IDEs and editors
 .vscode/*
@@ -45,6 +48,9 @@ lerna-debug.log*
 # Testing
 coverage
 .nyc_output
+
+# PR summaries
+pr-summaries
 
 # Misc
 *.tgz
