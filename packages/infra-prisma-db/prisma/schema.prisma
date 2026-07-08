@@ -1,0 +1,283 @@
+// Client used by the deployed apps (apps/server, apps/web) — they run on Cloudflare Workers
+// (workerd). The workerd runtime avoids the Node-only `fileURLToPath(import.meta.url)` shim
+// that crashes on workerd.
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated"
+  runtime  = "workerd"
+}
+
+// Node/Bun client used only by the example scripts (bun run examples/*). The workerd client's
+// WASM query compiler cannot be instantiated under Bun, so the scripts use this build instead.
+generator clientNode {
+  provider = "prisma-client"
+  output   = "../src/generated-node"
+  runtime  = "nodejs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model example_account {
+  id                       String       @id
+  account_id               String
+  provider_id              String
+  user_id                  String
+  access_token             String?
+  refresh_token            String?
+  id_token                 String?
+  access_token_expires_at  DateTime?    @db.Timestamp(6)
+  refresh_token_expires_at DateTime?    @db.Timestamp(6)
+  scope                    String?
+  password                 String?
+  created_at               DateTime     @default(now()) @db.Timestamp(6)
+  updated_at               DateTime     @db.Timestamp(6)
+  example_user             example_user @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "example_account_user_id_example_user_id_fk")
+
+  @@index([user_id], map: "example_account_userId_idx")
+}
+
+model example_session {
+  id           String       @id
+  expires_at   DateTime     @db.Timestamp(6)
+  token        String       @unique(map: "example_session_token_unique")
+  created_at   DateTime     @default(now()) @db.Timestamp(6)
+  updated_at   DateTime     @db.Timestamp(6)
+  ip_address   String?
+  user_agent   String?
+  user_id      String
+  example_user example_user @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "example_session_user_id_example_user_id_fk")
+
+  @@index([user_id], map: "example_session_userId_idx")
+}
+
+model example_user {
+  id              String            @id
+  name            String
+  email           String            @unique(map: "example_user_email_unique")
+  email_verified  Boolean           @default(false)
+  image           String?
+  created_at      DateTime          @default(now()) @db.Timestamp(6)
+  updated_at      DateTime          @default(now()) @db.Timestamp(6)
+  example_account example_account[]
+  example_session example_session[]
+}
+
+model example_verification {
+  id         String   @id
+  identifier String
+  value      String
+  expires_at DateTime @db.Timestamp(6)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([identifier])
+}
+
+model interviews_tool_account {
+  id                       String               @id
+  account_id               String
+  provider_id              String
+  user_id                  String
+  access_token             String?
+  refresh_token            String?
+  id_token                 String?
+  access_token_expires_at  DateTime?            @db.Timestamp(6)
+  refresh_token_expires_at DateTime?            @db.Timestamp(6)
+  scope                    String?
+  password                 String?
+  created_at               DateTime             @default(now()) @db.Timestamp(6)
+  updated_at               DateTime             @db.Timestamp(6)
+  interviews_tool_user     interviews_tool_user @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "interviews_tool_account_user_id_interviews_tool_user_id_fk")
+
+  @@index([user_id], map: "account_userId_idx")
+}
+
+model interviews_tool_company_details {
+  id                             String                         @id
+  hiring_process_id              String                         @unique(map: "company_details_hiringProcessId_unique")
+  website                        String?
+  location                       String?
+  benefits                       String?
+  contacted_via                  String?
+  contact_person                 String?
+  interview_steps                Int?                           @default(0)
+  created_at                     DateTime                       @default(now()) @db.Timestamp(6)
+  updated_at                     DateTime                       @default(now()) @db.Timestamp(6)
+  deleted_at                     DateTime?                      @db.Timestamp(6)
+  interviews_tool_hiring_process interviews_tool_hiring_process @relation(fields: [hiring_process_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "interviews_tool_company_details_hiring_process_id_interviews_to")
+
+  @@index([deleted_at], map: "company_details_deletedAt_idx")
+  @@index([hiring_process_id], map: "company_details_hiringProcessId_idx")
+}
+
+model interviews_tool_hiring_process {
+  id                              String                           @id
+  company_name                    String
+  status                          hiring_process_status
+  salary                          Int?
+  currency                        currency                         @default(USD)
+  created_at                      DateTime                         @default(now()) @db.Timestamp(6)
+  updated_at                      DateTime                         @default(now()) @db.Timestamp(6)
+  user_id                         String
+  job_title                       String?
+  deleted_at                      DateTime?                        @db.Timestamp(6)
+  salary_rate_type                salary_rate_type                 @default(monthly)
+  interviews_tool_company_details interviews_tool_company_details?
+  interviews_tool_user            interviews_tool_user             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "interviews_tool_hiring_process_user_id_interviews_tool_user_id_")
+  interviews_tool_interaction     interviews_tool_interaction[]
+  interviews_tool_interview       interviews_tool_interview[]
+
+  @@index([deleted_at], map: "hiring_process_deletedAt_idx")
+  @@index([status], map: "hiring_process_status_idx")
+  @@index([user_id], map: "hiring_process_userId_idx")
+}
+
+model interviews_tool_interaction {
+  id                             String                         @id
+  hiring_process_id              String
+  title                          String?
+  content                        String
+  type                           interaction_type?              @default(note)
+  created_at                     DateTime                       @default(now()) @db.Timestamp(6)
+  updated_at                     DateTime                       @default(now()) @db.Timestamp(6)
+  deleted_at                     DateTime?                      @db.Timestamp(6)
+  interviews_tool_hiring_process interviews_tool_hiring_process @relation(fields: [hiring_process_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "interviews_tool_interaction_hiring_process_id_interviews_tool_h")
+
+  @@index([created_at], map: "interaction_createdAt_idx")
+  @@index([deleted_at], map: "interaction_deletedAt_idx")
+  @@index([hiring_process_id], map: "interaction_hiringProcessId_idx")
+}
+
+model interviews_tool_interview {
+  id                             String                         @id
+  hiring_process_id              String
+  type                           String?
+  scheduled_at                   DateTime?                      @db.Timestamp(6)
+  status                         String?
+  notes                          String?
+  created_at                     DateTime                       @default(now()) @db.Timestamp(6)
+  updated_at                     DateTime                       @default(now()) @db.Timestamp(6)
+  interviews_tool_hiring_process interviews_tool_hiring_process @relation(fields: [hiring_process_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "interviews_tool_interview_hiring_process_id_interviews_tool_hir")
+
+  @@index([hiring_process_id], map: "interview_hiringProcessId_idx")
+}
+
+model interviews_tool_session {
+  id                   String               @id
+  expires_at           DateTime             @db.Timestamp(6)
+  token                String               @unique(map: "interviews_tool_session_token_unique")
+  created_at           DateTime             @default(now()) @db.Timestamp(6)
+  updated_at           DateTime             @db.Timestamp(6)
+  ip_address           String?
+  user_agent           String?
+  user_id              String
+  interviews_tool_user interviews_tool_user @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "interviews_tool_session_user_id_interviews_tool_user_id_fk")
+
+  @@index([user_id], map: "session_userId_idx")
+}
+
+model interviews_tool_user {
+  id                             String                           @id
+  name                           String
+  email                          String                           @unique(map: "interviews_tool_user_email_unique")
+  email_verified                 Boolean                          @default(false)
+  image                          String?
+  created_at                     DateTime                         @default(now()) @db.Timestamp(6)
+  updated_at                     DateTime                         @default(now()) @db.Timestamp(6)
+  interviews_tool_account        interviews_tool_account[]
+  interviews_tool_hiring_process interviews_tool_hiring_process[]
+  interviews_tool_session        interviews_tool_session[]
+}
+
+model interviews_tool_verification {
+  id         String   @id
+  identifier String
+  value      String
+  expires_at DateTime @db.Timestamp(6)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([identifier], map: "verification_identifier_idx")
+}
+
+model real_estate_broker_system_account {
+  id                       String    @id
+  account_id               String
+  provider_id              String
+  user_id                  String
+  access_token             String?
+  refresh_token            String?
+  id_token                 String?
+  access_token_expires_at  DateTime? @db.Timestamp(6)
+  refresh_token_expires_at DateTime? @db.Timestamp(6)
+  scope                    String?
+  password                 String?
+  created_at               DateTime  @default(now()) @db.Timestamp(6)
+  updated_at               DateTime  @db.Timestamp(6)
+}
+
+model real_estate_broker_system_session {
+  id         String   @id
+  expires_at DateTime @db.Timestamp(6)
+  token      String   @unique(map: "real_estate_broker_system_session_token_unique")
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @db.Timestamp(6)
+  ip_address String?
+  user_agent String?
+  user_id    String
+}
+
+model real_estate_broker_system_user {
+  id             String   @id
+  name           String
+  email          String   @unique(map: "real_estate_broker_system_user_email_unique")
+  email_verified Boolean  @default(false)
+  image          String?
+  created_at     DateTime @default(now()) @db.Timestamp(6)
+  updated_at     DateTime @default(now()) @db.Timestamp(6)
+}
+
+model real_estate_broker_system_verification {
+  id         String   @id
+  identifier String
+  value      String
+  expires_at DateTime @db.Timestamp(6)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+}
+
+enum currency {
+  USD
+  PEN
+}
+
+enum hiring_process_status {
+  first_contact  @map("first-contact")
+  ongoing
+  on_hold        @map("on-hold")
+  rejected
+  dropped_out    @map("dropped-out")
+  hired
+  offer_made     @map("offer-made")
+  offer_accepted @map("offer-accepted")
+}
+
+enum interaction_type {
+  email
+  phone_call          @map("phone-call")
+  video_call          @map("video-call")
+  in_person_meeting   @map("in-person-meeting")
+  technical_challenge @map("technical-challenge")
+  application
+  offer
+  rejection
+  follow_up           @map("follow-up")
+  note
+}
+
+enum salary_rate_type {
+  monthly
+  hourly
+}

@@ -36,6 +36,26 @@
     "db:generate": {
       "cache": false,
       "env": ["DATABASE_URL"]
+    },
+    "prisma:pull": {
+      "cache": false,
+      "env": ["DATABASE_URL_DIRECT"]
+    },
+    "prisma:generate": {
+      "cache": false
+    },
+    "prisma:studio": {
+      "cache": false,
+      "persistent": true,
+      "env": ["DATABASE_URL_DIRECT"]
+    },
+    "example": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "example:repo": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
     }
   }
 }

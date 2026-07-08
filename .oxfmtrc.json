@@ -6,6 +6,8 @@
     "apps/web/src/routeTree.gen.ts",
     "**/.next/**",
     "**/.wrangler/**",
-    "**/.source/**"
+    "**/.source/**",
+    "**/src/generated/**",
+    "**/src/generated-node/**"
   ]
 }
