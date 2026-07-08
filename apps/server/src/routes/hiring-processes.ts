@@ -1,6 +1,8 @@
 import { Elysia, t } from "elysia";
 import { createDatabaseClient } from "@interviews-tool/infra-db/client";
 import { HiringProcessRepository } from "@interviews-tool/infra-db/repositories";
+import { createPrismaClient } from "@interviews-tool/infra-prisma-db/client";
+import { PrismaHiringProcessRepository } from "@interviews-tool/infra-prisma-db/repositories";
 import {
   createHiringProcessSchema,
   updateHiringProcessSchema,
@@ -22,15 +24,24 @@ import { authMacro } from "@/plugins/auth.plugin";
 export const hiringProcessRoutes = new Elysia({ prefix: "/hiring-processes" })
   .use(errorHandlerPlugin)
   .decorate("db", createDatabaseClient(env.DATABASE_URL))
+  // Prisma repository over the same tables. Opt a single endpoint into Prisma by using
+  // `hiringProcessRepoPrisma` instead of `hiringProcessRepo` in that handler — the rest stay
+  // on Drizzle, untouched.
+  .decorate(
+    "hiringProcessRepoPrisma",
+    new PrismaHiringProcessRepository(createPrismaClient(env.DATABASE_URL)),
+  )
   .derive(({ db }) => ({
     hiringProcessRepo: new HiringProcessRepository(db),
   }))
   .use(authMacro)
   .get(
     "/",
-    async ({ query, status, hiringProcessRepo, user }) => {
+    async ({ query, status, hiringProcessRepoPrisma, user }) => {
+      // This endpoint (GET /hiring-processes) is served by Prisma. All other endpoints in
+      // this file keep using `hiringProcessRepo` (Drizzle).
       const result = await listHiringProcesses({
-        repo: hiringProcessRepo,
+        repo: hiringProcessRepoPrisma,
         userId: user.id,
         pagination: {
           page: query.page || 1,
