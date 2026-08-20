@@ -1,0 +1,86 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close"
+  },
+  "nav": {
+    "appName": "Hiring Tool",
+    "dashboard": "Dashboard",
+    "signIn": "Sign In"
+  },
+  "userMenu": {
+    "myAccount": "My Account",
+    "signOut": "Sign Out"
+  },
+  "auth": {
+    "welcomeBack": "Welcome Back",
+    "createAccount": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "submitting": "Submitting...",
+    "needAccount": "Need an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "signInSuccess": "Sign in successful",
+    "signUpSuccess": "Sign up successful",
+    "validation": {
+      "invalidEmail": "Invalid email address",
+      "passwordMin": "Password must be at least 8 characters",
+      "nameMin": "Name must be at least 2 characters"
+    }
+  },
+  "landing": {
+    "hero": {
+      "titleLine1": "Track Your Job Applications",
+      "titleLine2": "All in One Place",
+      "subtitle": "Stay organized during your job search. Manage applications, track company details, and record every interaction in your hiring journey.",
+      "goToDashboard": "Go to Dashboard",
+      "getStarted": "Get Started",
+      "signIn": "Sign In"
+    },
+    "features": {
+      "heading": "Everything You Need to Manage Your Job Search",
+      "applicationTracking": {
+        "title": "Application Tracking",
+        "description": "Keep track of all your job applications with detailed status updates: ongoing, rejected, dropped-out, or hired."
+      },
+      "companyDetails": {
+        "title": "Company Details",
+        "description": "Store comprehensive company information including salary, benefits, location, website, and contact details."
+      },
+      "interactionHistory": {
+        "title": "Interaction History",
+        "description": "Record every communication with companies during your hiring process to stay on top of your conversations."
+      },
+      "pipelineManagement": {
+        "title": "Pipeline Management",
+        "description": "Visualize your entire hiring pipeline and track progress through multiple interview stages."
+      },
+      "statusUpdates": {
+        "title": "Status Updates",
+        "description": "Quickly update application statuses and see at a glance where each opportunity stands."
+      },
+      "centralizedDashboard": {
+        "title": "Centralized Dashboard",
+        "description": "Access all your job applications from a clean, organized dashboard with powerful search and filtering."
+      }
+    },
+    "cta": {
+      "headingAuthenticated": "Your Dashboard Awaits",
+      "headingGuest": "Ready to Organize Your Job Search?",
+      "bodyAuthenticated": "Access your applications and continue tracking your hiring journey.",
+      "bodyGuest": "Join now and take control of your hiring journey. Start tracking your applications today.",
+      "goToDashboard": "Go to Dashboard",
+      "createFreeAccount": "Create Free Account"
+    },
+    "footer": {
+      "tagline": "Hiring Tool - Manage your job applications with ease"
+    }
+  }
+}

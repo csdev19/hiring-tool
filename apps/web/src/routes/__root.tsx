@@ -1,20 +1,31 @@
 import type { QueryClient } from "@tanstack/react-query";
 
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
+import {
+  HeadContent,
+  Outlet,
+  Scripts,
+  createRootRouteWithContext,
+  useRouter,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
+import { I18nProvider, type Locale } from "@interviews-tool/i18n";
 import { Toaster } from "@interviews-tool/web-ui";
 
 import Header from "../components/header";
 import appCss from "../index.css?url";
 import { getAuthSession } from "@/lib/auth/get-auth-session";
 import type { AuthSession } from "@/lib/auth/types";
+import { getLocale } from "@/functions/get-locale";
+import { setLocale as setLocaleFn } from "@/functions/set-locale";
 
 export interface RouterAppContext {
   queryClient: QueryClient;
   isAuthenticated: boolean;
   session: AuthSession | null;
+  locale: Locale;
+  messages: Record<string, unknown>;
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
@@ -41,10 +52,12 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   component: RootDocument,
   staleTime: 10 * 60 * 1000, // 10 minutes
   beforeLoad: async () => {
-    const session = await getAuthSession();
+    const [session, i18n] = await Promise.all([getAuthSession(), getLocale()]);
     return {
       session: session ?? null,
       isAuthenticated: !!session,
+      locale: i18n.locale,
+      messages: i18n.messages,
     };
   },
 });
@@ -61,26 +74,34 @@ const criticalStyles = `
 
 function RootDocument() {
   const context = Route.useRouteContext();
-  const { isAuthenticated, session } = context;
+  const router = useRouter();
+  const { isAuthenticated, session, locale, messages } = context;
+
+  const handleSetLocale = async (next: Locale) => {
+    await setLocaleFn({ data: next });
+    await router.invalidate();
+  };
 
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang={locale} className="dark" suppressHydrationWarning>
       <head>
         <style dangerouslySetInnerHTML={{ __html: criticalStyles }} />
         <HeadContent />
       </head>
       <body suppressHydrationWarning>
-        <div className="min-h-svh">
-          <Header
-            isAuthenticated={isAuthenticated}
-            userName={session?.user?.name ?? ""}
-            userEmail={session?.user?.email ?? ""}
-          />
-          <main className="pt-12">
-            <Outlet />
-          </main>
-        </div>
-        <Toaster richColors />
+        <I18nProvider locale={locale} messages={messages} setLocale={handleSetLocale}>
+          <div className="min-h-svh">
+            <Header
+              isAuthenticated={isAuthenticated}
+              userName={session?.user?.name ?? ""}
+              userEmail={session?.user?.email ?? ""}
+            />
+            <main className="pt-12">
+              <Outlet />
+            </main>
+          </div>
+          <Toaster richColors />
+        </I18nProvider>
         <TanStackRouterDevtools position="bottom-left" />
         <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
         <Scripts />

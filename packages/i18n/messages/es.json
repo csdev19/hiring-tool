@@ -1,0 +1,86 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Algo salió mal",
+    "retry": "Reintentar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "close": "Cerrar"
+  },
+  "nav": {
+    "appName": "Hiring Tool",
+    "dashboard": "Panel",
+    "signIn": "Iniciar sesión"
+  },
+  "userMenu": {
+    "myAccount": "Mi cuenta",
+    "signOut": "Cerrar sesión"
+  },
+  "auth": {
+    "welcomeBack": "Bienvenido de nuevo",
+    "createAccount": "Crear cuenta",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "name": "Nombre",
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "submitting": "Enviando...",
+    "needAccount": "¿Necesitas una cuenta?",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "signInSuccess": "Inicio de sesión exitoso",
+    "signUpSuccess": "Registro exitoso",
+    "validation": {
+      "invalidEmail": "Correo electrónico inválido",
+      "passwordMin": "La contraseña debe tener al menos 8 caracteres",
+      "nameMin": "El nombre debe tener al menos 2 caracteres"
+    }
+  },
+  "landing": {
+    "hero": {
+      "titleLine1": "Haz seguimiento de tus postulaciones",
+      "titleLine2": "Todo en un solo lugar",
+      "subtitle": "Mantente organizado durante tu búsqueda de empleo. Gestiona postulaciones, registra los detalles de cada empresa y anota cada interacción de tu proceso de contratación.",
+      "goToDashboard": "Ir al panel",
+      "getStarted": "Comenzar",
+      "signIn": "Iniciar sesión"
+    },
+    "features": {
+      "heading": "Todo lo que necesitas para gestionar tu búsqueda de empleo",
+      "applicationTracking": {
+        "title": "Seguimiento de postulaciones",
+        "description": "Haz seguimiento de todas tus postulaciones con estados detallados: en curso, rechazada, abandonada o contratado."
+      },
+      "companyDetails": {
+        "title": "Detalles de la empresa",
+        "description": "Guarda información completa de cada empresa: salario, beneficios, ubicación, sitio web y datos de contacto."
+      },
+      "interactionHistory": {
+        "title": "Historial de interacciones",
+        "description": "Registra cada comunicación con las empresas durante tu proceso de contratación para no perder el hilo de tus conversaciones."
+      },
+      "pipelineManagement": {
+        "title": "Gestión del pipeline",
+        "description": "Visualiza todo tu pipeline de contratación y sigue tu progreso a través de múltiples etapas de entrevistas."
+      },
+      "statusUpdates": {
+        "title": "Actualización de estados",
+        "description": "Actualiza rápidamente el estado de tus postulaciones y ve de un vistazo cómo va cada oportunidad."
+      },
+      "centralizedDashboard": {
+        "title": "Panel centralizado",
+        "description": "Accede a todas tus postulaciones desde un panel limpio y organizado con búsqueda y filtros potentes."
+      }
+    },
+    "cta": {
+      "headingAuthenticated": "Tu panel te espera",
+      "headingGuest": "¿Listo para organizar tu búsqueda de empleo?",
+      "bodyAuthenticated": "Accede a tus postulaciones y continúa el seguimiento de tu proceso.",
+      "bodyGuest": "Únete ahora y toma el control de tu proceso de contratación. Empieza a registrar tus postulaciones hoy.",
+      "goToDashboard": "Ir al panel",
+      "createFreeAccount": "Crear cuenta gratis"
+    },
+    "footer": {
+      "tagline": "Hiring Tool - Gestiona tus postulaciones con facilidad"
+    }
+  }
+}

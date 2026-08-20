@@ -1,5 +1,8 @@
 import { Link } from "@tanstack/react-router";
 
+import { useTranslations } from "@interviews-tool/i18n";
+
+import { LocaleSwitcher } from "./locale-switcher";
 import UserMenu from "./user-menu";
 import type { AuthSession } from "@/lib/auth/types";
 
@@ -10,23 +13,26 @@ interface HeaderProps {
 }
 
 export default function Header({ isAuthenticated, userName, userEmail }: HeaderProps) {
+  const t = useTranslations("nav");
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b">
       <div className="flex flex-row items-center justify-between px-4 py-2">
         <nav className="flex items-center gap-4 text-lg">
           <Link to="/" className="font-semibold">
-            Hiring Tool
+            {t("appName")}
           </Link>
           {isAuthenticated && (
             <Link
               to="/hiring-processes"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Dashboard
+              {t("dashboard")}
             </Link>
           )}
         </nav>
         <div className="flex items-center gap-2">
+          <LocaleSwitcher />
           <UserMenu userName={userName} userEmail={userEmail} isAuthenticated={isAuthenticated} />
         </div>
       </div>

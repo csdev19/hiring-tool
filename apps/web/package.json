@@ -16,6 +16,7 @@
     "@elysiajs/eden": "^1.4.5",
     "@interviews-tool/application": "workspace:*",
     "@interviews-tool/domain": "workspace:*",
+    "@interviews-tool/i18n": "workspace:*",
     "@interviews-tool/infra-db": "workspace:*",
     "@interviews-tool/infra-env": "workspace:*",
     "@interviews-tool/infra-prisma-db": "workspace:*",
