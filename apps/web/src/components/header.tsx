@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
 import { useTranslations } from "@interviews-tool/i18n";
+import { TapuyLockup } from "@interviews-tool/web-ui";
 
 import { LocaleSwitcher } from "./locale-switcher";
 import UserMenu from "./user-menu";
@@ -18,14 +19,14 @@ export default function Header({ isAuthenticated, userName, userEmail }: HeaderP
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b">
       <div className="flex flex-row items-center justify-between px-4 py-2">
-        <nav className="flex items-center gap-4 text-lg">
-          <Link to="/" className="font-semibold">
-            {t("appName")}
+        <nav className="flex items-center gap-5">
+          <Link to="/" aria-label="tapuy">
+            <TapuyLockup />
           </Link>
           {isAuthenticated && (
             <Link
               to="/hiring-processes"
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-text-secondary hover:text-text transition-colors"
             >
               {t("dashboard")}
             </Link>

@@ -39,7 +39,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Hiring Tool",
+        title: "tapuy",
       },
     ],
     links: [
@@ -65,8 +65,8 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 // Critical inline styles to prevent flash of unstyled content
 const criticalStyles = `
   html, body {
-    background-color: oklch(14.5% 0 0);
-    color: oklch(98.5% 0 0);
+    background-color: #0a0f14;
+    color: #e6ebf0;
     margin: 0;
     padding: 0;
   }
@@ -83,7 +83,7 @@ function RootDocument() {
   };
 
   return (
-    <html lang={locale} className="dark" suppressHydrationWarning>
+    <html lang={locale} className="dark" data-theme="dark" suppressHydrationWarning>
       <head>
         <style dangerouslySetInnerHTML={{ __html: criticalStyles }} />
         <HeadContent />
@@ -100,7 +100,7 @@ function RootDocument() {
               <Outlet />
             </main>
           </div>
-          <Toaster richColors />
+          <Toaster />
         </I18nProvider>
         <TanStackRouterDevtools position="bottom-left" />
         <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
