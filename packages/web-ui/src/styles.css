@@ -1,3 +1,11 @@
+/* ============================================================
+   Tapuy — theme tokens (Tailwind 4 implementation)
+   "Cumbia amazónica": tinta neón sobre base casi negra.
+   Dosificación 90 / 9 / 1 → neutros / estados / neones.
+   Dark es el default y el escaparate. Light con [data-theme="light"].
+   Canonical reference: documentation/tapuy-theme.css + DESIGN.md
+   ============================================================ */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -9,89 +17,133 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Neones — el 1% */
+  --mint: #00ffc2;
+  --mint-hover: #33ffd0;
+  --mint-on: #04261d;
+  --fuchsia: #ff00a0;
+  --fuchsia-on: #3a0022;
+  --violet: #7a00ff;
+  --violet-on: #e8d6ff;
+
+  /* Neutros — el 90%, tinte azul frío */
+  --bg: #0a0f14;
+  --surface: #0f161d;
+  --surface-2: #141c25;
+  --selected: #0f1a1a;
+  --border-strong: #2a3440;
+  --text: #e6ebf0;
+  --text-secondary: #a7b1bc;
+  --text-muted: #6b7785;
+
+  /* Danger */
+  --danger: #e05252;
+
+  /* Estados — el 9%. Activos: tintado + borde. Terminales: sólido, sin borde. */
+  --st-first-contact-bg: #1b0f33;
+  --st-first-contact-text: #c9a6ff;
+  --st-first-contact-border: #4a1f8a;
+  --st-ongoing-bg: #0e1f38;
+  --st-ongoing-text: #8fc1f5;
+  --st-ongoing-border: #1f4b82;
+  --st-on-hold-bg: #2a1e08;
+  --st-on-hold-text: #f0c061;
+  --st-on-hold-border: #7a5a18;
+  --st-offer-made-bg: #2e0a22;
+  --st-offer-made-text: #ff6bc6;
+  --st-offer-made-border: #8a0a5a;
+  --st-offer-accepted-bg: #2fa155;
+  --st-offer-accepted-text: #04200d;
+  --st-hired-bg: #1e7a3e;
+  --st-hired-text: #e6f7ec;
+  --st-rejected-bg: #c73a3a;
+  --st-rejected-text: #fdecec;
+  --st-dropped-out-bg: #4a5562;
+  --st-dropped-out-text: #eef2f5;
+
+  /* Focus ring — el único lugar donde la menta aparece "gratis" */
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--mint);
+
+  /* Semantic (shadcn) → Tapuy. Los componentes heredan el tema por aquí. */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface-2);
+  --popover-foreground: var(--text);
+  --primary: var(--mint);
+  --primary-foreground: var(--mint-on);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--text);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--selected);
+  --accent-foreground: var(--text);
+  --destructive: var(--danger);
+  --border: #1c232b;
+  --input: #1c232b;
+  --ring: var(--mint);
+  /* control 6px = rounded-md · card 12px = rounded-xl */
+  --radius: 0.5rem;
+
+  color-scheme: dark;
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.87 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.371 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+/* ---------- Light — correcto, no el escaparate ---------- */
+[data-theme="light"] {
+  --mint: #00a67e;
+  --mint-hover: #00926f;
+  --mint-on: #e4fff6;
+  --fuchsia: #c2007a;
+  --fuchsia-on: #ffe3f3;
+  --violet: #5b00c4;
+  --violet-on: #eedfff;
+
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --surface-2: #e9edf2;
+  --selected: #e4faf3;
+  --border-strong: #b8c0cb;
+  --text: #0f1720;
+  --text-secondary: #4a5563;
+  --text-muted: #7a8593;
+
+  --danger: #c73a3a;
+
+  --st-first-contact-bg: #efe4ff;
+  --st-first-contact-text: #4a1f8a;
+  --st-first-contact-border: #c9a6ff;
+  --st-ongoing-bg: #e3eefb;
+  --st-ongoing-text: #1f4b82;
+  --st-ongoing-border: #9fc7f0;
+  --st-on-hold-bg: #fbf0d5;
+  --st-on-hold-text: #7a5a18;
+  --st-on-hold-border: #edcf7a;
+  --st-offer-made-bg: #ffe3f3;
+  --st-offer-made-text: #8a0a5a;
+  --st-offer-made-border: #ff8dd4;
+  --st-offer-accepted-bg: #1e8c44;
+  --st-offer-accepted-text: #f0faf3;
+  --st-hired-bg: #156b34;
+  --st-hired-text: #eaf6ee;
+  --st-rejected-bg: #b52f2f;
+  --st-rejected-text: #fdecec;
+  --st-dropped-out-bg: #5a6470;
+  --st-dropped-out-text: #f4f6f8;
+
+  --border: #d5dae1;
+  --input: #d5dae1;
+
+  color-scheme: light;
 }
 
 @theme inline {
-  --font-sans: "Inter Variable", sans-serif;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
+  /* Tipografía: Geist (400/500), Geist Mono para cifras, Instrument Serif solo display */
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: "Instrument Serif", Georgia, serif;
+
+  /* Semantic (shadcn) */
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -110,6 +162,52 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+
+  /* Tapuy — neutros */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-selected: var(--selected);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  /* Tapuy — neones */
+  --color-mint: var(--mint);
+  --color-mint-hover: var(--mint-hover);
+  --color-mint-on: var(--mint-on);
+  --color-fuchsia: var(--fuchsia);
+  --color-fuchsia-on: var(--fuchsia-on);
+  --color-violet: var(--violet);
+  --color-violet-on: var(--violet-on);
+
+  /* Tapuy — danger */
+  --color-danger: var(--danger);
+
+  /* Tapuy — estados */
+  --color-status-first-contact-bg: var(--st-first-contact-bg);
+  --color-status-first-contact-text: var(--st-first-contact-text);
+  --color-status-first-contact-border: var(--st-first-contact-border);
+  --color-status-ongoing-bg: var(--st-ongoing-bg);
+  --color-status-ongoing-text: var(--st-ongoing-text);
+  --color-status-ongoing-border: var(--st-ongoing-border);
+  --color-status-on-hold-bg: var(--st-on-hold-bg);
+  --color-status-on-hold-text: var(--st-on-hold-text);
+  --color-status-on-hold-border: var(--st-on-hold-border);
+  --color-status-offer-made-bg: var(--st-offer-made-bg);
+  --color-status-offer-made-text: var(--st-offer-made-text);
+  --color-status-offer-made-border: var(--st-offer-made-border);
+  --color-status-offer-accepted-bg: var(--st-offer-accepted-bg);
+  --color-status-offer-accepted-text: var(--st-offer-accepted-text);
+  --color-status-hired-bg: var(--st-hired-bg);
+  --color-status-hired-text: var(--st-hired-text);
+  --color-status-rejected-bg: var(--st-rejected-bg);
+  --color-status-rejected-text: var(--st-rejected-text);
+  --color-status-dropped-out-bg: var(--st-dropped-out-bg);
+  --color-status-dropped-out-text: var(--st-dropped-out-text);
+
+  /* Radios: control 6px (md) · badge 5px · card 12px (xl) */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -121,12 +219,41 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply font-sans bg-background text-foreground;
+    @apply border-border;
   }
   html {
     @apply font-sans;
+  }
+  body {
+    @apply font-sans bg-background text-foreground text-sm antialiased;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--mint) 25%, transparent);
+  }
+  ::placeholder {
+    color: var(--text-muted);
+  }
+
+  /* Focus ring global — no reemplazar por outline del navegador ni ring de Tailwind */
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+@layer utilities {
+  /* Cifras: salarios, fechas, IDs, contadores — "Numbers, not vibes" */
+  .mono,
+  .tabular {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Display — solo landing / README / og:image, nunca dentro de la app */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.01em;
   }
 }
