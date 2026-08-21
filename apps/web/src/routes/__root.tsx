@@ -41,11 +41,40 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       {
         title: "tapuy",
       },
+      {
+        name: "description",
+        content: "Open-source interview and hiring process tracker",
+      },
+      {
+        property: "og:title",
+        content: "tapuy",
+      },
+      {
+        property: "og:description",
+        content: "Every question in the process, on record.",
+      },
+      {
+        property: "og:type",
+        content: "website",
+      },
+      {
+        property: "og:image",
+        content: "/og-image.svg",
+      },
+      {
+        name: "twitter:card",
+        content: "summary_large_image",
+      },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "/favicon.svg",
       },
     ],
   }),
