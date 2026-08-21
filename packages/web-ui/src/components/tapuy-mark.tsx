@@ -1,9 +1,11 @@
 import { cn } from "../lib/utils";
 
 /**
- * Tapuy mark: a question mark reduced to its minimal gesture — an open arc
- * and a dot. The dot is always mint (even in light mode); the arc follows
- * the current text color. No fuchsia/violet versions of the mark.
+ * Tapuy mark: two facing arcs — a question asked from each side of the
+ * table — around a mint dot. The dot is always mint (even in light mode);
+ * the arcs follow the current text color. No fuchsia/violet versions of
+ * the mark. Canonical SVG sources live in apps/web/public and the brand
+ * icon set (favicon, app icon, og-image) uses this same glyph.
  */
 function TapuyMark({ className, ...props }: React.ComponentProps<"svg">) {
   return (
@@ -14,8 +16,19 @@ function TapuyMark({ className, ...props }: React.ComponentProps<"svg">) {
       className={cn("size-5", className)}
       {...props}
     >
-      <path d="M7 9a5 5 0 1 1 5 5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-      <circle cx="12" cy="20" r="2" fill="var(--mint)" />
+      <path
+        d="M9 5.5a5.5 5.5 0 0 0 0 11"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M15 7.5a5.5 5.5 0 0 1 0 11"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <circle cx="12" cy="12" r="1.9" fill="var(--mint)" />
     </svg>
   );
 }

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Button,
   Input,
   Label,
   Select,
@@ -13,13 +13,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@interviews-tool/web-ui";
-import MDEditor from "@uiw/react-md-editor";
-import { type InteractionType } from "@interviews-tool/domain/constants";
+import { useTranslations } from "@interviews-tool/i18n";
+import { INTERACTION_TYPE_VALUES, type InteractionType } from "@interviews-tool/domain/constants";
 import {
   useUpdateInteraction,
   type Interaction,
   type UpdateInteractionInput,
 } from "@/hooks/use-interactions";
+import { useInteractionTypeLabel } from "@/lib/i18n-labels";
 import { toast } from "sonner";
 
 interface EditInteractionDialogProps {
@@ -29,28 +30,19 @@ interface EditInteractionDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const interactionTypeLabels: Record<InteractionType, string> = {
-  email: "Email",
-  "phone-call": "Phone Call",
-  "video-call": "Video Call",
-  "in-person-meeting": "In-Person Meeting",
-  "technical-challenge": "Technical Challenge",
-  application: "Application",
-  offer: "Offer",
-  rejection: "Rejection",
-  "follow-up": "Follow-up",
-  note: "Note",
-};
-
 export function EditInteractionDialog({
   interaction,
   hiringProcessId,
   open,
   onOpenChange,
 }: EditInteractionDialogProps) {
+  const t = useTranslations("interaction");
+  const tCommon = useTranslations("common");
+  const typeLabel = useInteractionTypeLabel();
   const [title, setTitle] = useState(interaction.title || "");
   const [content, setContent] = useState(interaction.content);
   const [type, setType] = useState<InteractionType>(interaction.type || "note");
+  const [contentError, setContentError] = useState(false);
 
   const updateMutation = useUpdateInteraction();
 
@@ -59,6 +51,7 @@ export function EditInteractionDialog({
       setTitle(interaction.title || "");
       setContent(interaction.content);
       setType(interaction.type || "note");
+      setContentError(false);
     }
   }, [open, interaction]);
 
@@ -66,7 +59,7 @@ export function EditInteractionDialog({
     e.preventDefault();
 
     if (content.length < 10) {
-      toast.error("Content must be at least 10 characters");
+      setContentError(true);
       return;
     }
 
@@ -82,41 +75,44 @@ export function EditInteractionDialog({
         interactionId: interaction.id,
         data,
       });
-      toast.success("Interaction updated successfully");
+      toast.success(t("savedToast"));
       onOpenChange(false);
     } catch (error) {
-      toast.error("Failed to update interaction");
+      toast.error(tCommon("error"));
       console.error(error);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-xl border-border-strong bg-surface p-6">
         <DialogHeader>
-          <DialogTitle>Edit Interaction</DialogTitle>
+          <DialogTitle>{t("editTitle")}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="edit-title">Title (Optional)</Label>
+        <form onSubmit={handleSubmit} className="grid gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_180px]">
+            <div className="grid gap-2">
+              <Label htmlFor="edit-interaction-title">
+                {t("title")} <span className="font-normal text-text-muted">{t("optional")}</span>
+              </Label>
               <Input
-                id="edit-title"
+                id="edit-interaction-title"
+                className="h-9"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={100}
               />
             </div>
-            <div>
-              <Label htmlFor="edit-type">Type</Label>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-interaction-type">{t("type")}</Label>
               <Select value={type} onValueChange={(value) => setType(value as InteractionType)}>
-                <SelectTrigger id="edit-type">
-                  <SelectValue />
+                <SelectTrigger id="edit-interaction-type" className="h-9 w-full">
+                  <SelectValue>{typeLabel(type)}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(interactionTypeLabels).map(([value, label]) => (
+                  {INTERACTION_TYPE_VALUES.map((value) => (
                     <SelectItem key={value} value={value}>
-                      {label}
+                      {typeLabel(value)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -124,22 +120,26 @@ export function EditInteractionDialog({
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="edit-content">Content</Label>
-            <MDEditor
+          <div className="grid gap-2">
+            <Label htmlFor="edit-interaction-content">{t("content")}</Label>
+            <textarea
+              id="edit-interaction-content"
               value={content}
-              onChange={(val) => setContent(val || "")}
-              preview="edit"
-              height={300}
+              onChange={(e) => {
+                setContent(e.target.value);
+                if (contentError && e.target.value.length >= 10) setContentError(false);
+              }}
+              className="mono min-h-[220px] w-full resize-y rounded-md border border-border bg-surface-2 px-3 py-2 text-[13px] leading-[1.65] text-text"
             />
+            {contentError && <p className="text-xs text-danger">{t("contentMinError")}</p>}
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+              {t("cancel")}
             </Button>
-            <Button type="submit" disabled={updateMutation.isPending || content.length < 10}>
-              {updateMutation.isPending ? "Updating..." : "Update"}
+            <Button type="submit" disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? t("saving") : t("save")}
             </Button>
           </div>
         </form>

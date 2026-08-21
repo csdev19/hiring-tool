@@ -3,47 +3,50 @@ import {
   Button,
   Input,
   Label,
+  MarkdownContent,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  cn,
 } from "@interviews-tool/web-ui";
-import MDEditor from "@uiw/react-md-editor";
-import { type InteractionType } from "@interviews-tool/domain/constants";
+import { useFormatter, useTranslations } from "@interviews-tool/i18n";
+import { INTERACTION_TYPE_VALUES, type InteractionType } from "@interviews-tool/domain/constants";
 import { useCreateInteraction, type CreateInteractionInput } from "@/hooks/use-interactions";
+import { useInteractionTypeLabel } from "@/lib/i18n-labels";
 import { toast } from "sonner";
+
+const CONTENT_MIN = 10;
+const CONTENT_MAX = 10000;
+
+export const INTERACTION_CONTENT_ID = "interaction-content";
 
 interface InteractionFormProps {
   hiringProcessId: string;
   onSuccess?: () => void;
 }
 
-const interactionTypeLabels: Record<InteractionType, string> = {
-  email: "Email",
-  "phone-call": "Phone Call",
-  "video-call": "Video Call",
-  "in-person-meeting": "In-Person Meeting",
-  "technical-challenge": "Technical Challenge",
-  application: "Application",
-  offer: "Offer",
-  rejection: "Rejection",
-  "follow-up": "Follow-up",
-  note: "Note",
-};
-
 export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormProps) {
+  const t = useTranslations("interaction");
+  const tCommon = useTranslations("common");
+  const format = useFormatter();
+  const typeLabel = useInteractionTypeLabel();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [type, setType] = useState<InteractionType>("note");
+  const [tab, setTab] = useState<"write" | "preview">("write");
+  const [contentError, setContentError] = useState(false);
 
   const createMutation = useCreateInteraction();
+  const overMax = content.length > CONTENT_MAX;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (content.length < 10) {
-      toast.error("Content must be at least 10 characters");
+    if (content.length < CONTENT_MIN || overMax) {
+      setContentError(true);
+      setTab("write");
       return;
     }
 
@@ -55,87 +58,108 @@ export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormP
 
     try {
       await createMutation.mutateAsync({ hiringProcessId, data });
-      toast.success("Interaction added successfully");
+      toast.success(t("savedToast"));
       setTitle("");
       setContent("");
-      setType("note");
+      setContentError(false);
+      setTab("write");
       onSuccess?.();
     } catch (error) {
-      toast.error("Failed to add interaction");
+      toast.error(tCommon("error"));
       console.error(error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="space-y-2">
-        <Label htmlFor="title" className="text-xs">
-          Title (Optional)
+    <form
+      onSubmit={handleSubmit}
+      className="grid gap-4 rounded-xl border border-border bg-surface p-5"
+    >
+      <h3 className="text-base font-medium text-text">{t("logInteraction")}</h3>
+
+      <div className="grid gap-2">
+        <Label htmlFor="interaction-title">
+          {t("title")} <span className="font-normal text-text-muted">{t("optional")}</span>
         </Label>
         <Input
-          id="title"
+          id="interaction-title"
+          className="h-9"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="e.g., Technical Interview Round 2"
+          placeholder={t("titlePlaceholder")}
           maxLength={100}
         />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="type" className="text-xs">
-          Type
-        </Label>
+
+      <div className="grid gap-2">
+        <Label htmlFor="interaction-type">{t("type")}</Label>
         <Select value={type} onValueChange={(value) => setType(value as InteractionType)}>
-          <SelectTrigger id="type">
-            <SelectValue />
+          <SelectTrigger id="interaction-type" className="h-9 w-full">
+            <SelectValue>{typeLabel(type)}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(interactionTypeLabels).map(([value, label]) => (
+            {INTERACTION_TYPE_VALUES.map((value) => (
               <SelectItem key={value} value={value}>
-                {label}
+                {typeLabel(value)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="content" className="text-xs">
-          Content
-        </Label>
-        <div data-color-mode="light" className="dark:data-[color-mode=light]:hidden">
-          <MDEditor
-            value={content}
-            onChange={(val) => setContent(val || "")}
-            preview="edit"
-            height={150}
-            textareaProps={{
-              placeholder: "What happened in this meeting?",
-            }}
-          />
+      <div className="grid gap-2">
+        <div className="flex items-center justify-between">
+          <Label htmlFor={INTERACTION_CONTENT_ID}>{t("content")}</Label>
+          <div className="flex rounded-md border border-border bg-surface-2 p-0.5">
+            {(["write", "preview"] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setTab(mode)}
+                className={cn(
+                  "h-[22px] rounded-[5px] px-2 text-xs font-medium transition-colors",
+                  tab === mode ? "bg-[#1C232B] text-text" : "text-text-muted hover:text-text",
+                )}
+              >
+                {t(mode)}
+              </button>
+            ))}
+          </div>
         </div>
-        <div data-color-mode="dark" className="data-[color-mode=dark]:hidden dark:block">
-          <MDEditor
+
+        {tab === "write" ? (
+          <textarea
+            id={INTERACTION_CONTENT_ID}
             value={content}
-            onChange={(val) => setContent(val || "")}
-            preview="edit"
-            height={150}
-            textareaProps={{
-              placeholder: "What happened in this meeting?",
+            onChange={(e) => {
+              setContent(e.target.value);
+              if (contentError && e.target.value.length >= CONTENT_MIN) setContentError(false);
             }}
+            placeholder={t("contentPlaceholder")}
+            className="mono min-h-[150px] w-full resize-y rounded-md border border-border bg-surface-2 px-3 py-2 text-[13px] leading-[1.65] text-text"
           />
+        ) : (
+          <div className="min-h-[150px] rounded-md border border-border bg-surface-2 px-3 py-2">
+            {content.trim() ? (
+              <MarkdownContent content={content} />
+            ) : (
+              <p className="text-sm text-text-muted">{t("nothingToPreview")}</p>
+            )}
+          </div>
+        )}
+
+        {contentError && <p className="text-xs text-danger">{t("contentMinError")}</p>}
+
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-text-muted">{t("markdownSupported")}</span>
+          <span className={cn("mono text-xs", overMax ? "text-danger" : "text-text-muted")}>
+            {format.number(content.length)} / {format.number(CONTENT_MAX)}
+          </span>
         </div>
-        <p className="text-xs text-muted-foreground/60">
-          {content.length} / 10,000 characters (min 10)
-        </p>
       </div>
 
-      <Button
-        type="submit"
-        disabled={createMutation.isPending || content.length < 10}
-        className="w-full"
-        size="sm"
-      >
-        {createMutation.isPending ? "Adding..." : "Add Interaction"}
+      <Button type="submit" disabled={createMutation.isPending} className="w-full">
+        {createMutation.isPending ? t("saving") : t("logInteraction")}
       </Button>
     </form>
   );

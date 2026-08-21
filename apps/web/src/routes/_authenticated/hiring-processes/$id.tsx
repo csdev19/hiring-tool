@@ -1,405 +1,348 @@
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Button,
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@interviews-tool/web-ui";
-import { StatusBadge } from "@/components/hiring-process/status-badge";
+import { ArrowLeft, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
+
+import { Button, Skeleton, StatusBadge, cn } from "@interviews-tool/web-ui";
+import { useFormatter, useTranslations } from "@interviews-tool/i18n";
+import { CURRENCY_INFO, SALARY_RATE_TYPES } from "@interviews-tool/domain/constants";
+import type { Currency, SalaryRateType } from "@interviews-tool/domain/constants";
+
 import { DeleteConfirmDialog } from "@/components/hiring-process/delete-confirm-dialog";
-import { HiringProcessDetailSkeleton } from "@/components/hiring-process/hiring-process-detail-skeleton";
-import { useHiringProcess, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";
-import { useCompanyDetails } from "@/hooks/use-company-details";
 import { InteractionTimeline } from "@/components/interaction/interaction-timeline";
 import { InteractionForm } from "@/components/interaction/interaction-form";
 import { EditInteractionDialog } from "@/components/interaction/edit-interaction-dialog";
 import { DeleteInteractionDialog } from "@/components/interaction/delete-interaction-dialog";
-import type { Interaction } from "@/hooks/use-interactions";
-import type { Currency, SalaryRateType } from "@interviews-tool/domain/constants";
-import { SALARY_RATE_TYPE_LABELS } from "@interviews-tool/domain/constants";
-import {
-  Pencil,
-  Trash2,
-  ArrowLeft,
-  ExternalLink,
-  MapPin,
-  Building2,
-  User,
-  MessageSquare,
-  DollarSign,
-  Briefcase,
-} from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { toast } from "sonner";
+import { useHiringProcess, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";
+import { useCompanyDetails } from "@/hooks/use-company-details";
+import { useInteractions, type Interaction } from "@/hooks/use-interactions";
+import { useStatusLabel } from "@/lib/i18n-labels";
 
 export const Route = createFileRoute("/_authenticated/hiring-processes/$id")({
   component: HiringProcessDetailPage,
 });
 
+const STICKY_THRESHOLD = 240;
+
+function useStickyHeader() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const next = window.scrollY > STICKY_THRESHOLD;
+      setVisible((prev) => (prev === next ? prev : next));
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return visible;
+}
+
+function useSalaryParts() {
+  const t = useTranslations("processForm");
+  const format = useFormatter();
+
+  return (salary: number | null, currency: Currency, rateType?: SalaryRateType | null) => {
+    if (!salary) return null;
+    const symbol = CURRENCY_INFO[currency]?.symbol ?? "$";
+    const rate =
+      rateType === SALARY_RATE_TYPES.HOURLY
+        ? { long: t("perHour"), short: t("perHourShort") }
+        : { long: t("perMonth"), short: t("perMonthShort") };
+    return { amount: `${symbol}${format.number(salary)}`, rate, currency };
+  };
+}
+
 function HiringProcessDetailPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { data, isLoading, error } = useHiringProcess(id);
-  const { data: companyDetailsData, isLoading: isLoadingCompanyDetails } = useCompanyDetails(id);
+  const t = useTranslations("process");
+  const format = useFormatter();
+  const statusLabel = useStatusLabel();
+  const salaryParts = useSalaryParts();
+
+  const { data: hiringProcess, isLoading, error, refetch } = useHiringProcess(id);
+  const { data: companyDetailsData } = useCompanyDetails(id);
+  const { data: interactionsData } = useInteractions(id);
   const deleteMutation = useDeleteHiringProcess();
+
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editingInteraction, setEditingInteraction] = useState<Interaction | null>(null);
   const [deletingInteractionId, setDeletingInteractionId] = useState<string | null>(null);
-  const [showStickyHeader, setShowStickyHeader] = useState(false);
-  const headerCardRef = useRef<HTMLDivElement>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const showStickyHeader = useStickyHeader();
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setShowStickyHeader(!entry.isIntersecting);
-      },
-      { threshold: 0, rootMargin: "-64px 0px 0px 0px" },
-    );
-
-    if (headerCardRef.current) {
-      observer.observe(headerCardRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [data]);
+  const interactionCount = interactionsData?.data?.length ?? 0;
 
   const handleDelete = async () => {
     try {
       await deleteMutation.mutateAsync(id);
-      toast.success("Hiring process deleted successfully");
+      toast.success(t("deletedToast"));
       navigate({ to: "/hiring-processes" });
-    } catch (error) {
-      toast.error("Failed to delete hiring process");
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
   if (error) {
     return (
-      <div className="container mx-auto max-w-5xl px-4 py-8">
-        <Card>
-          <CardContent className="py-8 text-center">
-            <p className="text-destructive">Error loading hiring process: {error.message}</p>
-            <Link to="/hiring-processes" className="mt-4 inline-block">
-              <Button variant="outline">Back to Hiring Processes</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      <main className="mx-auto max-w-[1200px] px-8 pb-24 pt-7">
+        <BackLink />
+        <div className="rounded-xl border border-border bg-surface p-6">
+          <h2 className="text-base font-medium text-text">{t("loadErrorTitle")}</h2>
+          <p className="mt-1 text-sm text-text-secondary">{t("loadErrorBody")}</p>
+          <Button variant="secondary" className="mt-4" onClick={() => refetch()}>
+            {t("retry")}
+          </Button>
+        </div>
+      </main>
     );
   }
 
-  if (isLoading || isLoadingCompanyDetails) {
-    return <HiringProcessDetailSkeleton />;
-  }
-
-  const hiringProcess = data;
-
-  if (!hiringProcess) {
+  if (!isLoading && !hiringProcess) {
     return (
-      <div className="container mx-auto max-w-5xl px-4 py-8">
-        <Card>
-          <CardContent className="py-8 text-center">
-            <p className="text-muted-foreground">Hiring process not found</p>
-            <Link to="/hiring-processes" className="mt-4 inline-block">
-              <Button variant="outline">Back to Hiring Processes</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      <main className="mx-auto max-w-[1200px] px-8 pb-24 pt-7">
+        <BackLink />
+        <div className="rounded-xl border border-border bg-surface p-6">
+          <h2 className="text-base font-medium text-text">{t("notFoundTitle")}</h2>
+          <p className="mt-1 text-sm text-text-secondary">{t("notFoundBody")}</p>
+          <Link to="/hiring-processes" className="mt-4 inline-block">
+            <Button variant="secondary">{t("backToProcesses")}</Button>
+          </Link>
+        </div>
+      </main>
     );
   }
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatSalary = (
-    salary: number | null,
-    currency: Currency = "USD",
-    salaryRateType?: SalaryRateType,
-  ) => {
-    if (!salary) return "Not specified";
-    const formatted = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency,
-      minimumFractionDigits: 0,
-    }).format(salary);
-    const rateTypeLabel = salaryRateType ? SALARY_RATE_TYPE_LABELS[salaryRateType] : undefined;
-    return rateTypeLabel ? `${formatted}/${rateTypeLabel.toLowerCase()}` : formatted;
-  };
-
-  const isValidUrl = (url: string | null | undefined): boolean => {
-    if (!url) return false;
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
+  const salary = hiringProcess
+    ? salaryParts(
+        hiringProcess.salary,
+        hiringProcess.currency,
+        hiringProcess.salaryRateType as SalaryRateType | undefined,
+      )
+    : null;
 
   const companyDetails = companyDetailsData?.data;
+  const detailFields = companyDetails
+    ? ([
+        ["website", companyDetails.website],
+        ["location", companyDetails.location],
+        ["contactedVia", companyDetails.contactedVia],
+        ["contactPerson", companyDetails.contactPerson],
+        ["interviewSteps", companyDetails.interviewSteps],
+        ["benefits", companyDetails.benefits],
+      ] as const)
+    : [];
+  const hasDetails = detailFields.some(
+    ([, value]) => value !== null && value !== undefined && value !== "",
+  );
 
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-8">
+    <>
       {/* Sticky contextual header */}
-      <div
-        className={`fixed top-0 left-0 right-0 z-40 border-b border-border/50 bg-background/95 backdrop-blur-sm transition-all duration-300 ${
-          showStickyHeader
-            ? "translate-y-0 opacity-100"
-            : "-translate-y-full opacity-0 pointer-events-none"
-        }`}
-      >
-        <div className="container mx-auto max-w-5xl px-4">
-          <div className="flex h-14 items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <Link to="/hiring-processes">
-                <Button variant="ghost" size="icon-sm" className="shrink-0">
-                  <ArrowLeft className="size-4" />
-                </Button>
-              </Link>
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="font-semibold text-sm truncate">{hiringProcess.companyName}</span>
-                {hiringProcess.jobTitle && (
-                  <>
-                    <span className="text-muted-foreground text-xs hidden sm:inline">/</span>
-                    <span className="text-muted-foreground text-xs truncate hidden sm:inline">
-                      {hiringProcess.jobTitle}
-                    </span>
-                  </>
-                )}
-              </div>
-              <StatusBadge status={hiringProcess.status} />
-            </div>
-            <div className="flex items-center gap-3 shrink-0">
-              <span className="text-xs text-muted-foreground hidden md:flex items-center gap-1">
-                <DollarSign className="size-3" />
-                {formatSalary(
-                  hiringProcess.salary,
-                  hiringProcess.currency,
-                  hiringProcess.salaryRateType as SalaryRateType | undefined,
-                )}
+      {hiringProcess && (
+        <div
+          className={cn(
+            "fixed inset-x-0 top-0 z-40 h-[52px] border-b border-border bg-bg/80 backdrop-blur-[12px] transition-all duration-200",
+            showStickyHeader
+              ? "translate-y-0 opacity-100"
+              : "pointer-events-none -translate-y-full opacity-0",
+          )}
+        >
+          <div className="mx-auto flex h-full max-w-[1200px] items-center justify-between gap-4 px-8">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="truncate text-sm font-medium text-text">
+                {hiringProcess.companyName}
               </span>
-              <div className="flex gap-1">
-                <Link to="/hiring-processes/$id/edit" params={{ id }}>
-                  <Button size="icon-sm" variant="ghost">
-                    <Pencil className="size-3.5" />
-                  </Button>
-                </Link>
-                <Button
-                  size="icon-sm"
-                  variant="ghost"
-                  onClick={() => setShowDeleteDialog(true)}
-                  className="text-muted-foreground hover:text-destructive"
-                >
-                  <Trash2 className="size-3.5" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Back button */}
-      <div className="mb-6">
-        <Link to="/hiring-processes">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="mr-2 size-4" />
-            Back to Hiring Processes
-          </Button>
-        </Link>
-      </div>
-
-      {/* Core Information Card */}
-      <Card ref={headerCardRef}>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-2xl">{hiringProcess.companyName}</CardTitle>
               {hiringProcess.jobTitle && (
-                <p className="text-muted-foreground mt-1 flex items-center gap-1.5">
-                  <Briefcase className="size-3.5" />
+                <span className="truncate text-[13px] text-text-secondary">
                   {hiringProcess.jobTitle}
-                </p>
+                </span>
               )}
-              <div className="mt-2">
-                <StatusBadge status={hiringProcess.status} />
-              </div>
+              <StatusBadge
+                status={hiringProcess.status}
+                label={statusLabel(hiringProcess.status)}
+              />
+              {salary && (
+                <span className="mono hidden text-[13px] text-text-secondary md:inline">
+                  {salary.amount} {salary.rate.short} · {salary.currency}
+                </span>
+              )}
             </div>
-            <div className="flex gap-2">
+            <div className="flex shrink-0 items-center gap-1">
               <Link to="/hiring-processes/$id/edit" params={{ id }}>
-                <Button size="sm" variant="ghost">
-                  <Pencil className="mr-2 size-4" />
-                  Edit
+                <Button variant="ghost" className="h-[30px] px-2.5 text-[13px]">
+                  {t("edit")}
                 </Button>
               </Link>
               <Button
-                size="sm"
                 variant="ghost"
+                className="h-[30px] px-2.5 text-[13px] hover:bg-[#2E1414] hover:text-danger"
                 onClick={() => setShowDeleteDialog(true)}
-                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
               >
-                <Trash2 className="mr-2 size-4" />
-                Delete
+                {t("delete")}
               </Button>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <h3 className="text-xs font-medium text-muted-foreground mb-1">Salary</h3>
-              <p className="text-sm font-medium">
-                {formatSalary(
-                  hiringProcess.salary,
-                  hiringProcess.currency,
-                  hiringProcess.salaryRateType as SalaryRateType | undefined,
+        </div>
+      )}
+
+      <main className="mx-auto max-w-[1200px] px-8 pb-24 pt-7">
+        <BackLink />
+
+        {/* Process card */}
+        {isLoading || !hiringProcess ? (
+          <ProcessCardSkeleton />
+        ) : (
+          <section className="rounded-xl border border-border bg-surface p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h1 className="text-[32px] font-medium leading-tight tracking-[-0.01em] text-text">
+                  {hiringProcess.companyName}
+                </h1>
+                {hiringProcess.jobTitle && (
+                  <p className="mt-1 text-sm text-text-secondary">{hiringProcess.jobTitle}</p>
                 )}
-              </p>
+                <div className="mt-3">
+                  <StatusBadge
+                    status={hiringProcess.status}
+                    label={statusLabel(hiringProcess.status)}
+                  />
+                </div>
+              </div>
+              <div className="flex shrink-0 gap-1">
+                <Link to="/hiring-processes/$id/edit" params={{ id }}>
+                  <Button variant="ghost" className="h-8">
+                    {t("edit")}
+                  </Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  className="h-8 hover:bg-[#2E1414] hover:text-danger"
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  {t("delete")}
+                </Button>
+              </div>
             </div>
-            <div>
-              <h3 className="text-xs font-medium text-muted-foreground mb-1">Status</h3>
-              <StatusBadge status={hiringProcess.status} />
+
+            <div className="mt-6 grid grid-cols-2 gap-6 border-t border-border pt-6 lg:grid-cols-4">
+              <div>
+                <FieldLabel>{t("salary")}</FieldLabel>
+                {salary ? (
+                  <>
+                    <p className="mono text-2xl text-text">{salary.amount}</p>
+                    <p className="mono mt-0.5 text-xs text-text-secondary">
+                      {salary.rate.long} · {salary.currency}
+                    </p>
+                  </>
+                ) : (
+                  <p className="mono text-2xl text-text-muted">—</p>
+                )}
+              </div>
+              <div>
+                <FieldLabel>{t("interactions")}</FieldLabel>
+                <p className="mono text-2xl text-text">{format.number(interactionCount)}</p>
+                <p className="mono mt-0.5 text-xs text-text-secondary">{t("logged")}</p>
+              </div>
+              <DateField label={t("created")} date={hiringProcess.createdAt} />
+              <DateField label={t("lastUpdated")} date={hiringProcess.updatedAt} />
             </div>
-            <div>
-              <h3 className="text-xs font-medium text-muted-foreground mb-1">Created</h3>
-              <p className="text-sm">{formatDate(hiringProcess.createdAt)}</p>
-            </div>
-            <div>
-              <h3 className="text-xs font-medium text-muted-foreground mb-1">Last Updated</h3>
-              <p className="text-sm">{formatDate(hiringProcess.updatedAt)}</p>
-            </div>
-          </div>
 
-          {/* Complementary Information Section */}
-          {companyDetails && (
-            <div className="mt-6">
-              <Accordion>
-                <AccordionItem value="company-info">
-                  <AccordionTrigger>
-                    <h3 className="text-sm font-semibold">Complementary Information</h3>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                      {companyDetails.website && (
-                        <div>
-                          <h4 className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                            <Building2 className="size-3" />
-                            Website
-                          </h4>
-                          {isValidUrl(companyDetails.website) ? (
-                            <a
-                              href={companyDetails.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-sm text-primary hover:underline flex items-center gap-1"
-                            >
-                              {companyDetails.website}
-                              <ExternalLink className="size-3" />
-                            </a>
-                          ) : (
-                            <p className="text-sm">{companyDetails.website}</p>
-                          )}
-                        </div>
-                      )}
-
-                      {companyDetails.location && (
-                        <div>
-                          <h4 className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                            <MapPin className="size-3" />
-                            Location
-                          </h4>
-                          <p className="text-sm">{companyDetails.location}</p>
-                        </div>
-                      )}
-
-                      {companyDetails.contactedVia && (
-                        <div>
-                          <h4 className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                            <MessageSquare className="size-3" />
-                            Contacted Via
-                          </h4>
-                          <p className="text-sm">{companyDetails.contactedVia}</p>
-                        </div>
-                      )}
-
-                      {companyDetails.contactPerson && (
-                        <div>
-                          <h4 className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                            <User className="size-3" />
-                            Contact Person
-                          </h4>
-                          <p className="text-sm">{companyDetails.contactPerson}</p>
-                        </div>
-                      )}
-
-                      {companyDetails.interviewSteps !== null &&
-                        companyDetails.interviewSteps !== undefined && (
-                          <div>
-                            <h4 className="text-xs font-medium text-muted-foreground mb-1">
-                              Interview Steps
-                            </h4>
-                            <p className="text-sm">{companyDetails.interviewSteps}</p>
-                          </div>
-                        )}
-                    </div>
-
-                    {companyDetails.benefits && (
-                      <div className="mt-4">
-                        <h4 className="text-xs font-medium text-muted-foreground mb-1">Benefits</h4>
-                        <p className="text-sm whitespace-pre-wrap">{companyDetails.benefits}</p>
+            {hasDetails && (
+              <div className="mt-4 border-t border-border pt-4">
+                <button
+                  type="button"
+                  onClick={() => setDetailsOpen((open) => !open)}
+                  className="flex w-full items-center justify-between text-left"
+                >
+                  <span className="text-sm font-medium text-text">{t("companyDetails")}</span>
+                  <ChevronDown
+                    className={cn(
+                      "size-4 text-text-muted transition-transform",
+                      detailsOpen && "rotate-180",
+                    )}
+                  />
+                </button>
+                {detailsOpen && companyDetails && (
+                  <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+                    {companyDetails.website && (
+                      <div>
+                        <FieldLabel>{t("website")}</FieldLabel>
+                        <a
+                          href={
+                            companyDetails.website.startsWith("http")
+                              ? companyDetails.website
+                              : `https://${companyDetails.website}`
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-mint hover:underline"
+                        >
+                          {companyDetails.website}
+                        </a>
                       </div>
                     )}
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                    {companyDetails.location && (
+                      <div>
+                        <FieldLabel>{t("location")}</FieldLabel>
+                        <p className="text-sm text-text">{companyDetails.location}</p>
+                      </div>
+                    )}
+                    {companyDetails.contactedVia && (
+                      <div>
+                        <FieldLabel>{t("contactedVia")}</FieldLabel>
+                        <p className="text-sm text-text">{companyDetails.contactedVia}</p>
+                      </div>
+                    )}
+                    {companyDetails.contactPerson && (
+                      <div>
+                        <FieldLabel>{t("contactPerson")}</FieldLabel>
+                        <p className="text-sm text-text">{companyDetails.contactPerson}</p>
+                      </div>
+                    )}
+                    {companyDetails.interviewSteps !== null &&
+                      companyDetails.interviewSteps !== undefined && (
+                        <div>
+                          <FieldLabel>{t("interviewSteps")}</FieldLabel>
+                          <p className="mono text-sm text-text">{companyDetails.interviewSteps}</p>
+                        </div>
+                      )}
+                    {companyDetails.benefits && (
+                      <div className="sm:col-span-2 lg:col-span-3">
+                        <FieldLabel>{t("benefits")}</FieldLabel>
+                        <p className="whitespace-pre-wrap text-sm text-text">
+                          {companyDetails.benefits}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+        )}
 
-      {/* Interaction Section: Two-column layout */}
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-4">Interaction History</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,5fr)] gap-6">
-          {/* Left column: Sticky interaction form */}
-          <div className="lg:self-start lg:sticky lg:top-20">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">New Interaction</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <InteractionForm hiringProcessId={id} />
-              </CardContent>
-            </Card>
+        {/* Interactions */}
+        <h2 className="mb-5 mt-11 text-2xl font-medium text-text">{t("interactions")}</h2>
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[360px_1fr]">
+          <div className="lg:sticky lg:top-20">
+            <InteractionForm hiringProcessId={id} />
           </div>
-
-          {/* Right column: Timeline */}
-          <div className="min-h-[50vh]">
-            <InteractionTimeline
-              hiringProcessId={id}
-              onEdit={(interaction) => setEditingInteraction(interaction)}
-              onDelete={(interaction) => setDeletingInteractionId(interaction.id)}
-            />
-          </div>
+          <InteractionTimeline
+            hiringProcessId={id}
+            onEdit={(interaction) => setEditingInteraction(interaction)}
+            onDelete={(interaction) => setDeletingInteractionId(interaction.id)}
+          />
         </div>
-      </div>
+      </main>
 
-      {showDeleteDialog && (
+      {showDeleteDialog && hiringProcess && (
         <DeleteConfirmDialog
           companyName={hiringProcess.companyName}
+          interactionCount={interactionCount}
           onConfirm={handleDelete}
           onCancel={() => setShowDeleteDialog(false)}
           isDeleting={deleteMutation.isPending}
@@ -423,6 +366,57 @@ function HiringProcessDetailPage() {
           onOpenChange={(open) => !open && setDeletingInteractionId(null)}
         />
       )}
+    </>
+  );
+}
+
+function BackLink() {
+  const t = useTranslations("process");
+  return (
+    <Link
+      to="/hiring-processes"
+      className="mb-6 inline-flex items-center gap-2 text-[13px] text-text-secondary transition-colors hover:text-text"
+    >
+      <ArrowLeft className="size-3.5" />
+      {t("backToProcesses")}
+    </Link>
+  );
+}
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="mb-1.5 text-[11px] font-medium tracking-[0.04em] text-text-muted">{children}</p>
+  );
+}
+
+function DateField({ label, date }: { label: string; date: Date }) {
+  const format = useFormatter();
+  const value = new Date(date);
+  return (
+    <div>
+      <FieldLabel>{label}</FieldLabel>
+      <p className="mono text-[13px] leading-relaxed text-text-secondary">
+        {format.dateTime(value, { month: "short", day: "numeric", year: "numeric" })}
+        <br />
+        {format.dateTime(value, { hour: "numeric", minute: "2-digit" })}
+      </p>
     </div>
+  );
+}
+
+function ProcessCardSkeleton() {
+  return (
+    <section className="rounded-xl border border-border bg-surface p-6">
+      <Skeleton className="h-8 w-64 bg-surface-2" />
+      <Skeleton className="mt-2 h-4 w-40 bg-surface-2" />
+      <div className="mt-6 grid grid-cols-2 gap-6 border-t border-border pt-6 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i}>
+            <Skeleton className="h-3 w-16 bg-surface-2" />
+            <Skeleton className="mt-2 h-7 w-24 bg-surface-2" />
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

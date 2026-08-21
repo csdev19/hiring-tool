@@ -3,11 +3,11 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@interviews-tool/web-ui";
+import { useTranslations } from "@interviews-tool/i18n";
 import { useDeleteInteraction } from "@/hooks/use-interactions";
 import { toast } from "sonner";
 
@@ -24,32 +24,37 @@ export function DeleteInteractionDialog({
   open,
   onOpenChange,
 }: DeleteInteractionDialogProps) {
+  const t = useTranslations("interaction");
+  const tCommon = useTranslations("common");
   const deleteMutation = useDeleteInteraction();
 
   const handleDelete = async () => {
     try {
       await deleteMutation.mutateAsync({ hiringProcessId, interactionId });
-      toast.success("Interaction deleted successfully");
+      toast.success(t("deletedToast"));
       onOpenChange(false);
     } catch (error) {
-      toast.error("Failed to delete interaction");
+      toast.error(tCommon("error"));
       console.error(error);
     }
   };
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="rounded-xl border-border-strong bg-surface p-6">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Interaction</AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to delete this interaction? This action cannot be undone.
-          </AlertDialogDescription>
+          <AlertDialogTitle className="text-base font-medium">
+            {t("deleteConfirm")}
+          </AlertDialogTitle>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={deleteMutation.isPending}>
-            {deleteMutation.isPending ? "Deleting..." : "Delete"}
+          <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleDelete}
+            disabled={deleteMutation.isPending}
+            className="bg-status-rejected-bg text-status-rejected-text hover:bg-danger"
+          >
+            {t("deleteAction")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
