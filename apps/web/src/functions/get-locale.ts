@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie, getRequestHeaders } from "@tanstack/react-start/server";
+import { getCookie } from "@tanstack/react-start/server";
 import {
   isLocale,
   loadMessages,
@@ -7,7 +7,6 @@ import {
   COOKIE_KEY,
   type Locale,
 } from "@interviews-tool/i18n/config";
-import { parseAcceptLanguage } from "@interviews-tool/i18n/web";
 
 interface LocalePayload {
   locale: Locale;
@@ -20,8 +19,9 @@ export const getLocale = createServerFn({ method: "GET" }).handler(
     if (isLocale(saved)) {
       return { locale: saved, messages: (await loadMessages(saved)) as Record<string, object> };
     }
-    const acceptLang = getRequestHeaders().get("accept-language") ?? "";
-    const locale = parseAcceptLanguage(acceptLang) ?? DEFAULT_LOCALE;
-    return { locale, messages: (await loadMessages(locale)) as Record<string, object> };
+    return {
+      locale: DEFAULT_LOCALE,
+      messages: (await loadMessages(DEFAULT_LOCALE)) as Record<string, object>,
+    };
   },
 );
