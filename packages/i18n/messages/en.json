@@ -1,0 +1,328 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close"
+  },
+  "nav": {
+    "appName": "tapuy",
+    "dashboard": "Dashboard",
+    "signIn": "Sign In"
+  },
+  "userMenu": {
+    "myAccount": "My Account",
+    "signOut": "Sign Out"
+  },
+  "auth": {
+    "tagline": "Ask. Listen. Remember.",
+    "signInTitle": "Sign in",
+    "signUpTitle": "Create your account",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "namePlaceholder": "Ana Torres",
+    "emailPlaceholder": "ana@acme.com",
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "signingIn": "Signing in…",
+    "creatingAccount": "Creating account…",
+    "noAccount": "No account?",
+    "createOne": "Create one",
+    "alreadyHaveAccount": "Already have an account?",
+    "signedIn": "Signed in",
+    "accountCreated": "Account created",
+    "errors": {
+      "signInFailed": "Couldn't sign you in. Check your connection and try again.",
+      "signUpFailed": "Couldn't create your account. Check your connection and try again.",
+      "emailTaken": "That email's already registered.",
+      "signInInstead": "Sign in instead."
+    },
+    "validation": {
+      "invalidEmail": "Enter a valid email address.",
+      "passwordMin": "Password needs at least 8 characters.",
+      "nameMin": "Name needs at least 2 characters."
+    }
+  },
+  "landing": {
+    "hero": {
+      "kicker": "Ask. Listen. Remember.",
+      "titlePlain": "Every question in the process,",
+      "titleEmphasis": "on record.",
+      "subtitle": "The interview log for people who want to remember.",
+      "description": "Open-source interview and hiring process tracker. Log every conversation, offer, and decision — from either side of the table.",
+      "createAccount": "Create account",
+      "signIn": "Sign in",
+      "openPipeline": "Open your pipeline"
+    },
+    "features": {
+      "pipeline": {
+        "title": "Pipeline",
+        "description": "Eight statuses, from first contact to signed offer. Every process shows where it stands — no digging through email."
+      },
+      "numbers": {
+        "title": "Numbers, not vibes",
+        "description": "Salary in figures with explicit currency. Stages counted. What they offered is what you compare."
+      },
+      "timeline": {
+        "title": "Timeline",
+        "description": "Every call, take-home and offer, logged in Markdown — written live or after. What they said in the second call is leverage in the fifth."
+      }
+    },
+    "principles": {
+      "heading": "Five principles",
+      "one": {
+        "title": "Your side of the table",
+        "description": "Whoever keeps the record runs it. The model has no side — a candidate and a hiring team use the same one."
+      },
+      "two": {
+        "title": "Memory is leverage",
+        "description": "Remembering what they told you on the second call is negotiating power."
+      },
+      "three": {
+        "title": "Numbers, not vibes",
+        "description": "Salary in figures, currency explicit, stages counted. Data doesn't get dressed up."
+      },
+      "four": {
+        "title": "Calm by default",
+        "description": "No gamification, no confetti. A rejection is a status, not a failure. The interface never judges."
+      },
+      "five": {
+        "title": "Yours to run",
+        "description": "Open source, your data in your Postgres. Privacy is the premise."
+      }
+    },
+    "yoursToRun": {
+      "heading": "Yours to run",
+      "description": "Self-hosted and open source. Your negotiations live in your Postgres, not on someone else's server.",
+      "starOnGitHub": "Star on GitHub"
+    },
+    "finalCta": {
+      "heading": "Start the record.",
+      "description": "Add the first company you're talking to.",
+      "createAccount": "Create account",
+      "openPipeline": "Open your pipeline"
+    },
+    "footer": {
+      "tagline": "tapuy — every question in the process, on record",
+      "github": "GitHub",
+      "docs": "Docs"
+    },
+    "liveNote": {
+      "kicker": "Live note",
+      "title": "Write during the call, not after.",
+      "body": "One key opens a full screen with a running clock. Type as they talk; / stamps the time, your questions sit on the right, and every keystroke is saved before you think to save it.",
+      "point1": "Timestamps, figures and next steps in one keystroke",
+      "point2": "Your question list on the side — tick it, it writes itself into the note",
+      "point3": "Autosaved as a draft, on your machine, until you file it"
+    }
+  },
+  "statuses": {
+    "firstContact": "First contact",
+    "ongoing": "Ongoing",
+    "onHold": "On hold",
+    "offerMade": "Offer made",
+    "offerAccepted": "Offer accepted",
+    "hired": "Hired",
+    "rejected": "Rejected",
+    "droppedOut": "Dropped out"
+  },
+  "interactionTypes": {
+    "note": "Note",
+    "phoneCall": "Call",
+    "email": "Email",
+    "videoCall": "Video call",
+    "inPersonMeeting": "Meeting",
+    "technicalChallenge": "Technical interview",
+    "application": "Application",
+    "offer": "Offer",
+    "rejection": "Rejection",
+    "followUp": "Follow-up"
+  },
+  "process": {
+    "backToProcesses": "Back to processes",
+    "interactions": "Interactions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "salary": "Salary",
+    "logged": "logged",
+    "created": "Created",
+    "lastUpdated": "Last updated",
+    "companyDetails": "Company details",
+    "website": "Website",
+    "location": "Location",
+    "contactedVia": "Contacted via",
+    "contactPerson": "Contact person",
+    "interviewSteps": "Interview steps",
+    "benefits": "Benefits",
+    "loadErrorTitle": "Couldn't load this process",
+    "loadErrorBody": "Check your connection and try again.",
+    "retry": "Retry",
+    "notFoundTitle": "Process not found",
+    "notFoundBody": "It may have been deleted.",
+    "deleteConfirm": "Delete {company} and its {count} interactions? This can't be undone.",
+    "deleteConfirmSimple": "Delete {company}? This can't be undone.",
+    "deleteAction": "Delete process",
+    "deletedToast": "Process deleted"
+  },
+  "processForm": {
+    "newTitle": "New process",
+    "editTitle": "Edit process",
+    "subtitle": "Only the company is required. The rest can wait.",
+    "companyName": "Company name",
+    "companyNameRequired": "Company name is required.",
+    "companyPlaceholder": "Acme Corp",
+    "jobTitle": "Job title",
+    "jobTitlePlaceholder": "React Native Developer",
+    "status": "Status",
+    "monthlySalary": "Monthly salary",
+    "hourlyRate": "Hourly rate",
+    "salaryPlaceholder": "5200",
+    "salaryMaxError": "Salary can't be higher than 25,000.",
+    "perMonth": "/ month",
+    "perHour": "/ hour",
+    "perMonthShort": "/ mo",
+    "perHourShort": "/ hr",
+    "companyDetails": "Company details",
+    "website": "Website",
+    "websitePlaceholder": "acme.example",
+    "websiteInvalid": "Enter a valid website address.",
+    "location": "Location",
+    "locationPlaceholder": "Remote · GMT−5 overlap",
+    "contactedVia": "Contacted via",
+    "contactedViaPlaceholder": "Select",
+    "otherOption": "Other",
+    "contactPerson": "Contact person",
+    "contactPersonPlaceholder": "Ana Torres, Engineering Manager",
+    "interviewSteps": "Interview steps",
+    "interviewStepsInvalid": "Interview steps must be a whole number.",
+    "benefits": "Benefits",
+    "benefitsPlaceholder": "25 days off, private health, yearly equipment budget",
+    "create": "Create process",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "createdToast": "Process created",
+    "savedToast": "Changes saved",
+    "markedRejectedToast": "Marked as rejected. The notes stay.",
+    "markedHiredToast": "Marked as hired."
+  },
+  "interaction": {
+    "logInteraction": "Log interaction",
+    "title": "Title",
+    "optional": "optional",
+    "titlePlaceholder": "Technical interview round 2",
+    "type": "Type",
+    "content": "Content",
+    "write": "Write",
+    "preview": "Preview",
+    "contentPlaceholder": "What happened in this conversation?",
+    "nothingToPreview": "Nothing to preview yet.",
+    "markdownSupported": "Markdown supported",
+    "contentMinError": "Content needs at least 10 characters.",
+    "saving": "Saving…",
+    "savedToast": "Interaction saved",
+    "emptyTitle": "Nothing logged yet",
+    "emptyBody": "Write down what happened. Future you will thank you.",
+    "emptyCta": "Log first interaction",
+    "editTitle": "Edit interaction",
+    "save": "Save",
+    "cancel": "Cancel",
+    "deleteConfirm": "Delete this interaction? This can't be undone.",
+    "deleteAction": "Delete interaction",
+    "deletedToast": "Interaction deleted",
+    "loadError": "Couldn't load interactions",
+    "contentMaxError": "Content can't exceed 10,000 characters."
+  },
+  "dashboard": {
+    "title": "Your processes",
+    "activeCount": "{count} active",
+    "closedCount": "{count} closed",
+    "createProcess": "Create process",
+    "statusFilterAll": "Status: all",
+    "statusFilterCount": "Status: {count}",
+    "filterByStatus": "Filter by status",
+    "salaryAll": "All salaries",
+    "salaryDeclared": "Declared",
+    "salaryNotDeclared": "Not declared",
+    "minSalary": "Min",
+    "maxSalary": "Max",
+    "clearFilters": "Clear filters",
+    "columns": {
+      "company": "Company",
+      "jobTitle": "Job title",
+      "status": "Status",
+      "salary": "Salary",
+      "lastUpdate": "Last update"
+    },
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "emptyTitle": "Your pipeline starts here",
+    "emptyBody": "Add the first company you're talking to.",
+    "noMatchTitle": "No processes match",
+    "noMatchBody": "Try widening the status or salary filter.",
+    "showing": "Showing {from} to {to} of {total}",
+    "noEntries": "No entries",
+    "rowsPerPage": "Rows per page",
+    "pageOf": "Page {page} of {pages}",
+    "loadError": "Couldn't load your processes. Check your connection and try again.",
+    "retry": "Retry",
+    "liveTip": "On a call? Open a process and hit <kbd>L</kbd> for live notes.",
+    "liveNote": "Live note"
+  },
+  "capture": {
+    "startLiveNote": "Start live note",
+    "liveNote": "Live note",
+    "saveInteraction": "Save interaction",
+    "hidePanel": "Hide panel",
+    "showPanel": "Show panel",
+    "close": "Close",
+    "draftSaved": "Draft saved {time}",
+    "draftRestored": "Draft restored from {time}",
+    "discard": "Discard",
+    "notes": "Notes",
+    "shortcutsHint": "⌘B bold · ⌘K link · / shortcuts · ⌘↵ save",
+    "quickCapturePlaceholder": "What just happened? Enter logs a note",
+    "log": "Log",
+    "templateInserted": "Template inserted",
+    "questionsTitle": "Questions to ask",
+    "openCount": "{count} open",
+    "showAsked": "Show {count} asked",
+    "hideAsked": "Hide asked",
+    "addQuestion": "Add a question",
+    "add": "Add",
+    "defaultList": "default list",
+    "thisProcess": "this process",
+    "carriedFrom": "carried from {date}",
+    "carryLegend": "Unasked questions carry over to the next conversation.",
+    "tickLegend": "Ticking a question writes it into your note.",
+    "earlierNotes": "Earlier notes",
+    "unsavedTitle": "You have an unsaved note",
+    "unsavedBody": "It stays as a draft on this device — nothing is lost if you leave.",
+    "leaveAnyway": "Leave anyway",
+    "keepWriting": "Keep writing",
+    "liveNoteDefaultTitle": "Live note",
+    "slash": {
+      "timestamp": "Timestamp",
+      "question": "Question I asked",
+      "figure": "Figure",
+      "nextStep": "Next step",
+      "followUp": "Follow up on this"
+    },
+    "toolbar": {
+      "bold": "Bold",
+      "italic": "Italic",
+      "code": "Code",
+      "heading": "Heading",
+      "bullet": "Bullet list",
+      "checkbox": "Checkbox",
+      "link": "Link"
+    },
+    "inCallTitle": "In a call right now?",
+    "inCallBody": "Full-screen notes with a running clock. Timestamps with /, your questions on the side, autosaved as you type.",
+    "logItAfter": "Log it after"
+  }
+}

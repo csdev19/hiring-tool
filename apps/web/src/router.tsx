@@ -1,6 +1,8 @@
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { routerWithQueryClient } from "@tanstack/react-router-with-query";
 
+import { DEFAULT_LOCALE } from "@interviews-tool/i18n";
+
 import Loader from "./components/loader";
 import { routeTree } from "./routeTree.gen";
 import { createQueryClient } from "./lib/query-client";
@@ -12,7 +14,13 @@ export const getRouter = () => {
       routeTree,
       scrollRestoration: true,
       defaultPreloadStaleTime: 0,
-      context: { queryClient, isAuthenticated: false, session: null },
+      context: {
+        queryClient,
+        isAuthenticated: false,
+        session: null,
+        locale: DEFAULT_LOCALE,
+        messages: {},
+      },
       defaultPendingComponent: () => <Loader />,
       defaultNotFoundComponent: () => <div>Not Found</div>,
     }),

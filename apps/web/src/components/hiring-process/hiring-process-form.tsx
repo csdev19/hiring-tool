@@ -1,20 +1,51 @@
+import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { useEffect, useMemo, useState } from "react";
-import { Button, Input, Label, Textarea } from "@interviews-tool/web-ui";
-import type { CreateHiringProcessInput } from "@/hooks/use-hiring-processes";
-import type { CreateCompanyDetailsInput } from "@/hooks/use-company-details";
+import { ChevronDown } from "lucide-react";
+
+import { Button, Input, Label, cn } from "@interviews-tool/web-ui";
+import { useTranslations } from "@interviews-tool/i18n";
 import {
-  HIRING_PROCESS_STATUS_INFO,
-  DEFAULT_HIRING_PROCESS_STATUS,
   CURRENCIES,
-  CURRENCY_INFO,
+  DEFAULT_HIRING_PROCESS_STATUS,
   SALARY_RATE_TYPES,
-  SALARY_RATE_TYPE_LABELS,
-  type HiringProcessStatus,
   type Currency,
+  type HiringProcessStatus,
   type SalaryRateType,
 } from "@interviews-tool/domain/constants";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import type { CreateHiringProcessInput } from "@/hooks/use-hiring-processes";
+import type { CreateCompanyDetailsInput } from "@/hooks/use-company-details";
+import { StatusField } from "./status-field";
+import { SalaryField } from "./salary-field";
+import { CompanyDetailsFields } from "./company-details-fields";
+
+export interface HiringProcessFormValues {
+  companyName: string;
+  jobTitle: string;
+  status: HiringProcessStatus;
+  salary: number | undefined;
+  currency: Currency;
+  salaryRateType: SalaryRateType;
+  website: string;
+  location: string;
+  contactedVia: string;
+  contactPerson: string;
+  interviewSteps: number | undefined;
+  benefits: string;
+}
+
+/* Typed handle for the field components in this folder. Kept as a hook so
+   ReturnType captures TanStack Form's full generic without spelling it out. */
+function useHiringProcessForm(
+  defaultValues: HiringProcessFormValues,
+  onSubmitValues: (values: HiringProcessFormValues) => void,
+) {
+  return useForm({
+    defaultValues,
+    onSubmit: async ({ value }) => onSubmitValues(value),
+  });
+}
+
+export type HiringProcessFormApi = ReturnType<typeof useHiringProcessForm>;
 
 interface HiringProcessFormProps {
   initialValues?: Partial<CreateHiringProcessInput>;
@@ -22,49 +53,8 @@ interface HiringProcessFormProps {
   onSubmit: (data: CreateHiringProcessInput, companyDetails?: CreateCompanyDetailsInput) => void;
   onCancel?: () => void;
   isSubmitting?: boolean;
-  submitLabel?: string;
+  mode: "create" | "edit";
 }
-
-const contactedViaOptions = [
-  { value: "LinkedIn", label: "LinkedIn" },
-  { value: "Email", label: "Email" },
-  { value: "Facebook", label: "Facebook" },
-  { value: "Other", label: "Other" },
-];
-
-// Generate status options dynamically from HIRING_PROCESS_STATUS_INFO
-const statusOptions: { value: HiringProcessStatus; label: string; order: number }[] =
-  Object.entries(HIRING_PROCESS_STATUS_INFO)
-    .map(([key, info]) => ({
-      value: key as HiringProcessStatus,
-      label: info.label,
-      order: info.order,
-    }))
-    .sort((a, b) => a.order - b.order);
-
-const currencyOptions: { value: Currency; label: string; symbol: string }[] = [
-  {
-    value: CURRENCIES.USD,
-    label: CURRENCY_INFO[CURRENCIES.USD].label,
-    symbol: CURRENCY_INFO[CURRENCIES.USD].symbol,
-  },
-  {
-    value: CURRENCIES.PEN,
-    label: CURRENCY_INFO[CURRENCIES.PEN].label,
-    symbol: CURRENCY_INFO[CURRENCIES.PEN].symbol,
-  },
-];
-
-const salaryRateTypeOptions: { value: SalaryRateType; label: string }[] = [
-  {
-    value: SALARY_RATE_TYPES.MONTHLY,
-    label: SALARY_RATE_TYPE_LABELS[SALARY_RATE_TYPES.MONTHLY],
-  },
-  {
-    value: SALARY_RATE_TYPES.HOURLY,
-    label: SALARY_RATE_TYPE_LABELS[SALARY_RATE_TYPES.HOURLY],
-  },
-];
 
 export function HiringProcessForm({
   initialValues,
@@ -72,123 +62,55 @@ export function HiringProcessForm({
   onSubmit,
   onCancel,
   isSubmitting = false,
-  submitLabel = "Save",
-}: HiringProcessFormProps) {
-  const [showCompanyDetails, setShowCompanyDetails] = useState(false);
+  mode,
+}: HiringProcessFormProps): React.ReactElement {
+  const t = useTranslations("processForm");
 
-  // Memoize default values to avoid recreating form on every render
-  const defaultValues = useMemo(
-    () => ({
-      companyName: initialValues?.companyName || "",
-      jobTitle: initialValues?.jobTitle || "",
-      status: initialValues?.status || DEFAULT_HIRING_PROCESS_STATUS,
-      salary: initialValues?.salary,
-      currency: initialValues?.currency || CURRENCIES.USD,
-      salaryRateType: initialValues?.salaryRateType || SALARY_RATE_TYPES.MONTHLY,
-    }),
-    [
-      initialValues?.companyName,
-      initialValues?.jobTitle,
-      initialValues?.status,
-      initialValues?.salary,
-      initialValues?.currency,
-      initialValues?.salaryRateType,
-    ],
+  const hasInitialDetails = Boolean(
+    initialCompanyDetails &&
+    Object.values(initialCompanyDetails).some((v) => v !== undefined && v !== "" && v !== null),
   );
+  const [showCompanyDetails, setShowCompanyDetails] = useState(hasInitialDetails);
 
-  const defaultCompanyDetailsValues = useMemo(
-    () => ({
-      website: initialCompanyDetails?.website || "",
-      location: initialCompanyDetails?.location || "",
-      benefits: initialCompanyDetails?.benefits || "",
-      contactedVia: initialCompanyDetails?.contactedVia || "",
-      contactPerson: initialCompanyDetails?.contactPerson || "",
-      hiringProcessSteps: initialCompanyDetails?.interviewSteps || 0,
-    }),
-    [
-      initialCompanyDetails?.website,
-      initialCompanyDetails?.location,
-      initialCompanyDetails?.benefits,
-      initialCompanyDetails?.contactedVia,
-      initialCompanyDetails?.contactPerson,
-      initialCompanyDetails?.interviewSteps,
-    ],
-  );
-
-  const form = useForm({
-    defaultValues,
-    onSubmit: async ({ value }) => {
-      const companyDetailsData: CreateCompanyDetailsInput = {
-        website: companyDetailsForm.state.values.website || undefined,
-        location: companyDetailsForm.state.values.location || undefined,
-        benefits: companyDetailsForm.state.values.benefits || undefined,
-        contactedVia: companyDetailsForm.state.values.contactedVia || undefined,
-        contactPerson: companyDetailsForm.state.values.contactPerson || undefined,
-        interviewSteps: companyDetailsForm.state.values.hiringProcessSteps || undefined,
-      };
-
-      // Only include company details if at least one field is filled
-      const hasCompanyDetails = Object.values(companyDetailsData).some(
-        (val) => val !== undefined && val !== "" && val !== 0,
-      );
-
-      onSubmit(value, hasCompanyDetails ? companyDetailsData : undefined);
+  const form = useHiringProcessForm(
+    {
+      companyName: initialValues?.companyName ?? "",
+      jobTitle: initialValues?.jobTitle ?? "",
+      status: initialValues?.status ?? DEFAULT_HIRING_PROCESS_STATUS,
+      salary: initialValues?.salary as number | undefined,
+      currency: initialValues?.currency ?? CURRENCIES.USD,
+      salaryRateType: initialValues?.salaryRateType ?? SALARY_RATE_TYPES.MONTHLY,
+      website: initialCompanyDetails?.website ?? "",
+      location: initialCompanyDetails?.location ?? "",
+      contactedVia: initialCompanyDetails?.contactedVia ?? "",
+      contactPerson: initialCompanyDetails?.contactPerson ?? "",
+      interviewSteps: initialCompanyDetails?.interviewSteps as number | undefined,
+      benefits: initialCompanyDetails?.benefits ?? "",
     },
-  });
+    (value) => {
+      const companyDetails: CreateCompanyDetailsInput = {
+        website: value.website || undefined,
+        location: value.location || undefined,
+        contactedVia: value.contactedVia || undefined,
+        contactPerson: value.contactPerson || undefined,
+        interviewSteps: value.interviewSteps || undefined,
+        benefits: value.benefits || undefined,
+      };
+      const hasDetails = Object.values(companyDetails).some((v) => v !== undefined);
 
-  const companyDetailsForm = useForm({
-    defaultValues: defaultCompanyDetailsValues,
-  });
-
-  // Update form values when initialValues change (for edit mode)
-  useEffect(() => {
-    if (initialValues) {
-      form.setFieldValue("companyName", initialValues.companyName || "");
-      form.setFieldValue("jobTitle", initialValues.jobTitle || "");
-      form.setFieldValue("status", initialValues.status || DEFAULT_HIRING_PROCESS_STATUS);
-      form.setFieldValue("currency", initialValues.currency || CURRENCIES.USD);
-      if (initialValues.salaryRateType !== undefined) {
-        form.setFieldValue("salaryRateType", initialValues.salaryRateType);
-      }
-      if (initialValues.salary !== undefined) {
-        form.setFieldValue("salary", initialValues.salary);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    initialValues?.companyName,
-    initialValues?.jobTitle,
-    initialValues?.status,
-    initialValues?.salary,
-    initialValues?.currency,
-    initialValues?.salaryRateType,
-  ]);
-
-  // Update company details form values when initialCompanyDetails change
-  useEffect(() => {
-    if (initialCompanyDetails) {
-      companyDetailsForm.setFieldValue("website", initialCompanyDetails.website || "");
-      companyDetailsForm.setFieldValue("location", initialCompanyDetails.location || "");
-      companyDetailsForm.setFieldValue("benefits", initialCompanyDetails.benefits || "");
-      companyDetailsForm.setFieldValue("contactedVia", initialCompanyDetails.contactedVia || "");
-      companyDetailsForm.setFieldValue("contactPerson", initialCompanyDetails.contactPerson || "");
-      companyDetailsForm.setFieldValue(
-        "hiringProcessSteps",
-        initialCompanyDetails.interviewSteps || 0,
+      onSubmit(
+        {
+          companyName: value.companyName,
+          jobTitle: value.jobTitle || undefined,
+          status: value.status,
+          salary: value.salary,
+          currency: value.currency,
+          salaryRateType: value.salaryRateType,
+        },
+        hasDetails ? companyDetails : undefined,
       );
-      if (initialCompanyDetails.website || initialCompanyDetails.location) {
-        setShowCompanyDetails(true);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    initialCompanyDetails?.website,
-    initialCompanyDetails?.location,
-    initialCompanyDetails?.benefits,
-    initialCompanyDetails?.contactedVia,
-    initialCompanyDetails?.contactPerson,
-    initialCompanyDetails?.interviewSteps,
-  ]);
+    },
+  );
 
   return (
     <form
@@ -197,277 +119,91 @@ export function HiringProcessForm({
         e.stopPropagation();
         form.handleSubmit();
       }}
-      className="space-y-4"
+      className="grid gap-7"
     >
+      {/* Company name — the only required field, and it shows */}
       <form.Field
         name="companyName"
         validators={{
-          onChange: ({ value }) =>
-            !value
-              ? "Company name is required"
-              : value.length < 1
-                ? "Company name is required"
-                : undefined,
+          onSubmit: ({ value }) => (!value.trim() ? t("companyNameRequired") : undefined),
         }}
       >
         {(field) => (
-          <div className="space-y-1.5">
-            <Label htmlFor="companyName">
-              Company Name <span className="text-destructive">*</span>
-            </Label>
+          <div className="grid gap-2">
+            <Label htmlFor="companyName">{t("companyName")}</Label>
             <Input
               id="companyName"
               value={field.state.value}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="Enter company name"
+              placeholder={t("companyPlaceholder")}
               disabled={isSubmitting}
+              className={cn(
+                "h-[52px] text-xl",
+                field.state.meta.errors.length > 0 && "border-danger",
+              )}
             />
-            {field.state.meta.errors && (
-              <p className="text-xs text-destructive">{field.state.meta.errors[0]}</p>
+            {field.state.meta.errors.length > 0 && (
+              <p className="text-xs text-danger">{field.state.meta.errors[0]}</p>
             )}
           </div>
         )}
       </form.Field>
 
-      <form.Field name="jobTitle">
-        {(field) => (
-          <div className="space-y-1.5">
-            <Label htmlFor="jobTitle">Job Title (Optional)</Label>
-            <Input
-              id="jobTitle"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="e.g., Frontend Developer, React Native Developer, DevOps Engineer"
-              disabled={isSubmitting}
-            />
-          </div>
-        )}
-      </form.Field>
-
-      <form.Field name="status">
-        {(field) => (
-          <div className="space-y-1.5">
-            <Label htmlFor="status">
-              Status <span className="text-destructive">*</span>
-            </Label>
-            <select
-              id="status"
-              value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value as HiringProcessStatus)}
-              className="flex h-8 w-full rounded-md border border-input bg-background px-2.5 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={isSubmitting}
-            >
-              {statusOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-      </form.Field>
-
-      <form.Field name="salaryRateType">
-        {(rateTypeField) => {
-          const salaryLabel =
-            rateTypeField.state.value === SALARY_RATE_TYPES.MONTHLY
-              ? "Monthly Salary (Optional)"
-              : "Hourly Rate (Optional)";
-          return (
-            <form.Field name="currency">
-              {(currencyField) => (
-                <form.Field name="salary">
-                  {(salaryField) => (
-                    <div className="space-y-2">
-                      <Label htmlFor="salary">{salaryLabel}</Label>
-                      <div className="flex gap-2">
-                        <div className="flex-1">
-                          <Input
-                            id="salary"
-                            type="number"
-                            min="0"
-                            max="25000"
-                            value={salaryField.state.value || ""}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              salaryField.handleChange(value ? Number(value) : undefined);
-                            }}
-                            placeholder="Enter salary (optional)"
-                            disabled={isSubmitting}
-                          />
-                        </div>
-                        <select
-                          id="salaryRateType"
-                          value={rateTypeField.state.value}
-                          onChange={(e) =>
-                            rateTypeField.handleChange(e.target.value as SalaryRateType)
-                          }
-                          onBlur={rateTypeField.handleBlur}
-                          className="flex h-8 w-28 rounded-md border border-input bg-background px-2.5 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                          disabled={isSubmitting}
-                        >
-                          {salaryRateTypeOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                        <select
-                          id="currency"
-                          value={currencyField.state.value}
-                          onChange={(e) => currencyField.handleChange(e.target.value as Currency)}
-                          className="flex h-8 w-24 rounded-md border border-input bg-background px-2.5 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                          disabled={isSubmitting}
-                        >
-                          {currencyOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.value}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  )}
-                </form.Field>
-              )}
-            </form.Field>
-          );
-        }}
-      </form.Field>
-
-      {/* Company Details Section */}
-      <div className="border-t pt-4 mt-4">
-        <button
-          type="button"
-          onClick={() => setShowCompanyDetails(!showCompanyDetails)}
-          className="flex items-center justify-between w-full text-left"
-          disabled={isSubmitting}
-        >
-          <Label className="text-sm font-medium cursor-pointer">Company Details (Optional)</Label>
-          {showCompanyDetails ? (
-            <ChevronUp className="size-4" />
-          ) : (
-            <ChevronDown className="size-4" />
+      {/* Job title | Status with live badge */}
+      <div className="grid grid-cols-1 gap-7 sm:grid-cols-[1fr_220px] sm:gap-6">
+        <form.Field name="jobTitle">
+          {(field) => (
+            <div className="grid content-start gap-2">
+              <Label htmlFor="jobTitle">{t("jobTitle")}</Label>
+              <Input
+                id="jobTitle"
+                className="h-9"
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder={t("jobTitlePlaceholder")}
+                disabled={isSubmitting}
+              />
+            </div>
           )}
-        </button>
+        </form.Field>
 
-        {showCompanyDetails && (
-          <div className="space-y-4 mt-4">
-            <companyDetailsForm.Field name="website">
-              {(field) => (
-                <div className="space-y-1.5">
-                  <Label htmlFor="website">Website</Label>
-                  <Input
-                    id="website"
-                    type="url"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="https://example.com"
-                    disabled={isSubmitting}
-                  />
-                </div>
-              )}
-            </companyDetailsForm.Field>
-
-            <companyDetailsForm.Field name="location">
-              {(field) => (
-                <div className="space-y-1.5">
-                  <Label htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="City, Country"
-                    disabled={isSubmitting}
-                  />
-                </div>
-              )}
-            </companyDetailsForm.Field>
-
-            <companyDetailsForm.Field name="benefits">
-              {(field) => (
-                <div className="space-y-1.5">
-                  <Label htmlFor="benefits">Benefits</Label>
-                  <Textarea
-                    id="benefits"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="Describe company benefits..."
-                    rows={3}
-                    disabled={isSubmitting}
-                  />
-                </div>
-              )}
-            </companyDetailsForm.Field>
-
-            <companyDetailsForm.Field name="contactedVia">
-              {(field) => (
-                <div className="space-y-1.5">
-                  <Label htmlFor="contactedVia">Contacted Via</Label>
-                  <select
-                    id="contactedVia"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    className="flex h-8 w-full rounded-md border border-input bg-background px-2.5 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled={isSubmitting}
-                  >
-                    <option value="">Select an option</option>
-                    {contactedViaOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </companyDetailsForm.Field>
-
-            <companyDetailsForm.Field name="contactPerson">
-              {(field) => (
-                <div className="space-y-1.5">
-                  <Label htmlFor="contactPerson">Contact Person</Label>
-                  <Input
-                    id="contactPerson"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="@username or name"
-                    disabled={isSubmitting}
-                  />
-                </div>
-              )}
-            </companyDetailsForm.Field>
-
-            <companyDetailsForm.Field name="hiringProcessSteps">
-              {(field) => (
-                <div className="space-y-1.5">
-                  <Label htmlFor="hiringProcessSteps">Hiring Process Steps</Label>
-                  <Input
-                    id="hiringProcessSteps"
-                    type="number"
-                    min="0"
-                    value={field.state.value || ""}
-                    onChange={(e) => field.handleChange(Number(e.target.value))}
-                    placeholder="0"
-                    disabled={isSubmitting}
-                  />
-                </div>
-              )}
-            </companyDetailsForm.Field>
-          </div>
-        )}
+        <StatusField form={form} isSubmitting={isSubmitting} />
       </div>
 
-      <div className="flex gap-2 pt-2">
+      {/* Salary — "Numbers, not vibes" */}
+      <SalaryField form={form} isSubmitting={isSubmitting} />
+
+      {/* Company details — collapsible */}
+      <div className="border-t border-border pt-4">
+        <button
+          type="button"
+          onClick={() => setShowCompanyDetails((open) => !open)}
+          className="flex w-full items-center justify-between text-left"
+          disabled={isSubmitting}
+        >
+          <span className="text-sm font-medium text-text">{t("companyDetails")}</span>
+          <ChevronDown
+            className={cn(
+              "size-4 text-text-muted transition-transform",
+              showCompanyDetails && "rotate-180",
+            )}
+          />
+        </button>
+
+        {showCompanyDetails && <CompanyDetailsFields form={form} isSubmitting={isSubmitting} />}
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center gap-3 border-t border-border pt-6">
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? t("saving") : mode === "create" ? t("create") : t("save")}
+        </Button>
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-            Cancel
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
+            {t("cancel")}
           </Button>
         )}
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : submitLabel}
-        </Button>
       </div>
     </form>
   );

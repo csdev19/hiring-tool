@@ -1,43 +1,32 @@
-import { Badge } from "@interviews-tool/web-ui";
+import { cn } from "@interviews-tool/web-ui";
 import type { InteractionType } from "@interviews-tool/domain/constants";
-import {
-  Mail,
-  Phone,
-  Video,
-  Users,
-  Code,
-  FileText,
-  CheckCircle,
-  XCircle,
-  MessageCircle,
-  StickyNote,
-} from "lucide-react";
+import { useInteractionTypeLabel } from "@/lib/i18n-labels";
 
-const typeConfig: Record<
-  InteractionType,
-  { label: string; icon: React.ComponentType<{ className?: string }>; variant: string }
-> = {
-  email: { label: "Email", icon: Mail, variant: "default" },
-  "phone-call": { label: "Phone Call", icon: Phone, variant: "default" },
-  "video-call": { label: "Video Call", icon: Video, variant: "default" },
-  "in-person-meeting": { label: "Meeting", icon: Users, variant: "default" },
-  "technical-challenge": { label: "Technical", icon: Code, variant: "secondary" },
-  application: { label: "Application", icon: FileText, variant: "secondary" },
-  offer: { label: "Offer", icon: CheckCircle, variant: "default" },
-  rejection: { label: "Rejection", icon: XCircle, variant: "destructive" },
-  "follow-up": { label: "Follow-up", icon: MessageCircle, variant: "outline" },
-  note: { label: "Note", icon: StickyNote, variant: "outline" },
+/* Type badges speak the same language as status badges: 12px/500, 2×8 padding,
+   radius 5, sentence case, never an icon or emoji inside. Only `offer` and
+   `rejection` get color (offer-made / rejected palettes); the rest are neutral. */
+const typeClasses: Partial<Record<InteractionType, string>> = {
+  offer: "bg-status-offer-made-bg text-status-offer-made-text border-status-offer-made-border",
+  rejection: "bg-status-rejected-bg text-status-rejected-text border-transparent",
 };
 
-export function InteractionTypeBadge({ type }: { type: InteractionType | null }) {
+export function InteractionTypeBadge({
+  type,
+}: {
+  type: InteractionType | null;
+}): React.ReactElement | null {
+  const typeLabel = useInteractionTypeLabel();
   if (!type) return null;
-  const config = typeConfig[type];
-  const Icon = config.icon;
 
   return (
-    <Badge variant={config.variant as any} className="gap-1">
-      <Icon className="size-3" />
-      {config.label}
-    </Badge>
+    <span
+      data-slot="interaction-type-badge"
+      className={cn(
+        "inline-flex w-fit items-center whitespace-nowrap rounded-[5px] border px-2 py-0.5 text-xs font-medium leading-[18px]",
+        typeClasses[type] ?? "bg-surface-2 text-text-secondary border-border-strong",
+      )}
+    >
+      {typeLabel(type)}
+    </span>
   );
 }

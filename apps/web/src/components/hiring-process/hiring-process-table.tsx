@@ -8,8 +8,14 @@ import {
   type SortingState,
   type PaginationState,
 } from "@tanstack/react-table";
-import { Button } from "@interviews-tool/web-ui";
 import {
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  StatusBadge,
   Table,
   TableBody,
   TableCell,
@@ -17,11 +23,12 @@ import {
   TableHeader,
   TableRow,
 } from "@interviews-tool/web-ui";
-import { StatusBadge } from "./status-badge";
+import { useTranslations, useFormatter } from "@interviews-tool/i18n";
+import { useStatusLabel } from "@/lib/i18n-labels";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import type { HiringProcess } from "@/hooks/use-hiring-processes";
+import { SALARY_RATE_TYPES } from "@interviews-tool/domain/constants";
 import type { Currency, SalaryRateType } from "@interviews-tool/domain/constants";
-import { SALARY_RATE_TYPE_LABELS } from "@interviews-tool/domain/constants";
 import {
   Pencil,
   Trash2,
@@ -30,32 +37,11 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  ArrowDown,
+  ArrowUp,
 } from "lucide-react";
 
 const columnHelper = createColumnHelper<HiringProcess>();
-
-const formatDate = (date: Date) => {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-};
-
-const formatSalary = (
-  salary: number | null,
-  currency: Currency = "USD",
-  salaryRateType?: SalaryRateType,
-) => {
-  if (!salary) return "-";
-  const formatted = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency,
-    minimumFractionDigits: 0,
-  }).format(salary);
-  const rateTypeLabel = salaryRateType ? SALARY_RATE_TYPE_LABELS[salaryRateType] : undefined;
-  return rateTypeLabel ? `${formatted}/${rateTypeLabel.toLowerCase()}` : `${formatted} ${currency}`;
-};
 
 interface InterviewTableProps {
   interviews: HiringProcess[];
@@ -77,25 +63,51 @@ export function InterviewTable({
   isLoading = false,
 }: InterviewTableProps) {
   const navigate = useNavigate();
+  const t = useTranslations("dashboard");
+  const tForm = useTranslations("processForm");
+  const format = useFormatter();
+  const statusLabel = useStatusLabel();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [sorting, setSorting] = useState<SortingState>([{ id: "updatedAt", desc: true }]);
 
   const interviewToDelete = interviews.find((i) => i.id === deleteId);
-
-  // Calculate page count based on server total
   const pageCount = Math.ceil(totalCount / pagination.pageSize);
+
+  const formatDate = (date: Date): string =>
+    format.dateTime(new Date(date), { month: "short", day: "numeric", year: "numeric" });
+
+  /* "$5,200 / mo" — locale-aware amount plus the localized short rate
+     (the perMonthShort/perHourShort messages already include the slash).
+     Zero stays "–": the app treats 0 as undeclared. */
+  const formatSalary = (
+    salary: number | null,
+    currency: Currency = "USD",
+    salaryRateType?: SalaryRateType,
+  ): string => {
+    if (!salary) return "–";
+    const amount = format.number(salary, {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+    if (!salaryRateType) return amount;
+    const short =
+      salaryRateType === SALARY_RATE_TYPES.HOURLY ? tForm("perHourShort") : tForm("perMonthShort");
+    return `${amount} ${short}`;
+  };
 
   const columns = useMemo(
     () => [
       columnHelper.accessor("companyName", {
-        header: "Company",
+        header: t("columns.company"),
         cell: (info) => {
           const interview = info.row.original;
           return (
             <Link
               to="/hiring-processes/$id"
               params={{ id: interview.id }}
-              className="font-medium hover:underline truncate block max-w-[200px]"
+              className="block max-w-[220px] truncate font-medium text-text transition-colors hover:text-mint"
               title={info.getValue()}
             >
               {info.getValue()}
@@ -105,64 +117,81 @@ export function InterviewTable({
         enableSorting: true,
       }),
       columnHelper.accessor("jobTitle", {
-        header: "Job Title",
+        header: t("columns.jobTitle"),
         cell: (info) => {
           const jobTitle = info.getValue();
           return jobTitle ? (
-            <span className="text-muted-foreground truncate block max-w-[300px]" title={jobTitle}>
+            <span className="block max-w-[320px] truncate text-text-secondary" title={jobTitle}>
               {jobTitle}
             </span>
           ) : (
-            <span className="text-muted-foreground italic">-</span>
+            <span className="text-text-muted">–</span>
           );
         },
         enableSorting: true,
       }),
       columnHelper.accessor("status", {
-        header: "Status",
-        cell: (info) => <StatusBadge status={info.getValue()} />,
+        header: t("columns.status"),
+        cell: (info) => (
+          <StatusBadge status={info.getValue()} label={statusLabel(info.getValue())} />
+        ),
         enableSorting: false,
       }),
       columnHelper.accessor("salary", {
-        header: "Salary",
-        cell: (info) => {
-          const interview = info.row.original;
-          return formatSalary(
-            info.getValue(),
-            interview.currency,
-            interview.salaryRateType as SalaryRateType | undefined,
-          );
-        },
-        enableSorting: true,
-        sortingFn: (rowA, rowB) => {
-          const salaryA = rowA.original.salary || 0;
-          const salaryB = rowB.original.salary || 0;
-          return salaryA - salaryB;
-        },
-      }),
-      columnHelper.accessor("updatedAt", {
-        header: "Last Update",
-        cell: (info) => (
-          <span className="text-muted-foreground">{formatDate(info.getValue())}</span>
-        ),
-        enableSorting: true,
-        sortingFn: (rowA, rowB) => {
-          const dateA = new Date(rowA.original.updatedAt).getTime();
-          const dateB = new Date(rowB.original.updatedAt).getTime();
-          return dateA - dateB;
-        },
-      }),
-      columnHelper.display({
-        id: "actions",
-        header: () => <div className="text-right">Actions</div>,
+        header: () => <div className="text-right">{t("columns.salary")}</div>,
         cell: (info) => {
           const interview = info.row.original;
           return (
-            <div className="flex justify-end gap-1">
+            <div className="mono text-right text-[13px] text-text">
+              {formatSalary(
+                info.getValue(),
+                interview.currency,
+                interview.salaryRateType as SalaryRateType | undefined,
+              )}
+            </div>
+          );
+        },
+        enableSorting: true,
+        sortingFn: (rowA, rowB) => (rowA.original.salary || 0) - (rowB.original.salary || 0),
+      }),
+      columnHelper.accessor("updatedAt", {
+        header: t("columns.lastUpdate"),
+        cell: (info) => (
+          <span className="mono text-[13px] text-text-secondary">
+            {formatDate(info.getValue())}
+          </span>
+        ),
+        enableSorting: true,
+        sortingFn: (rowA, rowB) =>
+          new Date(rowA.original.updatedAt).getTime() - new Date(rowB.original.updatedAt).getTime(),
+      }),
+      columnHelper.display({
+        id: "actions",
+        header: () => null,
+        cell: (info) => {
+          const interview = info.row.original;
+          return (
+            <div className="flex items-center justify-end gap-0.5">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="gap-2 text-[13px] text-text-secondary hover:text-text"
+                onClick={() =>
+                  navigate({
+                    to: "/hiring-processes/$id",
+                    params: { id: interview.id },
+                    search: { live: true },
+                  })
+                }
+              >
+                <span className="size-1.5 rounded-full bg-mint" />
+                {t("liveNote")}
+              </Button>
               <Button
                 size="icon-sm"
                 variant="ghost"
-                title="View"
+                title={t("view")}
+                className="text-text-muted hover:text-text"
                 onClick={() =>
                   navigate({ to: "/hiring-processes/$id", params: { id: interview.id } })
                 }
@@ -172,7 +201,8 @@ export function InterviewTable({
               <Button
                 size="icon-sm"
                 variant="ghost"
-                title="Edit"
+                title={t("edit")}
+                className="text-text-muted hover:text-text"
                 onClick={() =>
                   navigate({
                     to: "/hiring-processes/$id/edit",
@@ -185,8 +215,9 @@ export function InterviewTable({
               <Button
                 size="icon-sm"
                 variant="ghost"
+                title={t("delete")}
+                className="text-text-muted hover:text-danger"
                 onClick={() => setDeleteId(interview.id)}
-                title="Delete"
               >
                 <Trash2 className="size-3.5" />
               </Button>
@@ -196,19 +227,19 @@ export function InterviewTable({
         enableSorting: false,
       }),
     ],
-    [navigate],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- formatSalary/formatDate derive from format+tForm
+    [navigate, t, tForm, statusLabel, format],
   );
 
   const table = useReactTable({
     data: interviews,
     columns,
-    pageCount, // Tell the table how many pages there are based on server data
-    manualPagination: true, // This tells the table to use server-side pagination
+    pageCount,
+    manualPagination: true,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     onPaginationChange: (updater) => {
-      // Handle both direct state updates and updater functions
       const newPagination = typeof updater === "function" ? updater(pagination) : updater;
       onPaginationChange(newPagination);
     },
@@ -218,56 +249,46 @@ export function InterviewTable({
     },
   });
 
-  if (interviews.length === 0) {
-    return (
-      <div className="text-center py-12 text-muted-foreground">
-        <p>No interviews yet. Create your first interview to get started.</p>
-      </div>
-    );
-  }
-
   return (
     <>
-      <div className="space-y-4 relative">
+      <div className="relative">
         {isLoading && (
-          <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] z-10 flex items-center justify-center">
-            <div className="text-sm text-muted-foreground">Loading...</div>
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-bg/60 backdrop-blur-[1px]">
+            <div className="text-sm text-text-muted">…</div>
           </div>
         )}
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-b border-border">
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => {
                   const canSort = header.column.getCanSort();
                   const isSorted = header.column.getIsSorted();
-                  const isActionsColumn = header.column.id === "actions";
+                  const isActions = header.column.id === "actions";
+                  const isSalary = header.column.id === "salary";
+                  const rendered = header.isPlaceholder
+                    ? null
+                    : typeof header.column.columnDef.header === "function"
+                      ? header.column.columnDef.header(header.getContext())
+                      : header.column.columnDef.header;
                   return (
                     <TableHead
                       key={header.id}
-                      className={
-                        isActionsColumn ? "text-right p-2 font-medium" : "text-left p-2 font-medium"
-                      }
+                      className={isActions || isSalary ? "text-right" : "text-left"}
                     >
                       {canSort ? (
                         <button
                           onClick={header.column.getToggleSortingHandler()}
-                          className="hover:text-foreground flex items-center gap-1"
+                          className={`inline-flex items-center gap-1 transition-colors hover:text-text ${
+                            isSalary ? "justify-end" : ""
+                          }`}
                         >
-                          {header.isPlaceholder
-                            ? null
-                            : typeof header.column.columnDef.header === "function"
-                              ? header.column.columnDef.header(header.getContext())
-                              : header.column.columnDef.header}
-                          {isSorted && (
-                            <span className="text-xs">{isSorted === "asc" ? "↑" : "↓"}</span>
-                          )}
+                          {rendered}
+                          {isSorted === "asc" && <ArrowUp className="size-3" />}
+                          {isSorted === "desc" && <ArrowDown className="size-3" />}
                         </button>
-                      ) : header.isPlaceholder ? null : typeof header.column.columnDef.header ===
-                        "function" ? (
-                        header.column.columnDef.header(header.getContext())
                       ) : (
-                        header.column.columnDef.header
+                        rendered
                       )}
                     </TableHead>
                   );
@@ -277,98 +298,89 @@ export function InterviewTable({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="border-b border-border hover:bg-muted/50">
-                {row.getVisibleCells().map((cell) => {
-                  const isActionsColumn = cell.column.id === "actions";
-                  return (
-                    <TableCell key={cell.id} className={isActionsColumn ? "p-2 text-right" : "p-2"}>
-                      {typeof cell.column.columnDef.cell === "function"
-                        ? cell.column.columnDef.cell(cell.getContext())
-                        : cell.getValue()}
-                    </TableCell>
-                  );
-                })}
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {typeof cell.column.columnDef.cell === "function"
+                      ? cell.column.columnDef.cell(cell.getContext())
+                      : cell.getValue()}
+                  </TableCell>
+                ))}
               </TableRow>
             ))}
           </TableBody>
         </Table>
 
-        {/* Pagination Controls */}
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center gap-2">
-            <p className="text-sm text-muted-foreground">
-              {totalCount === 0 ? (
-                "No entries"
-              ) : (
-                <>
-                  Showing {pagination.pageIndex * pagination.pageSize + 1} to{" "}
-                  {Math.min((pagination.pageIndex + 1) * pagination.pageSize, totalCount)} of{" "}
-                  {totalCount} {totalCount === 1 ? "entry" : "entries"}
-                </>
-              )}
-            </p>
-          </div>
+        {/* Pagination */}
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-4">
+          <p className="mono text-[13px] text-text-muted">
+            {totalCount === 0
+              ? t("noEntries")
+              : t("showing", {
+                  from: pagination.pageIndex * pagination.pageSize + 1,
+                  to: Math.min((pagination.pageIndex + 1) * pagination.pageSize, totalCount),
+                  total: totalCount,
+                })}
+          </p>
 
-          <div className="flex items-center gap-6">
-            {/* Page Size Selector */}
+          <div className="flex flex-wrap items-center gap-5">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Rows per page:</span>
-              <select
-                value={table.getState().pagination.pageSize}
-                onChange={(e) => {
-                  table.setPageSize(Number(e.target.value));
+              <span className="text-sm text-text-secondary">{t("rowsPerPage")}</span>
+              <Select
+                value={String(table.getState().pagination.pageSize)}
+                onValueChange={(value) => {
+                  if (value) table.setPageSize(Number(value));
                 }}
-                className="flex h-8 w-20 rounded-md border border-input bg-background px-2 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
-                {[5, 10, 20, 50].map((pageSize) => (
-                  <option key={pageSize} value={pageSize}>
-                    {pageSize}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger size="sm" className="w-18">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[5, 10, 20, 50].map((pageSize) => (
+                    <SelectItem key={pageSize} value={String(pageSize)}>
+                      {pageSize}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Pagination Buttons */}
             <div className="flex items-center gap-1">
               <Button
-                variant="outline"
+                variant="secondary"
                 size="icon-sm"
                 onClick={() => table.setPageIndex(0)}
                 disabled={!table.getCanPreviousPage()}
-                title="First page"
               >
                 <ChevronsLeft className="size-4" />
               </Button>
               <Button
-                variant="outline"
+                variant="secondary"
                 size="icon-sm"
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
-                title="Previous page"
               >
                 <ChevronLeft className="size-4" />
               </Button>
-              <span className="flex items-center gap-1 px-2 text-sm">
-                <span className="text-muted-foreground">Page</span>
-                <strong>
-                  {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-                </strong>
+              <span className="mono px-2 text-[13px] text-text-secondary">
+                {t("pageOf", {
+                  page: table.getState().pagination.pageIndex + 1,
+                  pages: Math.max(table.getPageCount(), 1),
+                })}
               </span>
               <Button
-                variant="outline"
+                variant="secondary"
                 size="icon-sm"
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
-                title="Next page"
               >
                 <ChevronRight className="size-4" />
               </Button>
               <Button
-                variant="outline"
+                variant="secondary"
                 size="icon-sm"
                 onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                 disabled={!table.getCanNextPage()}
-                title="Last page"
               >
                 <ChevronsRight className="size-4" />
               </Button>

@@ -5,10 +5,17 @@
     "transit": {
       "dependsOn": ["^transit"]
     },
+    "@interviews-tool/i18n#generate:types": {
+      "inputs": ["messages/**", "scripts/**"],
+      "outputs": ["src/messages.generated.ts"]
+    },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["@interviews-tool/i18n#generate:types", "^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**"]
+    },
+    "@interviews-tool/i18n#check-types": {
+      "dependsOn": ["@interviews-tool/i18n#generate:types", "transit"]
     },
     "lint": {
       "dependsOn": ["transit"]

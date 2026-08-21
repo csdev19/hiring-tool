@@ -17,6 +17,8 @@ export * from "./components/badge";
 export * from "./components/select";
 export * from "./components/dialog";
 export * from "./components/alert-dialog";
+export * from "./components/status-badge";
+export * from "./components/tapuy-mark";
 
 // Export utilities
 export * from "./lib/utils";

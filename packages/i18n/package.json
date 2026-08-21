@@ -1,0 +1,61 @@
+{
+  "name": "@interviews-tool/i18n",
+  "version": "1.0.0",
+  "description": "Internationalization package for interviews-tool: locale config, message catalogs, and React bindings",
+  "keywords": [
+    "i18n",
+    "intl",
+    "locale",
+    "translations"
+  ],
+  "license": "ISC",
+  "author": "",
+  "files": [
+    "dist",
+    "messages",
+    "src"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./config": "./src/config.ts",
+    "./web": "./src/web.ts",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./config": "./dist/config.mjs",
+      "./web": "./dist/web.mjs",
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev:watch": "tsdown --watch",
+    "clean": "rm -rf dist",
+    "check-types": "tsc --noEmit",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint --fix src",
+    "test": "vitest run",
+    "generate:types": "bun scripts/generate-types.ts",
+    "generate:types:watch": "bun --watch scripts/generate-types.ts"
+  },
+  "dependencies": {
+    "use-intl": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "@types/react": "19.2.7",
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "^2.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19"
+  },
+  "packageManager": "bun@1.3.4"
+}

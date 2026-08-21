@@ -1,0 +1,328 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Algo salió mal",
+    "retry": "Reintentar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "close": "Cerrar"
+  },
+  "nav": {
+    "appName": "tapuy",
+    "dashboard": "Panel",
+    "signIn": "Iniciar sesión"
+  },
+  "userMenu": {
+    "myAccount": "Mi cuenta",
+    "signOut": "Cerrar sesión"
+  },
+  "auth": {
+    "tagline": "Pregunta. Escucha. Recuerda.",
+    "signInTitle": "Inicia sesión",
+    "signUpTitle": "Crea tu cuenta",
+    "name": "Nombre",
+    "email": "Correo",
+    "password": "Contraseña",
+    "namePlaceholder": "Ana Torres",
+    "emailPlaceholder": "ana@acme.com",
+    "signIn": "Iniciar sesión",
+    "createAccount": "Crear cuenta",
+    "signingIn": "Iniciando sesión…",
+    "creatingAccount": "Creando cuenta…",
+    "noAccount": "¿No tienes cuenta?",
+    "createOne": "Crea una",
+    "alreadyHaveAccount": "¿Ya tienes cuenta?",
+    "signedIn": "Sesión iniciada",
+    "accountCreated": "Cuenta creada",
+    "errors": {
+      "signInFailed": "No pudimos iniciar tu sesión. Revisa tu conexión e intenta de nuevo.",
+      "signUpFailed": "No pudimos crear tu cuenta. Revisa tu conexión e intenta de nuevo.",
+      "emailTaken": "Ese correo ya está registrado.",
+      "signInInstead": "Inicia sesión."
+    },
+    "validation": {
+      "invalidEmail": "Ingresa un correo válido.",
+      "passwordMin": "La contraseña necesita al menos 8 caracteres.",
+      "nameMin": "El nombre necesita al menos 2 caracteres."
+    }
+  },
+  "landing": {
+    "hero": {
+      "kicker": "Pregunta. Escucha. Recuerda.",
+      "titlePlain": "Cada pregunta del proceso,",
+      "titleEmphasis": "registrada.",
+      "subtitle": "La bitácora de entrevistas para quienes quieren recordar.",
+      "description": "Tracker open source de procesos de contratación y entrevistas. Registra cada conversación, oferta y decisión, desde cualquier lado de la mesa.",
+      "createAccount": "Crear cuenta",
+      "signIn": "Iniciar sesión",
+      "openPipeline": "Abrir tu pipeline"
+    },
+    "features": {
+      "pipeline": {
+        "title": "Pipeline",
+        "description": "Ocho estados, del primer contacto a la oferta firmada. Cada proceso muestra dónde está — sin buscar en el correo."
+      },
+      "numbers": {
+        "title": "Números, no sensaciones",
+        "description": "Salario en cifras con moneda explícita. Etapas contadas. Lo que ofrecieron es lo que comparas."
+      },
+      "timeline": {
+        "title": "Timeline",
+        "description": "Cada llamada, reto y oferta, registrados en Markdown — escritos en vivo o después. Lo que dijeron en la segunda llamada es ventaja en la quinta."
+      }
+    },
+    "principles": {
+      "heading": "Cinco principios",
+      "one": {
+        "title": "Tu lado de la mesa",
+        "description": "Quien lleva el registro, manda. El modelo no tiene lado — un candidato y un equipo de contratación usan el mismo."
+      },
+      "two": {
+        "title": "La memoria es ventaja",
+        "description": "Recordar qué te dijeron en la segunda llamada es poder de negociación."
+      },
+      "three": {
+        "title": "Números, no sensaciones",
+        "description": "Salario en cifras, moneda explícita, etapas contadas. Los datos no se adornan."
+      },
+      "four": {
+        "title": "Calma por defecto",
+        "description": "Sin gamificación ni confeti. Un rechazo es un estado, no un fracaso. La interfaz nunca juzga."
+      },
+      "five": {
+        "title": "Tuyo de verdad",
+        "description": "Open source, tus datos en tu Postgres. La privacidad es la premisa."
+      }
+    },
+    "yoursToRun": {
+      "heading": "Tuyo de verdad",
+      "description": "Self-hosted y open source. Tus negociaciones viven en tu Postgres, no en el servidor de alguien más.",
+      "starOnGitHub": "Star en GitHub"
+    },
+    "finalCta": {
+      "heading": "Empieza el registro.",
+      "description": "Agrega la primera empresa con la que estás hablando.",
+      "createAccount": "Crear cuenta",
+      "openPipeline": "Abrir tu pipeline"
+    },
+    "footer": {
+      "tagline": "tapuy — cada pregunta del proceso, registrada",
+      "github": "GitHub",
+      "docs": "Docs"
+    },
+    "liveNote": {
+      "kicker": "Nota en vivo",
+      "title": "Escribe durante la llamada, no después.",
+      "body": "Una tecla abre la pantalla completa con cronómetro. Escribe mientras hablan; / sella la hora, tus preguntas quedan a la derecha, y cada tecla se guarda antes de que pienses en guardar.",
+      "point1": "Marcas de hora, cifras y siguientes pasos en una sola tecla",
+      "point2": "Tu lista de preguntas al lado — la tildas y se escribe sola en la nota",
+      "point3": "Autoguardada como borrador, en tu máquina, hasta que la registres"
+    }
+  },
+  "statuses": {
+    "firstContact": "Primer contacto",
+    "ongoing": "En curso",
+    "onHold": "En pausa",
+    "offerMade": "Oferta recibida",
+    "offerAccepted": "Oferta aceptada",
+    "hired": "Contratado",
+    "rejected": "Rechazado",
+    "droppedOut": "Abandonado"
+  },
+  "interactionTypes": {
+    "note": "Nota",
+    "phoneCall": "Llamada",
+    "email": "Correo",
+    "videoCall": "Videollamada",
+    "inPersonMeeting": "Reunión",
+    "technicalChallenge": "Entrevista técnica",
+    "application": "Postulación",
+    "offer": "Oferta",
+    "rejection": "Rechazo",
+    "followUp": "Seguimiento"
+  },
+  "process": {
+    "backToProcesses": "Volver a procesos",
+    "interactions": "Interacciones",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "salary": "Salario",
+    "logged": "registradas",
+    "created": "Creado",
+    "lastUpdated": "Última actualización",
+    "companyDetails": "Detalles de la empresa",
+    "website": "Sitio web",
+    "location": "Ubicación",
+    "contactedVia": "Contactado por",
+    "contactPerson": "Persona de contacto",
+    "interviewSteps": "Etapas de entrevista",
+    "benefits": "Beneficios",
+    "loadErrorTitle": "No se pudo cargar este proceso",
+    "loadErrorBody": "Revisa tu conexión e intenta de nuevo.",
+    "retry": "Reintentar",
+    "notFoundTitle": "Proceso no encontrado",
+    "notFoundBody": "Puede que haya sido eliminado.",
+    "deleteConfirm": "¿Eliminar {company} y sus {count} interacciones? Esto no se puede deshacer.",
+    "deleteConfirmSimple": "¿Eliminar {company}? Esto no se puede deshacer.",
+    "deleteAction": "Eliminar proceso",
+    "deletedToast": "Proceso eliminado"
+  },
+  "processForm": {
+    "newTitle": "Nuevo proceso",
+    "editTitle": "Editar proceso",
+    "subtitle": "Solo la empresa es obligatoria. El resto puede esperar.",
+    "companyName": "Nombre de la empresa",
+    "companyNameRequired": "El nombre de la empresa es obligatorio.",
+    "companyPlaceholder": "Acme Corp",
+    "jobTitle": "Puesto",
+    "jobTitlePlaceholder": "React Native Developer",
+    "status": "Estado",
+    "monthlySalary": "Salario mensual",
+    "hourlyRate": "Tarifa por hora",
+    "salaryPlaceholder": "5200",
+    "salaryMaxError": "El salario no puede ser mayor a 25,000.",
+    "perMonth": "/ mes",
+    "perHour": "/ hora",
+    "perMonthShort": "/ mes",
+    "perHourShort": "/ h",
+    "companyDetails": "Detalles de la empresa",
+    "website": "Sitio web",
+    "websitePlaceholder": "acme.example",
+    "websiteInvalid": "Ingresa una dirección web válida.",
+    "location": "Ubicación",
+    "locationPlaceholder": "Remoto · overlap GMT−5",
+    "contactedVia": "Contactado por",
+    "contactedViaPlaceholder": "Seleccionar",
+    "otherOption": "Otro",
+    "contactPerson": "Persona de contacto",
+    "contactPersonPlaceholder": "Ana Torres, Engineering Manager",
+    "interviewSteps": "Etapas de entrevista",
+    "interviewStepsInvalid": "Las etapas deben ser un número entero.",
+    "benefits": "Beneficios",
+    "benefitsPlaceholder": "25 días libres, seguro privado, presupuesto anual de equipo",
+    "create": "Crear proceso",
+    "save": "Guardar cambios",
+    "saving": "Guardando…",
+    "cancel": "Cancelar",
+    "createdToast": "Proceso creado",
+    "savedToast": "Cambios guardados",
+    "markedRejectedToast": "Marcado como rechazado. Las notas se quedan.",
+    "markedHiredToast": "Marcado como contratado."
+  },
+  "interaction": {
+    "logInteraction": "Registrar interacción",
+    "title": "Título",
+    "optional": "opcional",
+    "titlePlaceholder": "Entrevista técnica ronda 2",
+    "type": "Tipo",
+    "content": "Contenido",
+    "write": "Escribir",
+    "preview": "Vista previa",
+    "contentPlaceholder": "¿Qué pasó en esta conversación?",
+    "nothingToPreview": "Aún no hay nada que previsualizar.",
+    "markdownSupported": "Markdown soportado",
+    "contentMinError": "El contenido necesita al menos 10 caracteres.",
+    "saving": "Guardando…",
+    "savedToast": "Interacción guardada",
+    "emptyTitle": "Aún no hay nada registrado",
+    "emptyBody": "Anota lo que pasó. Tu yo del futuro te lo agradecerá.",
+    "emptyCta": "Registrar primera interacción",
+    "editTitle": "Editar interacción",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "deleteConfirm": "¿Eliminar esta interacción? Esto no se puede deshacer.",
+    "deleteAction": "Eliminar interacción",
+    "deletedToast": "Interacción eliminada",
+    "loadError": "No se pudieron cargar las interacciones",
+    "contentMaxError": "El contenido no puede superar los 10,000 caracteres."
+  },
+  "dashboard": {
+    "title": "Tus procesos",
+    "activeCount": "{count} activos",
+    "closedCount": "{count} cerrados",
+    "createProcess": "Crear proceso",
+    "statusFilterAll": "Estado: todos",
+    "statusFilterCount": "Estado: {count}",
+    "filterByStatus": "Filtrar por estado",
+    "salaryAll": "Todos los salarios",
+    "salaryDeclared": "Declarado",
+    "salaryNotDeclared": "No declarado",
+    "minSalary": "Mín",
+    "maxSalary": "Máx",
+    "clearFilters": "Limpiar filtros",
+    "columns": {
+      "company": "Empresa",
+      "jobTitle": "Puesto",
+      "status": "Estado",
+      "salary": "Salario",
+      "lastUpdate": "Última actualización"
+    },
+    "view": "Ver",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "emptyTitle": "Tu pipeline empieza aquí",
+    "emptyBody": "Agrega la primera empresa con la que estás hablando.",
+    "noMatchTitle": "Ningún proceso coincide",
+    "noMatchBody": "Prueba ampliar el filtro de estado o salario.",
+    "showing": "Mostrando {from} a {to} de {total}",
+    "noEntries": "Sin registros",
+    "rowsPerPage": "Filas por página",
+    "pageOf": "Página {page} de {pages}",
+    "loadError": "No pudimos cargar tus procesos. Revisa tu conexión e intenta de nuevo.",
+    "retry": "Reintentar",
+    "liveTip": "¿En una llamada? Abre un proceso y presiona <kbd>L</kbd> para notas en vivo.",
+    "liveNote": "Nota en vivo"
+  },
+  "capture": {
+    "startLiveNote": "Iniciar nota en vivo",
+    "liveNote": "Nota en vivo",
+    "saveInteraction": "Guardar interacción",
+    "hidePanel": "Ocultar panel",
+    "showPanel": "Mostrar panel",
+    "close": "Cerrar",
+    "draftSaved": "Borrador guardado {time}",
+    "draftRestored": "Borrador restaurado de {time}",
+    "discard": "Descartar",
+    "notes": "Notas",
+    "shortcutsHint": "⌘B negrita · ⌘K link · / atajos · ⌘↵ guardar",
+    "quickCapturePlaceholder": "¿Qué acaba de pasar? Enter registra una nota",
+    "log": "Registrar",
+    "templateInserted": "Plantilla insertada",
+    "questionsTitle": "Preguntas por hacer",
+    "openCount": "{count} pendientes",
+    "showAsked": "Ver {count} hechas",
+    "hideAsked": "Ocultar hechas",
+    "addQuestion": "Agrega una pregunta",
+    "add": "Agregar",
+    "defaultList": "lista por defecto",
+    "thisProcess": "este proceso",
+    "carriedFrom": "viene del {date}",
+    "carryLegend": "Las preguntas sin hacer pasan a la siguiente conversación.",
+    "tickLegend": "Tildar una pregunta la escribe en tu nota.",
+    "earlierNotes": "Notas anteriores",
+    "unsavedTitle": "Tienes una nota sin guardar",
+    "unsavedBody": "Queda como borrador en este dispositivo — no se pierde nada si sales.",
+    "leaveAnyway": "Salir igual",
+    "keepWriting": "Seguir escribiendo",
+    "liveNoteDefaultTitle": "Nota en vivo",
+    "slash": {
+      "timestamp": "Marca de hora",
+      "question": "Pregunta que hice",
+      "figure": "Cifra",
+      "nextStep": "Siguiente paso",
+      "followUp": "Hacer seguimiento"
+    },
+    "toolbar": {
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "code": "Código",
+      "heading": "Título",
+      "bullet": "Lista",
+      "checkbox": "Casilla",
+      "link": "Enlace"
+    },
+    "inCallTitle": "¿En una llamada ahora?",
+    "inCallBody": "Notas a pantalla completa con cronómetro. Marcas de hora con /, tus preguntas al lado, autoguardado mientras escribes.",
+    "logItAfter": "Regístralo después"
+  }
+}
