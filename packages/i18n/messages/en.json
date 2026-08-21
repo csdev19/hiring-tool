@@ -233,7 +233,8 @@
     "deleteConfirm": "Delete this interaction? This can't be undone.",
     "deleteAction": "Delete interaction",
     "deletedToast": "Interaction deleted",
-    "loadError": "Couldn't load interactions"
+    "loadError": "Couldn't load interactions",
+    "contentMaxError": "Content can't exceed 10,000 characters."
   },
   "dashboard": {
     "title": "Your processes",

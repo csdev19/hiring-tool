@@ -14,7 +14,8 @@
 @source "./components/**/*.tsx";
 @source "./lib/**/*.ts";
 
-@custom-variant dark (&:is(.dark *));
+/* One theme signal: tokens and the dark: variant both key off data-theme */
+@custom-variant dark (&:is([data-theme="dark"] *));
 
 :root {
   /* Neones — el 1% */

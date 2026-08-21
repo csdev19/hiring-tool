@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useBlocker, useNavigate } from "@tanstack/react-router";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
@@ -102,7 +102,6 @@ function HiringProcessDetailPage() {
   const draft = useInteractionDraft(id);
   const [liveOpen, setLiveOpen] = useState(!!live);
   const [quickText, setQuickText] = useState("");
-  const [pendingHref, setPendingHref] = useState<string | null>(null);
   const createInteraction = useCreateInteraction();
 
   const closeLive = () => {
@@ -117,12 +116,17 @@ function HiringProcessDetailPage() {
      to true for single keys, so typing in the notepad never triggers it. */
   useHotkey("L", () => setLiveOpen(true));
 
-  const interactions = interactionsData?.data ?? [];
+  /* The API order is not guaranteed: sort newest-first once and pass the
+     sorted array everywhere (carry-over dates, earlier notes). */
+  const interactions = [...(interactionsData?.data ?? [])].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
   const interactionCount = interactions.length;
   const hasUnsavedNote = draft.content.trim().length > 0;
 
-  /* Leave guards — spec §5: beforeunload plus a capture-phase click listener
-     over links; the draft survives either way, the dialog just says so. */
+  /* Leave guards — spec §5. Router navigations go through useBlocker (keeps
+     router state and query cache intact); beforeunload covers browser-level
+     exits. The draft survives either way, the dialog just says so. */
   useEffect(() => {
     if (!hasUnsavedNote) return;
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -132,22 +136,11 @@ function HiringProcessDetailPage() {
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [hasUnsavedNote]);
 
-  useEffect(() => {
-    if (!hasUnsavedNote) return;
-    const onClick = (e: MouseEvent) => {
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      const target = e.target as HTMLElement;
-      const anchor = target.closest?.("a[href]") as HTMLAnchorElement | null;
-      if (!anchor) return;
-      const href = anchor.getAttribute("href") ?? "";
-      if (!href || href.startsWith("#") || anchor.target === "_blank") return;
-      e.preventDefault();
-      e.stopPropagation();
-      setPendingHref(href);
-    };
-    document.addEventListener("click", onClick, true);
-    return () => document.removeEventListener("click", onClick, true);
-  }, [hasUnsavedNote]);
+  const blocker = useBlocker({
+    /* Same-route search changes (e.g. clearing ?live on close) must not block */
+    shouldBlockFn: ({ current, next }) => hasUnsavedNote && current.pathname !== next.pathname,
+    withResolver: true,
+  });
 
   const handleQuickCapture = async () => {
     const text = quickText.trim();
@@ -530,8 +523,8 @@ function HiringProcessDetailPage() {
       )}
 
       {/* Leave guard — the draft survives on this device either way */}
-      {pendingHref && (
-        <AlertDialog open onOpenChange={(open) => !open && setPendingHref(null)}>
+      {blocker.status === "blocked" && (
+        <AlertDialog open onOpenChange={(open) => !open && blocker.reset()}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle className="text-base font-medium">
@@ -540,17 +533,10 @@ function HiringProcessDetailPage() {
               <AlertDialogDescription>{tCapture("unsavedBody")}</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setPendingHref(null)}>
+              <AlertDialogCancel onClick={() => blocker.reset()}>
                 {tCapture("keepWriting")}
               </AlertDialogCancel>
-              <AlertDialogAction
-                variant="secondary"
-                onClick={() => {
-                  const href = pendingHref;
-                  setPendingHref(null);
-                  if (href) window.location.assign(href);
-                }}
-              >
+              <AlertDialogAction variant="secondary" onClick={() => blocker.proceed()}>
                 {tCapture("leaveAnyway")}
               </AlertDialogAction>
             </AlertDialogFooter>

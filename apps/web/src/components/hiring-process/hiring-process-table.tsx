@@ -27,6 +27,7 @@ import { useTranslations, useFormatter } from "@interviews-tool/i18n";
 import { useStatusLabel } from "@/lib/i18n-labels";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import type { HiringProcess } from "@/hooks/use-hiring-processes";
+import { SALARY_RATE_TYPES } from "@interviews-tool/domain/constants";
 import type { Currency, SalaryRateType } from "@interviews-tool/domain/constants";
 import {
   Pencil,
@@ -41,24 +42,6 @@ import {
 } from "lucide-react";
 
 const columnHelper = createColumnHelper<HiringProcess>();
-
-const RATE_ABBR: Record<string, string> = { monthly: "mo", hourly: "hr" };
-
-/* "$5,200 / mo" — figures in Geist Mono via the .mono cell class */
-function formatSalary(
-  salary: number | null,
-  currency: Currency = "USD",
-  salaryRateType?: SalaryRateType,
-) {
-  if (!salary) return "–";
-  const formatted = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 0,
-  }).format(salary);
-  const abbr = salaryRateType ? RATE_ABBR[salaryRateType] : undefined;
-  return abbr ? `${formatted} / ${abbr}` : formatted;
-}
 
 interface InterviewTableProps {
   interviews: HiringProcess[];
@@ -81,6 +64,7 @@ export function InterviewTable({
 }: InterviewTableProps) {
   const navigate = useNavigate();
   const t = useTranslations("dashboard");
+  const tForm = useTranslations("processForm");
   const format = useFormatter();
   const statusLabel = useStatusLabel();
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -89,8 +73,29 @@ export function InterviewTable({
   const interviewToDelete = interviews.find((i) => i.id === deleteId);
   const pageCount = Math.ceil(totalCount / pagination.pageSize);
 
-  const formatDate = (date: Date) =>
+  const formatDate = (date: Date): string =>
     format.dateTime(new Date(date), { month: "short", day: "numeric", year: "numeric" });
+
+  /* "$5,200 / mo" — locale-aware amount plus the localized short rate
+     (the perMonthShort/perHourShort messages already include the slash).
+     Zero stays "–": the app treats 0 as undeclared. */
+  const formatSalary = (
+    salary: number | null,
+    currency: Currency = "USD",
+    salaryRateType?: SalaryRateType,
+  ): string => {
+    if (!salary) return "–";
+    const amount = format.number(salary, {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+    if (!salaryRateType) return amount;
+    const short =
+      salaryRateType === SALARY_RATE_TYPES.HOURLY ? tForm("perHourShort") : tForm("perMonthShort");
+    return `${amount} ${short}`;
+  };
 
   const columns = useMemo(
     () => [
@@ -222,7 +227,8 @@ export function InterviewTable({
         enableSorting: false,
       }),
     ],
-    [navigate, t, statusLabel, format],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- formatSalary/formatDate derive from format+tForm
+    [navigate, t, tForm, statusLabel, format],
   );
 
   const table = useReactTable({

@@ -13,8 +13,7 @@ import type { InteractionDraftState } from "@/lib/interaction-draft";
 import { useSlashMenu } from "./slash-menu";
 import { EditorToolbar, useMdEditing } from "./editor-toolbar";
 import { QuestionsPanel } from "./questions-panel";
-
-const CONTENT_MIN = 10;
+import { CONTENT_MIN } from "./interaction-form";
 
 interface LiveNoteProps {
   processId: string;
@@ -27,6 +26,127 @@ interface LiveNoteProps {
   interactions: Interaction[];
   draft: InteractionDraftState;
   onClose: () => void;
+}
+
+interface LiveTopBarProps {
+  elapsed: number;
+  companyName: string;
+  jobTitle?: string | null;
+  status: HiringProcessStatus | string;
+  statusLabel: string;
+  salaryText?: string | null;
+  savedAt: number | null;
+  panelOpen: boolean;
+  onTogglePanel: () => void;
+  onSave: () => void;
+  saving: boolean;
+  onClose: () => void;
+}
+
+/* Top bar — 52px: recording dot, timer, process context, draft state, actions */
+function LiveTopBar({
+  elapsed,
+  companyName,
+  jobTitle,
+  status,
+  statusLabel,
+  salaryText,
+  savedAt,
+  panelOpen,
+  onTogglePanel,
+  onSave,
+  saving,
+  onClose,
+}: LiveTopBarProps): React.ReactElement {
+  const t = useTranslations("capture");
+  const tInteraction = useTranslations("interaction");
+  const format = useFormatter();
+
+  return (
+    <div className="flex h-[52px] shrink-0 items-center gap-3 border-b border-border px-4">
+      <span className="size-[7px] shrink-0 rounded-full bg-fuchsia" />
+      <span className="mono shrink-0 text-[13px] tabular-nums text-text">
+        {formatTimer(elapsed)}
+      </span>
+      <span className="shrink-0 text-sm font-medium text-text">{companyName}</span>
+      {jobTitle && <span className="min-w-0 truncate text-[13px] text-text-muted">{jobTitle}</span>}
+      <StatusBadge status={status} label={statusLabel} className="shrink-0" />
+      {salaryText && (
+        <span className="mono hidden shrink-0 text-[13px] text-text-secondary lg:inline">
+          {salaryText}
+        </span>
+      )}
+
+      <div className="ml-auto flex shrink-0 items-center gap-2">
+        {savedAt && (
+          <span className="mono max-w-[160px] truncate text-xs text-text-muted">
+            {t("draftSaved", {
+              time: format.dateTime(new Date(savedAt), { hour: "numeric", minute: "2-digit" }),
+            })}
+          </span>
+        )}
+        <Button
+          variant="secondary"
+          size="sm"
+          className="shrink-0 whitespace-nowrap"
+          onClick={onTogglePanel}
+        >
+          {panelOpen ? t("hidePanel") : t("showPanel")}
+        </Button>
+        <Button size="sm" className="shrink-0 whitespace-nowrap" onClick={onSave} disabled={saving}>
+          {saving ? tInteraction("saving") : t("saveInteraction")}
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          className="size-[30px] shrink-0"
+          onClick={onClose}
+          title={t("close")}
+        >
+          <X className="size-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/* Earlier notes — the last conversations, excerpted with exact wording */
+function EarlierNotes({
+  interactions,
+}: {
+  interactions: Interaction[];
+}): React.ReactElement | null {
+  const t = useTranslations("capture");
+  const format = useFormatter();
+  const typeLabel = useInteractionTypeLabel();
+
+  if (interactions.length === 0) return null;
+
+  return (
+    <div className="mt-8 border-t border-border pt-5">
+      <h3 className="text-base font-medium text-text">{t("earlierNotes")}</h3>
+      <div className="mt-4 space-y-5">
+        {interactions.map((interaction) => (
+          <div key={interaction.id}>
+            <div className="flex items-center gap-2">
+              <span className="rounded-[5px] bg-surface-2 px-1.5 py-0.5 text-[11px] font-medium text-text-secondary">
+                {interaction.type ? typeLabel(interaction.type) : "—"}
+              </span>
+              <span className="mono text-[11px] text-text-muted">
+                {format.dateTime(new Date(interaction.createdAt), {
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-text-secondary">
+              {excerpt(interaction.content)}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 /* Live mode — spec §2 of documentation/CAPTURE-V2.md. Full-screen overlay
@@ -43,12 +163,10 @@ export function LiveNote({
   interactions,
   draft,
   onClose,
-}: LiveNoteProps) {
+}: LiveNoteProps): React.ReactElement {
   const t = useTranslations("capture");
   const tInteraction = useTranslations("interaction");
   const tCommon = useTranslations("common");
-  const format = useFormatter();
-  const typeLabel = useInteractionTypeLabel();
   const createMutation = useCreateInteraction();
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -90,7 +208,7 @@ export function LiveNote({
     }
   }, []);
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
     if (content.length < CONTENT_MIN) {
       toast.error(tInteraction("contentMinError"));
       return;
@@ -115,9 +233,6 @@ export function LiveNote({
     }
   };
 
-  const lastInteractionAt = interactions[0]?.createdAt ?? null;
-  const earlierNotes = interactions.slice(0, 4);
-
   return (
     <div
       className="fixed inset-0 z-[70] flex flex-col bg-bg"
@@ -125,61 +240,20 @@ export function LiveNote({
         if (e.key === "Escape") onClose();
       }}
     >
-      {/* Top bar — 52px */}
-      <div className="flex h-[52px] shrink-0 items-center gap-3 border-b border-border px-4">
-        <span className="size-[7px] shrink-0 rounded-full bg-fuchsia" />
-        <span className="mono shrink-0 text-[13px] tabular-nums text-text">
-          {formatTimer(elapsed)}
-        </span>
-        <span className="shrink-0 text-sm font-medium text-text">{companyName}</span>
-        {jobTitle && (
-          <span className="min-w-0 truncate text-[13px] text-text-muted">{jobTitle}</span>
-        )}
-        <StatusBadge status={status} label={statusLabel} className="shrink-0" />
-        {salaryText && (
-          <span className="mono hidden shrink-0 text-[13px] text-text-secondary lg:inline">
-            {salaryText}
-          </span>
-        )}
-
-        <div className="ml-auto flex shrink-0 items-center gap-2">
-          {draft.savedAt && (
-            <span className="mono max-w-[160px] truncate text-xs text-text-muted">
-              {t("draftSaved", {
-                time: format.dateTime(new Date(draft.savedAt), {
-                  hour: "numeric",
-                  minute: "2-digit",
-                }),
-              })}
-            </span>
-          )}
-          <Button
-            variant="secondary"
-            size="sm"
-            className="shrink-0 whitespace-nowrap"
-            onClick={() => setPanelOpen((v) => !v)}
-          >
-            {panelOpen ? t("hidePanel") : t("showPanel")}
-          </Button>
-          <Button
-            size="sm"
-            className="shrink-0 whitespace-nowrap"
-            onClick={handleSave}
-            disabled={createMutation.isPending}
-          >
-            {createMutation.isPending ? tInteraction("saving") : t("saveInteraction")}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="size-[30px] shrink-0"
-            onClick={onClose}
-            title={t("close")}
-          >
-            <X className="size-4" />
-          </Button>
-        </div>
-      </div>
+      <LiveTopBar
+        elapsed={elapsed}
+        companyName={companyName}
+        jobTitle={jobTitle}
+        status={status}
+        statusLabel={statusLabel}
+        salaryText={salaryText}
+        savedAt={draft.savedAt}
+        panelOpen={panelOpen}
+        onTogglePanel={() => setPanelOpen((v) => !v)}
+        onSave={handleSave}
+        saving={createMutation.isPending}
+        onClose={onClose}
+      />
 
       {/* Body */}
       <div className="flex min-h-0 flex-1">
@@ -246,36 +320,11 @@ export function LiveNote({
         >
           <QuestionsPanel
             processId={processId}
-            lastInteractionAt={lastInteractionAt}
+            lastInteractionAt={interactions[0]?.createdAt ?? null}
             variant="live"
             onTick={(text) => slash.insertSnippet(`**Q:** ${text}\n`)}
           />
-
-          {earlierNotes.length > 0 && (
-            <div className="mt-8 border-t border-border pt-5">
-              <h3 className="text-base font-medium text-text">{t("earlierNotes")}</h3>
-              <div className="mt-4 space-y-5">
-                {earlierNotes.map((interaction) => (
-                  <div key={interaction.id}>
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-[5px] bg-surface-2 px-1.5 py-0.5 text-[11px] font-medium text-text-secondary">
-                        {interaction.type ? typeLabel(interaction.type) : "—"}
-                      </span>
-                      <span className="mono text-[11px] text-text-muted">
-                        {format.dateTime(new Date(interaction.createdAt), {
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </span>
-                    </div>
-                    <p className="mt-1.5 text-[13px] leading-relaxed text-text-secondary">
-                      {excerpt(interaction.content)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <EarlierNotes interactions={interactions.slice(0, 4)} />
         </aside>
       </div>
     </div>

@@ -101,18 +101,18 @@ const criticalStyles = `
   }
 `;
 
-function RootDocument() {
+function RootDocument(): React.ReactElement {
   const context = Route.useRouteContext();
   const router = useRouter();
   const { isAuthenticated, session, locale, messages } = context;
 
-  const handleSetLocale = async (next: Locale) => {
+  const handleSetLocale = async (next: Locale): Promise<void> => {
     await setLocaleFn({ data: next });
     await router.invalidate();
   };
 
   return (
-    <html lang={locale} className="dark" data-theme="dark" suppressHydrationWarning>
+    <html lang={locale} data-theme="dark" suppressHydrationWarning>
       <head>
         <style dangerouslySetInnerHTML={{ __html: criticalStyles }} />
         <HeadContent />

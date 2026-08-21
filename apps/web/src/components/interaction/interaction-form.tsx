@@ -21,8 +21,8 @@ import { TYPE_TEMPLATES, formatClock } from "@/lib/capture";
 import type { InteractionDraftState } from "@/lib/interaction-draft";
 import { toast } from "sonner";
 
-const CONTENT_MIN = 10;
-const CONTENT_MAX = 10000;
+export const CONTENT_MIN = 10;
+export const CONTENT_MAX = 10000;
 const MIN_HEIGHT = 200;
 
 export const INTERACTION_CONTENT_ID = "interaction-content";
@@ -35,14 +35,18 @@ interface InteractionFormProps {
 
 /* Notepad, not a form — spec §1 of documentation/CAPTURE-V2.md.
    Notes first, then Type + Title, then submit: write first, classify last. */
-export function InteractionForm({ hiringProcessId, draft, onSuccess }: InteractionFormProps) {
+export function InteractionForm({
+  hiringProcessId,
+  draft,
+  onSuccess,
+}: InteractionFormProps): React.ReactElement {
   const t = useTranslations("interaction");
   const tCapture = useTranslations("capture");
   const tCommon = useTranslations("common");
   const format = useFormatter();
   const typeLabel = useInteractionTypeLabel();
   const [tab, setTab] = useState<"write" | "preview">("write");
-  const [contentError, setContentError] = useState(false);
+  const [contentError, setContentError] = useState<"min" | "max" | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { content, title, type, setContent, setTitle, setType } = draft;
@@ -85,7 +89,7 @@ export function InteractionForm({ hiringProcessId, draft, onSuccess }: Interacti
     e?.preventDefault();
 
     if (content.length < CONTENT_MIN || overMax) {
-      setContentError(true);
+      setContentError(overMax ? "max" : "min");
       setTab("write");
       return;
     }
@@ -100,7 +104,7 @@ export function InteractionForm({ hiringProcessId, draft, onSuccess }: Interacti
       await createMutation.mutateAsync({ hiringProcessId, data });
       toast.success(t("savedToast"));
       draft.clear();
-      setContentError(false);
+      setContentError(null);
       setTab("write");
       onSuccess?.();
     } catch (error) {
@@ -169,10 +173,8 @@ export function InteractionForm({ hiringProcessId, draft, onSuccess }: Interacti
                 <button
                   type="button"
                   title={t("type")}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    slash.insertSnippet(`**${formatClock()}** `);
-                  }}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => slash.insertSnippet(`**${formatClock()}** `)}
                   className="mono ml-1 flex h-7 items-center rounded-[5px] border-l border-border px-2.5 pl-3 text-[12px] text-text-secondary transition-colors hover:text-text"
                 >
                   {formatClock()}
@@ -185,7 +187,13 @@ export function InteractionForm({ hiringProcessId, draft, onSuccess }: Interacti
                 onChange={(e) => {
                   setContent(e.target.value);
                   slash.detect(e.target);
-                  if (contentError && e.target.value.length >= CONTENT_MIN) setContentError(false);
+                  if (
+                    contentError &&
+                    e.target.value.length >= CONTENT_MIN &&
+                    e.target.value.length <= CONTENT_MAX
+                  ) {
+                    setContentError(null);
+                  }
                 }}
                 onKeyDown={(e) => {
                   if (slash.handleKeyDown(e)) return;
@@ -214,7 +222,11 @@ export function InteractionForm({ hiringProcessId, draft, onSuccess }: Interacti
           </div>
         )}
 
-        {contentError && <p className="text-xs text-danger">{t("contentMinError")}</p>}
+        {contentError && (
+          <p className="text-xs text-danger">
+            {contentError === "max" ? t("contentMaxError") : t("contentMinError")}
+          </p>
+        )}
 
         <div className="flex items-center justify-between gap-3">
           <span className="truncate text-xs text-text-muted">{tCapture("shortcutsHint")}</span>

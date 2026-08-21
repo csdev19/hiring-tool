@@ -27,12 +27,12 @@ const interactionTypeKeys = {
   "follow-up": "followUp",
 } as const satisfies Record<InteractionType, string>;
 
-export function useStatusLabel() {
+export function useStatusLabel(): (status: HiringProcessStatus) => string {
   const t = useTranslations("statuses");
   return (status: HiringProcessStatus) => t(statusKeys[status]);
 }
 
-export function useInteractionTypeLabel() {
+export function useInteractionTypeLabel(): (type: InteractionType) => string {
   const t = useTranslations("interactionTypes");
   return (type: InteractionType) => t(interactionTypeKeys[type]);
 }

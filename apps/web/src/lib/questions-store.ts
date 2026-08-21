@@ -23,8 +23,8 @@ export interface QuestionWithState extends Question {
 }
 
 const DEFAULTS_KEY = "tapuy:questions:default";
-const processKey = (id: string) => `tapuy:questions:proc:${id}`;
-const doneKey = (id: string) => `tapuy:questions:done:${id}`;
+const processKey = (id: string): string => `tapuy:questions:proc:${id}`;
+const doneKey = (id: string): string => `tapuy:questions:done:${id}`;
 
 const SEED_DEFAULTS: Question[] = [
   {
@@ -56,7 +56,7 @@ function readJSON<T>(key: string, fallback: T): T {
   }
 }
 
-function writeJSON(key: string, value: unknown) {
+function writeJSON(key: string, value: unknown): void {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch {
@@ -64,7 +64,18 @@ function writeJSON(key: string, value: unknown) {
   }
 }
 
-export function useQuestions(processId: string, lastInteractionAt?: Date | string | null) {
+export interface UseQuestionsResult {
+  questions: QuestionWithState[];
+  open: QuestionWithState[];
+  asked: QuestionWithState[];
+  addQuestion: (text: string) => void;
+  toggle: (id: string) => void;
+}
+
+export function useQuestions(
+  processId: string,
+  lastInteractionAt?: Date | string | null,
+): UseQuestionsResult {
   const [defaults, setDefaults] = useState<Question[]>([]);
   const [processQuestions, setProcessQuestions] = useState<Question[]>([]);
   const [doneIds, setDoneIds] = useState<string[]>([]);

@@ -21,6 +21,7 @@ import {
   type UpdateInteractionInput,
 } from "@/hooks/use-interactions";
 import { useInteractionTypeLabel } from "@/lib/i18n-labels";
+import { CONTENT_MAX, CONTENT_MIN } from "./interaction-form";
 import { toast } from "sonner";
 
 interface EditInteractionDialogProps {
@@ -35,14 +36,14 @@ export function EditInteractionDialog({
   hiringProcessId,
   open,
   onOpenChange,
-}: EditInteractionDialogProps) {
+}: EditInteractionDialogProps): React.ReactElement {
   const t = useTranslations("interaction");
   const tCommon = useTranslations("common");
   const typeLabel = useInteractionTypeLabel();
   const [title, setTitle] = useState(interaction.title || "");
   const [content, setContent] = useState(interaction.content);
   const [type, setType] = useState<InteractionType>(interaction.type || "note");
-  const [contentError, setContentError] = useState(false);
+  const [contentError, setContentError] = useState<"min" | "max" | null>(null);
 
   const updateMutation = useUpdateInteraction();
 
@@ -51,15 +52,15 @@ export function EditInteractionDialog({
       setTitle(interaction.title || "");
       setContent(interaction.content);
       setType(interaction.type || "note");
-      setContentError(false);
+      setContentError(null);
     }
   }, [open, interaction]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (content.length < 10) {
-      setContentError(true);
+    if (content.length < CONTENT_MIN || content.length > CONTENT_MAX) {
+      setContentError(content.length > CONTENT_MAX ? "max" : "min");
       return;
     }
 
@@ -85,7 +86,10 @@ export function EditInteractionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-xl border-border-strong bg-surface p-6">
+      <DialogContent
+        size="wide"
+        className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-xl border-border-strong bg-surface p-6"
+      >
         <DialogHeader>
           <DialogTitle>{t("editTitle")}</DialogTitle>
         </DialogHeader>
@@ -127,11 +131,21 @@ export function EditInteractionDialog({
               value={content}
               onChange={(e) => {
                 setContent(e.target.value);
-                if (contentError && e.target.value.length >= 10) setContentError(false);
+                if (
+                  contentError &&
+                  e.target.value.length >= CONTENT_MIN &&
+                  e.target.value.length <= CONTENT_MAX
+                ) {
+                  setContentError(null);
+                }
               }}
               className="mono min-h-[220px] w-full resize-y rounded-md border border-border bg-surface-2 px-3 py-2 text-[13px] leading-[1.65] text-text"
             />
-            {contentError && <p className="text-xs text-danger">{t("contentMinError")}</p>}
+            {contentError && (
+              <p className="text-xs text-danger">
+                {contentError === "max" ? t("contentMaxError") : t("contentMinError")}
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end gap-2">

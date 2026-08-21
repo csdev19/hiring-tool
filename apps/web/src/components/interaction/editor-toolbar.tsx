@@ -13,7 +13,17 @@ interface UseMdEditingArgs {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
 }
 
-export function useMdEditing({ value, onValueChange, textareaRef }: UseMdEditingArgs) {
+export interface MdEditingApi {
+  run: (action: MdAction) => void;
+  /** Returns true when the shortcut was handled. */
+  handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => boolean;
+}
+
+export function useMdEditing({
+  value,
+  onValueChange,
+  textareaRef,
+}: UseMdEditingArgs): MdEditingApi {
   const run = useCallback(
     (action: MdAction) => {
       const el = textareaRef.current;
@@ -72,7 +82,12 @@ interface EditorToolbarProps {
   className?: string;
 }
 
-export function EditorToolbar({ run, actions, children, className }: EditorToolbarProps) {
+export function EditorToolbar({
+  run,
+  actions,
+  children,
+  className,
+}: EditorToolbarProps): React.ReactElement {
   const t = useTranslations("capture");
   const items = actions
     ? actions
@@ -87,10 +102,10 @@ export function EditorToolbar({ run, actions, children, className }: EditorToolb
           key={item.action}
           type="button"
           title={t(`toolbar.${item.action}`)}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            run(item.action);
-          }}
+          /* preventDefault on mousedown keeps the textarea selection alive;
+             the action runs on click so Enter/Space also trigger it */
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => run(item.action)}
           className={cn(
             "flex h-7 min-w-7 items-center justify-center rounded-[5px] px-1.5 text-[13px] text-text-secondary transition-colors hover:bg-surface-2 hover:text-text",
             item.mono && "mono text-[11px]",

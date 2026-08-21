@@ -11,7 +11,11 @@ interface InteractionCardProps {
 }
 
 /* Content renders in full — the timeline is the product, not a teaser. */
-export function InteractionCard({ interaction, onEdit, onDelete }: InteractionCardProps) {
+export function InteractionCard({
+  interaction,
+  onEdit,
+  onDelete,
+}: InteractionCardProps): React.ReactElement {
   const format = useFormatter();
   const createdAt = new Date(interaction.createdAt);
 

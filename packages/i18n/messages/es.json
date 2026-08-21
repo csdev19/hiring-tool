@@ -233,7 +233,8 @@
     "deleteConfirm": "¿Eliminar esta interacción? Esto no se puede deshacer.",
     "deleteAction": "Eliminar interacción",
     "deletedToast": "Interacción eliminada",
-    "loadError": "No se pudieron cargar las interacciones"
+    "loadError": "No se pudieron cargar las interacciones",
+    "contentMaxError": "El contenido no puede superar los 10,000 caracteres."
   },
   "dashboard": {
     "title": "Tus procesos",

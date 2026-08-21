@@ -10,7 +10,11 @@ const typeClasses: Partial<Record<InteractionType, string>> = {
   rejection: "bg-status-rejected-bg text-status-rejected-text border-transparent",
 };
 
-export function InteractionTypeBadge({ type }: { type: InteractionType | null }) {
+export function InteractionTypeBadge({
+  type,
+}: {
+  type: InteractionType | null;
+}): React.ReactElement | null {
   const typeLabel = useInteractionTypeLabel();
   if (!type) return null;
 
