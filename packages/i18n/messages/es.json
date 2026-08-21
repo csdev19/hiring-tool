@@ -68,7 +68,7 @@
       },
       "timeline": {
         "title": "Timeline",
-        "description": "Cada llamada, reto y oferta, registrados en Markdown. Lo que dijeron en la segunda llamada es ventaja en la quinta."
+        "description": "Cada llamada, reto y oferta, registrados en Markdown — escritos en vivo o después. Lo que dijeron en la segunda llamada es ventaja en la quinta."
       }
     },
     "principles": {
@@ -109,6 +109,14 @@
       "tagline": "tapuy — cada pregunta del proceso, registrada",
       "github": "GitHub",
       "docs": "Docs"
+    },
+    "liveNote": {
+      "kicker": "Nota en vivo",
+      "title": "Escribe durante la llamada, no después.",
+      "body": "Una tecla abre la pantalla completa con cronómetro. Escribe mientras hablan; / sella la hora, tus preguntas quedan a la derecha, y cada tecla se guarda antes de que pienses en guardar.",
+      "point1": "Marcas de hora, cifras y siguientes pasos en una sola tecla",
+      "point2": "Tu lista de preguntas al lado — la tildas y se escribe sola en la nota",
+      "point3": "Autoguardada como borrador, en tu máquina, hasta que la registres"
     }
   },
   "statuses": {
@@ -260,7 +268,9 @@
     "rowsPerPage": "Filas por página",
     "pageOf": "Página {page} de {pages}",
     "loadError": "No pudimos cargar tus procesos. Revisa tu conexión e intenta de nuevo.",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "liveTip": "¿En una llamada? Abre un proceso y presiona <kbd>⌘L</kbd> para notas en vivo.",
+    "liveNote": "Nota en vivo"
   },
   "capture": {
     "startLiveNote": "Iniciar nota en vivo",
@@ -309,6 +319,9 @@
       "bullet": "Lista",
       "checkbox": "Casilla",
       "link": "Enlace"
-    }
+    },
+    "inCallTitle": "¿En una llamada ahora?",
+    "inCallBody": "Notas a pantalla completa con cronómetro. Marcas de hora con /, tus preguntas al lado, autoguardado mientras escribes.",
+    "logItAfter": "Regístralo después"
   }
 }

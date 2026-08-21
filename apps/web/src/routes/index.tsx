@@ -83,6 +83,58 @@ function DemoTimelineCard() {
   );
 }
 
+/* Static mock of the live-note mode — screenshot material, not translated */
+function LiveNoteShowcase() {
+  return (
+    <Card className="w-full gap-0 overflow-hidden py-0 text-left">
+      <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">
+        <span className="size-[7px] shrink-0 rounded-full bg-fuchsia" />
+        <span className="mono text-[13px] text-text">28:14</span>
+        <span className="truncate text-sm font-medium text-text">Acme Corp</span>
+        <span className="mono ml-auto shrink-0 text-xs text-text-muted">Draft saved 9:41 AM</span>
+      </div>
+      <div className="grid grid-cols-[minmax(0,1fr)] sm:grid-cols-[minmax(0,1fr)_180px]">
+        <div className="mono px-5 py-5 text-[13px] leading-[1.9] text-text">
+          <p>
+            <span className="font-medium">9:36 AM</span> Ana, EM. Four on mobile.
+          </p>
+          <p>
+            <span className="font-medium">Q:</span> How is comp reviewed?
+          </p>
+          <p className="text-text-secondary">once a year, band-based</p>
+          <p>
+            <span className="font-medium">9:41 AM</span> range{" "}
+            <span className="rounded bg-surface-2 px-1.5">$4,800–5,500</span>
+          </p>
+          <p>
+            <span className="font-medium">Next step:</span> CTO chat
+          </p>
+          <span className="mt-1 inline-block h-4 w-[2px] bg-mint" />
+        </div>
+        <div className="hidden border-l border-border px-4 py-5 sm:block">
+          <p className="text-[11px] font-medium tracking-[0.08em] text-text-muted uppercase">
+            Questions
+          </p>
+          <div className="mt-3 space-y-3 text-[12px] leading-snug">
+            <p className="flex gap-2 text-text-muted">
+              <span className="text-mint">✓</span>
+              <span className="line-through">How is comp reviewed?</span>
+            </p>
+            <p className="flex gap-2 text-text-secondary">
+              <span className="text-text-muted">▢</span>
+              What does the week look like?
+            </p>
+            <p className="flex gap-2 text-text-secondary">
+              <span className="text-text-muted">▢</span>
+              Who signs off?
+            </p>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 function PipelinePanel() {
   return (
     <Card className="mt-6 px-4 py-4">
@@ -174,6 +226,30 @@ function HomePage() {
         </div>
 
         <DemoTimelineCard />
+      </section>
+
+      {/* Live note — write during the call, not after */}
+      <section className="container mx-auto max-w-6xl px-4 pt-28 text-left">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div>
+            <p className="flex items-center gap-2.5">
+              <span className="size-[7px] shrink-0 rounded-full bg-fuchsia" />
+              <span className="mono text-sm tracking-[0.3em] text-fuchsia uppercase">
+                {t("liveNote.kicker")}
+              </span>
+            </p>
+            <h2 className="display mt-6 text-4xl md:text-5xl">{t("liveNote.title")}</h2>
+            <p className="mt-6 max-w-lg text-base leading-relaxed text-text-secondary">
+              {t("liveNote.body")}
+            </p>
+            <ul className="mt-8 max-w-lg space-y-4 text-base leading-relaxed text-text">
+              <li>{t("liveNote.point1")}</li>
+              <li>{t("liveNote.point2")}</li>
+              <li>{t("liveNote.point3")}</li>
+            </ul>
+          </div>
+          <LiveNoteShowcase />
+        </div>
       </section>
 
       {/* Three features — one per principle */}

@@ -160,10 +160,26 @@ function HiringProcessesComponent() {
         <div>
           <h1 className="text-[32px] leading-tight font-medium text-text">{t("title")}</h1>
           {activeCount !== undefined && closedCount !== undefined && (
-            <p className="mono mt-2 text-sm text-text-muted">
-              {t("activeCount", { count: activeCount })} ·{" "}
-              {t("closedCount", { count: closedCount })}
-            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+              <p className="mono text-sm text-text-muted">
+                {t("activeCount", { count: activeCount })} ·{" "}
+                {t("closedCount", { count: closedCount })}
+              </p>
+              {activeCount + closedCount > 0 && (
+                <p className="flex items-center gap-2 text-sm text-text-secondary">
+                  <span className="size-1.5 shrink-0 rounded-full bg-mint" />
+                  <span>
+                    {t.rich("liveTip", {
+                      kbd: (chunks) => (
+                        <kbd className="mono rounded border border-border bg-surface-2 px-1 py-px text-xs">
+                          {chunks}
+                        </kbd>
+                      ),
+                    })}
+                  </span>
+                </p>
+              )}
+            </div>
           )}
         </div>
         <Link to="/hiring-processes/new" className="shrink-0">

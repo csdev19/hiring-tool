@@ -38,6 +38,9 @@ import { formatClock } from "@/lib/capture";
 
 export const Route = createFileRoute("/_authenticated/hiring-processes/$id")({
   component: HiringProcessDetailPage,
+  validateSearch: (search: Record<string, unknown>): { live?: boolean } => ({
+    live: search.live === true || search.live === "true" ? true : undefined,
+  }),
 });
 
 const STICKY_THRESHOLD = 240;
@@ -94,11 +97,31 @@ function HiringProcessDetailPage() {
 
   const tCapture = useTranslations("capture");
   const tInteraction = useTranslations("interaction");
+  const { live } = Route.useSearch();
   const draft = useInteractionDraft(id);
-  const [liveOpen, setLiveOpen] = useState(false);
+  const [liveOpen, setLiveOpen] = useState(!!live);
   const [quickText, setQuickText] = useState("");
   const [pendingHref, setPendingHref] = useState<string | null>(null);
   const createInteraction = useCreateInteraction();
+
+  const closeLive = () => {
+    setLiveOpen(false);
+    if (live) {
+      navigate({ to: ".", search: {}, replace: true });
+    }
+  };
+
+  /* ⌘L / Ctrl+L opens live mode from anywhere on the page */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "l") {
+        e.preventDefault();
+        setLiveOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const interactions = interactionsData?.data ?? [];
   const interactionCount = interactions.length;
@@ -405,15 +428,28 @@ function HiringProcessDetailPage() {
         )}
 
         {/* Interactions */}
-        <div className="mb-5 mt-11 flex items-center justify-between gap-4">
+        <div className="mb-5 mt-11 flex items-baseline justify-between gap-4">
           <h2 className="text-2xl font-medium text-text">{t("interactions")}</h2>
-          <Button variant="secondary" className="gap-2" onClick={() => setLiveOpen(true)}>
-            <span className="size-1.5 rounded-full bg-mint" />
-            {tCapture("startLiveNote")}
-          </Button>
+          <span className="mono text-[13px] text-text-muted">
+            {format.number(interactionCount)} {t("logged")}
+          </span>
         </div>
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[440px_1fr]">
           <div className="space-y-6 lg:sticky lg:top-20">
+            {/* Live-note CTA — the fast path when the call is happening now */}
+            <section className="rounded-xl border border-border bg-surface p-5">
+              <div className="flex items-center gap-2.5">
+                <span className="size-[7px] rounded-full bg-fuchsia" />
+                <h3 className="text-base font-medium text-text">{tCapture("inCallTitle")}</h3>
+              </div>
+              <p className="mt-2.5 text-sm leading-relaxed text-text-secondary">
+                {tCapture("inCallBody")}
+              </p>
+              <Button className="mt-4 w-full gap-2.5" onClick={() => setLiveOpen(true)}>
+                {tCapture("startLiveNote")}
+                <kbd className="mono text-xs font-normal opacity-60">⌘L</kbd>
+              </Button>
+            </section>
             <InteractionForm hiringProcessId={id} draft={draft} />
             <QuestionsPanel
               processId={id}
@@ -493,7 +529,7 @@ function HiringProcessDetailPage() {
           salaryText={salary ? `${salary.amount} ${salary.rate.short} · ${salary.currency}` : null}
           interactions={interactions}
           draft={draft}
-          onClose={() => setLiveOpen(false)}
+          onClose={closeLive}
         />
       )}
 

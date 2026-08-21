@@ -166,7 +166,22 @@ export function InterviewTable({
         cell: (info) => {
           const interview = info.row.original;
           return (
-            <div className="flex justify-end gap-0.5">
+            <div className="flex items-center justify-end gap-0.5">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="gap-2 text-[13px] text-text-secondary hover:text-text"
+                onClick={() =>
+                  navigate({
+                    to: "/hiring-processes/$id",
+                    params: { id: interview.id },
+                    search: { live: true },
+                  })
+                }
+              >
+                <span className="size-1.5 rounded-full bg-mint" />
+                {t("liveNote")}
+              </Button>
               <Button
                 size="icon-sm"
                 variant="ghost"

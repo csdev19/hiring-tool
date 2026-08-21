@@ -68,7 +68,7 @@
       },
       "timeline": {
         "title": "Timeline",
-        "description": "Every call, take-home and offer, logged in Markdown. What they said in the second call is leverage in the fifth."
+        "description": "Every call, take-home and offer, logged in Markdown — written live or after. What they said in the second call is leverage in the fifth."
       }
     },
     "principles": {
@@ -109,6 +109,14 @@
       "tagline": "tapuy — every question in the process, on record",
       "github": "GitHub",
       "docs": "Docs"
+    },
+    "liveNote": {
+      "kicker": "Live note",
+      "title": "Write during the call, not after.",
+      "body": "One key opens a full screen with a running clock. Type as they talk; / stamps the time, your questions sit on the right, and every keystroke is saved before you think to save it.",
+      "point1": "Timestamps, figures and next steps in one keystroke",
+      "point2": "Your question list on the side — tick it, it writes itself into the note",
+      "point3": "Autosaved as a draft, on your machine, until you file it"
     }
   },
   "statuses": {
@@ -260,7 +268,9 @@
     "rowsPerPage": "Rows per page",
     "pageOf": "Page {page} of {pages}",
     "loadError": "Couldn't load your processes. Check your connection and try again.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "liveTip": "On a call? Open a process and hit <kbd>⌘L</kbd> for live notes.",
+    "liveNote": "Live note"
   },
   "capture": {
     "startLiveNote": "Start live note",
@@ -309,6 +319,9 @@
       "bullet": "Bullet list",
       "checkbox": "Checkbox",
       "link": "Link"
-    }
+    },
+    "inCallTitle": "In a call right now?",
+    "inCallBody": "Full-screen notes with a running clock. Timestamps with /, your questions on the side, autosaved as you type.",
+    "logItAfter": "Log it after"
   }
 }

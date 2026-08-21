@@ -118,7 +118,7 @@ export function InteractionForm({ hiringProcessId, draft, onSuccess }: Interacti
       className="grid gap-4 rounded-xl border border-border bg-surface p-5"
     >
       <div className="flex items-baseline justify-between gap-3">
-        <h3 className="text-base font-medium text-text">{t("logInteraction")}</h3>
+        <h3 className="text-base font-medium text-text">{tCapture("logItAfter")}</h3>
         {draft.savedAt && (
           <span className="mono truncate text-xs text-text-muted">
             {tCapture("draftSaved", { time: formatClockAt(draft.savedAt) })}
