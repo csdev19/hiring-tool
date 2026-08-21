@@ -3,7 +3,21 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button, Skeleton, StatusBadge, cn } from "@interviews-tool/web-ui";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  Button,
+  Input,
+  Skeleton,
+  StatusBadge,
+  cn,
+} from "@interviews-tool/web-ui";
 import { useFormatter, useTranslations } from "@interviews-tool/i18n";
 import { CURRENCY_INFO, SALARY_RATE_TYPES } from "@interviews-tool/domain/constants";
 import type { Currency, SalaryRateType } from "@interviews-tool/domain/constants";
@@ -13,10 +27,14 @@ import { InteractionTimeline } from "@/components/interaction/interaction-timeli
 import { InteractionForm } from "@/components/interaction/interaction-form";
 import { EditInteractionDialog } from "@/components/interaction/edit-interaction-dialog";
 import { DeleteInteractionDialog } from "@/components/interaction/delete-interaction-dialog";
+import { LiveNote } from "@/components/interaction/live-note";
+import { QuestionsPanel } from "@/components/interaction/questions-panel";
 import { useHiringProcess, useDeleteHiringProcess } from "@/hooks/use-hiring-processes";
 import { useCompanyDetails } from "@/hooks/use-company-details";
-import { useInteractions, type Interaction } from "@/hooks/use-interactions";
+import { useCreateInteraction, useInteractions, type Interaction } from "@/hooks/use-interactions";
 import { useStatusLabel } from "@/lib/i18n-labels";
+import { useInteractionDraft } from "@/lib/interaction-draft";
+import { formatClock } from "@/lib/capture";
 
 export const Route = createFileRoute("/_authenticated/hiring-processes/$id")({
   component: HiringProcessDetailPage,
@@ -74,7 +92,60 @@ function HiringProcessDetailPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const showStickyHeader = useStickyHeader();
 
-  const interactionCount = interactionsData?.data?.length ?? 0;
+  const tCapture = useTranslations("capture");
+  const tInteraction = useTranslations("interaction");
+  const draft = useInteractionDraft(id);
+  const [liveOpen, setLiveOpen] = useState(false);
+  const [quickText, setQuickText] = useState("");
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+  const createInteraction = useCreateInteraction();
+
+  const interactions = interactionsData?.data ?? [];
+  const interactionCount = interactions.length;
+  const hasUnsavedNote = draft.content.trim().length > 0;
+
+  /* Leave guards — spec §5: beforeunload plus a capture-phase click listener
+     over links; the draft survives either way, the dialog just says so. */
+  useEffect(() => {
+    if (!hasUnsavedNote) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [hasUnsavedNote]);
+
+  useEffect(() => {
+    if (!hasUnsavedNote) return;
+    const onClick = (e: MouseEvent) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const target = e.target as HTMLElement;
+      const anchor = target.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!anchor) return;
+      const href = anchor.getAttribute("href") ?? "";
+      if (!href || href.startsWith("#") || anchor.target === "_blank") return;
+      e.preventDefault();
+      e.stopPropagation();
+      setPendingHref(href);
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, [hasUnsavedNote]);
+
+  const handleQuickCapture = async () => {
+    const text = quickText.trim();
+    if (!text) return;
+    try {
+      await createInteraction.mutateAsync({
+        hiringProcessId: id,
+        data: { content: `**${formatClock()}** ${text}`, type: "note" },
+      });
+      toast.success(tInteraction("savedToast"));
+      setQuickText("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -172,6 +243,14 @@ function HiringProcessDetailPage() {
               )}
             </div>
             <div className="flex shrink-0 items-center gap-1">
+              <Button
+                variant="secondary"
+                className="h-[30px] gap-2 px-2.5 text-[13px]"
+                onClick={() => setLiveOpen(true)}
+              >
+                <span className="size-1.5 rounded-full bg-mint" />
+                {tCapture("liveNote")}
+              </Button>
               <Link to="/hiring-processes/$id/edit" params={{ id }}>
                 <Button variant="ghost" className="h-[30px] px-2.5 text-[13px]">
                   {t("edit")}
@@ -326,16 +405,52 @@ function HiringProcessDetailPage() {
         )}
 
         {/* Interactions */}
-        <h2 className="mb-5 mt-11 text-2xl font-medium text-text">{t("interactions")}</h2>
-        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[360px_1fr]">
-          <div className="lg:sticky lg:top-20">
-            <InteractionForm hiringProcessId={id} />
+        <div className="mb-5 mt-11 flex items-center justify-between gap-4">
+          <h2 className="text-2xl font-medium text-text">{t("interactions")}</h2>
+          <Button variant="secondary" className="gap-2" onClick={() => setLiveOpen(true)}>
+            <span className="size-1.5 rounded-full bg-mint" />
+            {tCapture("startLiveNote")}
+          </Button>
+        </div>
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[440px_1fr]">
+          <div className="space-y-6 lg:sticky lg:top-20">
+            <InteractionForm hiringProcessId={id} draft={draft} />
+            <QuestionsPanel
+              processId={id}
+              lastInteractionAt={interactions[0]?.createdAt ?? null}
+              variant="column"
+            />
           </div>
-          <InteractionTimeline
-            hiringProcessId={id}
-            onEdit={(interaction) => setEditingInteraction(interaction)}
-            onDelete={(interaction) => setDeletingInteractionId(interaction.id)}
-          />
+          <div className="min-w-0">
+            {/* Quick capture — spec §6: Enter logs a time-stamped note */}
+            <div className="mb-6 flex gap-2">
+              <Input
+                value={quickText}
+                onChange={(e) => setQuickText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleQuickCapture();
+                  }
+                }}
+                placeholder={tCapture("quickCapturePlaceholder")}
+                className="h-10 flex-1"
+              />
+              <Button
+                variant="secondary"
+                className="h-10"
+                onClick={handleQuickCapture}
+                disabled={createInteraction.isPending}
+              >
+                {tCapture("log")}
+              </Button>
+            </div>
+            <InteractionTimeline
+              hiringProcessId={id}
+              onEdit={(interaction) => setEditingInteraction(interaction)}
+              onDelete={(interaction) => setDeletingInteractionId(interaction.id)}
+            />
+          </div>
         </div>
       </main>
 
@@ -365,6 +480,50 @@ function HiringProcessDetailPage() {
           open={!!deletingInteractionId}
           onOpenChange={(open) => !open && setDeletingInteractionId(null)}
         />
+      )}
+
+      {/* Live mode overlay */}
+      {liveOpen && hiringProcess && (
+        <LiveNote
+          processId={id}
+          companyName={hiringProcess.companyName}
+          jobTitle={hiringProcess.jobTitle}
+          status={hiringProcess.status}
+          statusLabel={statusLabel(hiringProcess.status)}
+          salaryText={salary ? `${salary.amount} ${salary.rate.short} · ${salary.currency}` : null}
+          interactions={interactions}
+          draft={draft}
+          onClose={() => setLiveOpen(false)}
+        />
+      )}
+
+      {/* Leave guard — the draft survives on this device either way */}
+      {pendingHref && (
+        <AlertDialog open onOpenChange={(open) => !open && setPendingHref(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-base font-medium">
+                {tCapture("unsavedTitle")}
+              </AlertDialogTitle>
+              <AlertDialogDescription>{tCapture("unsavedBody")}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setPendingHref(null)}>
+                {tCapture("keepWriting")}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                variant="secondary"
+                onClick={() => {
+                  const href = pendingHref;
+                  setPendingHref(null);
+                  if (href) window.location.assign(href);
+                }}
+              >
+                {tCapture("leaveAnyway")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
     </>
   );

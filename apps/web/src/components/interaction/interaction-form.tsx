@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Button,
   Input,
@@ -15,34 +15,67 @@ import { useFormatter, useTranslations } from "@interviews-tool/i18n";
 import { INTERACTION_TYPE_VALUES, type InteractionType } from "@interviews-tool/domain/constants";
 import { useCreateInteraction, type CreateInteractionInput } from "@/hooks/use-interactions";
 import { useInteractionTypeLabel } from "@/lib/i18n-labels";
+import { useSlashMenu } from "./slash-menu";
+import { TYPE_TEMPLATES } from "@/lib/capture";
+import type { InteractionDraftState } from "@/lib/interaction-draft";
 import { toast } from "sonner";
 
 const CONTENT_MIN = 10;
 const CONTENT_MAX = 10000;
+const MIN_HEIGHT = 200;
 
 export const INTERACTION_CONTENT_ID = "interaction-content";
 
 interface InteractionFormProps {
   hiringProcessId: string;
+  draft: InteractionDraftState;
   onSuccess?: () => void;
 }
 
-export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormProps) {
+/* Notepad, not a form — spec §1 of documentation/CAPTURE-V2.md.
+   Notes first, then Type + Title, then submit: write first, classify last. */
+export function InteractionForm({ hiringProcessId, draft, onSuccess }: InteractionFormProps) {
   const t = useTranslations("interaction");
+  const tCapture = useTranslations("capture");
   const tCommon = useTranslations("common");
   const format = useFormatter();
   const typeLabel = useInteractionTypeLabel();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [type, setType] = useState<InteractionType>("note");
   const [tab, setTab] = useState<"write" | "preview">("write");
   const [contentError, setContentError] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const { content, title, type, setContent, setTitle, setType } = draft;
   const createMutation = useCreateInteraction();
   const overMax = content.length > CONTENT_MAX;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const slash = useSlashMenu({
+    value: content,
+    onValueChange: setContent,
+    textareaRef,
+  });
+
+  /* Auto-grow: height:auto → scrollHeight, min 200px, capped at 52vh
+     (then the textarea scrolls internally) */
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el || tab !== "write") return;
+    el.style.height = "auto";
+    el.style.height = `${Math.max(el.scrollHeight, MIN_HEIGHT)}px`;
+  }, [content, tab]);
+
+  const handleTypeChange = (value: InteractionType) => {
+    setType(value);
+    /* Empty area + a template for this type → insert the skeleton.
+       Never overwrites existing text. */
+    const template = TYPE_TEMPLATES[value];
+    if (template && !content.trim()) {
+      setContent(template);
+      toast.success(tCapture("templateInserted"));
+    }
+  };
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
 
     if (content.length < CONTENT_MIN || overMax) {
       setContentError(true);
@@ -59,8 +92,7 @@ export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormP
     try {
       await createMutation.mutateAsync({ hiringProcessId, data });
       toast.success(t("savedToast"));
-      setTitle("");
-      setContent("");
+      draft.clear();
       setContentError(false);
       setTab("write");
       onSuccess?.();
@@ -70,6 +102,9 @@ export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormP
     }
   };
 
+  const formatClockAt = (at: number) =>
+    format.dateTime(new Date(at), { hour: "numeric", minute: "2-digit" });
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -77,39 +112,24 @@ export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormP
     >
       <h3 className="text-base font-medium text-text">{t("logInteraction")}</h3>
 
-      <div className="grid gap-2">
-        <Label htmlFor="interaction-title">
-          {t("title")} <span className="font-normal text-text-muted">{t("optional")}</span>
-        </Label>
-        <Input
-          id="interaction-title"
-          className="h-9"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder={t("titlePlaceholder")}
-          maxLength={100}
-        />
-      </div>
-
-      <div className="grid gap-2">
-        <Label htmlFor="interaction-type">{t("type")}</Label>
-        <Select value={type} onValueChange={(value) => setType(value as InteractionType)}>
-          <SelectTrigger id="interaction-type" className="h-9 w-full">
-            <SelectValue>{typeLabel(type)}</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {INTERACTION_TYPE_VALUES.map((value) => (
-              <SelectItem key={value} value={value}>
-                {typeLabel(value)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {draft.restoredFrom && (
+        <div className="flex items-center justify-between rounded-md border border-border bg-surface-2 px-3 py-2">
+          <span className="text-[13px] text-text-secondary">
+            {tCapture("draftRestored", { time: formatClockAt(draft.restoredFrom) })}
+          </span>
+          <button
+            type="button"
+            onClick={draft.discard}
+            className="text-[13px] font-medium text-text transition-colors hover:text-danger"
+          >
+            {tCapture("discard")}
+          </button>
+        </div>
+      )}
 
       <div className="grid gap-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor={INTERACTION_CONTENT_ID}>{t("content")}</Label>
+          <Label htmlFor={INTERACTION_CONTENT_ID}>{tCapture("notes")}</Label>
           <div className="flex rounded-md border border-border bg-surface-2 p-0.5">
             {(["write", "preview"] as const).map((mode) => (
               <button
@@ -128,18 +148,34 @@ export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormP
         </div>
 
         {tab === "write" ? (
-          <textarea
-            id={INTERACTION_CONTENT_ID}
-            value={content}
-            onChange={(e) => {
-              setContent(e.target.value);
-              if (contentError && e.target.value.length >= CONTENT_MIN) setContentError(false);
-            }}
-            placeholder={t("contentPlaceholder")}
-            className="mono min-h-[150px] w-full resize-y rounded-md border border-border bg-surface-2 px-3 py-2 text-[13px] leading-[1.65] text-text"
-          />
+          <div className="relative">
+            {slash.menu}
+            <textarea
+              ref={textareaRef}
+              id={INTERACTION_CONTENT_ID}
+              value={content}
+              onChange={(e) => {
+                setContent(e.target.value);
+                slash.detect(e.target);
+                if (contentError && e.target.value.length >= CONTENT_MIN) setContentError(false);
+              }}
+              onKeyDown={(e) => {
+                if (slash.handleKeyDown(e)) return;
+                if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                  e.preventDefault();
+                  handleSubmit();
+                }
+              }}
+              onPointerDown={(e) => {
+                e.currentTarget.dataset.touched = "1";
+              }}
+              placeholder={t("contentPlaceholder")}
+              style={{ maxHeight: "52vh" }}
+              className="mono min-h-[200px] w-full resize-none overflow-y-auto rounded-md border border-border bg-surface-2 px-3 py-2 text-[13px] leading-[1.65] text-text"
+            />
+          </div>
         ) : (
-          <div className="min-h-[150px] rounded-md border border-border bg-surface-2 px-3 py-2">
+          <div className="min-h-[200px] rounded-md border border-border bg-surface-2 px-3 py-2">
             {content.trim() ? (
               <MarkdownContent content={content} />
             ) : (
@@ -150,12 +186,46 @@ export function InteractionForm({ hiringProcessId, onSuccess }: InteractionFormP
 
         {contentError && <p className="text-xs text-danger">{t("contentMinError")}</p>}
 
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-text-muted">{t("markdownSupported")}</span>
-          <span className={cn("mono text-xs", overMax ? "text-danger" : "text-text-muted")}>
+        <div className="flex items-center justify-between gap-3">
+          <span className="truncate text-xs text-text-muted">
+            {tCapture("shortcutsHint")}
+            {draft.savedAt && (
+              <span className="mono">
+                {" · "}
+                {tCapture("draftSaved", { time: formatClockAt(draft.savedAt) })}
+              </span>
+            )}
+          </span>
+          <span
+            className={cn("mono shrink-0 text-xs", overMax ? "text-danger" : "text-text-muted")}
+          >
             {format.number(content.length)} / {format.number(CONTENT_MAX)}
           </span>
         </div>
+      </div>
+
+      {/* Classify at the end: Type + Title on one row */}
+      <div className="flex gap-2">
+        <Select value={type} onValueChange={(value) => handleTypeChange(value as InteractionType)}>
+          <SelectTrigger id="interaction-type" className="h-9 w-[150px] shrink-0">
+            <SelectValue>{typeLabel(type)}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {INTERACTION_TYPE_VALUES.map((value) => (
+              <SelectItem key={value} value={value}>
+                {typeLabel(value)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Input
+          id="interaction-title"
+          className="h-9 min-w-0 flex-1"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder={t("titlePlaceholder")}
+          maxLength={100}
+        />
       </div>
 
       <Button type="submit" disabled={createMutation.isPending} className="w-full">
