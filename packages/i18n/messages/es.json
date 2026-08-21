@@ -226,5 +226,40 @@
     "deleteAction": "Eliminar interacción",
     "deletedToast": "Interacción eliminada",
     "loadError": "No se pudieron cargar las interacciones"
+  },
+  "dashboard": {
+    "title": "Tus procesos",
+    "activeCount": "{count} activos",
+    "closedCount": "{count} cerrados",
+    "createProcess": "Crear proceso",
+    "statusFilterAll": "Estado: todos",
+    "statusFilterCount": "Estado: {count}",
+    "filterByStatus": "Filtrar por estado",
+    "salaryAll": "Todos los salarios",
+    "salaryDeclared": "Declarado",
+    "salaryNotDeclared": "No declarado",
+    "minSalary": "Mín",
+    "maxSalary": "Máx",
+    "clearFilters": "Limpiar filtros",
+    "columns": {
+      "company": "Empresa",
+      "jobTitle": "Puesto",
+      "status": "Estado",
+      "salary": "Salario",
+      "lastUpdate": "Última actualización"
+    },
+    "view": "Ver",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "emptyTitle": "Tu pipeline empieza aquí",
+    "emptyBody": "Agrega la primera empresa con la que estás hablando.",
+    "noMatchTitle": "Ningún proceso coincide",
+    "noMatchBody": "Prueba ampliar el filtro de estado o salario.",
+    "showing": "Mostrando {from} a {to} de {total}",
+    "noEntries": "Sin registros",
+    "rowsPerPage": "Filas por página",
+    "pageOf": "Página {page} de {pages}",
+    "loadError": "No pudimos cargar tus procesos. Revisa tu conexión e intenta de nuevo.",
+    "retry": "Reintentar"
   }
 }

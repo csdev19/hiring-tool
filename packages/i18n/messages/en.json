@@ -226,5 +226,40 @@
     "deleteAction": "Delete interaction",
     "deletedToast": "Interaction deleted",
     "loadError": "Couldn't load interactions"
+  },
+  "dashboard": {
+    "title": "Your processes",
+    "activeCount": "{count} active",
+    "closedCount": "{count} closed",
+    "createProcess": "Create process",
+    "statusFilterAll": "Status: all",
+    "statusFilterCount": "Status: {count}",
+    "filterByStatus": "Filter by status",
+    "salaryAll": "All salaries",
+    "salaryDeclared": "Declared",
+    "salaryNotDeclared": "Not declared",
+    "minSalary": "Min",
+    "maxSalary": "Max",
+    "clearFilters": "Clear filters",
+    "columns": {
+      "company": "Company",
+      "jobTitle": "Job title",
+      "status": "Status",
+      "salary": "Salary",
+      "lastUpdate": "Last update"
+    },
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "emptyTitle": "Your pipeline starts here",
+    "emptyBody": "Add the first company you're talking to.",
+    "noMatchTitle": "No processes match",
+    "noMatchBody": "Try widening the status or salary filter.",
+    "showing": "Showing {from} to {to} of {total}",
+    "noEntries": "No entries",
+    "rowsPerPage": "Rows per page",
+    "pageOf": "Page {page} of {pages}",
+    "loadError": "Couldn't load your processes. Check your connection and try again.",
+    "retry": "Retry"
   }
 }

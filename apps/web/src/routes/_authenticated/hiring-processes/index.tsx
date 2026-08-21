@@ -1,10 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -18,35 +14,64 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Label,
+  Skeleton,
+  TapuyMark,
 } from "@interviews-tool/web-ui";
 import {
   HIRING_PROCESS_STATUS_VALUES,
-  HIRING_PROCESS_STATUS_INFO,
+  getActiveStatuses,
+  getTerminalStatuses,
   type HiringProcessStatus,
 } from "@interviews-tool/domain/constants";
+import { useTranslations } from "@interviews-tool/i18n";
+import { useStatusLabel } from "@/lib/i18n-labels";
 import { InterviewTable } from "@/components/hiring-process/hiring-process-table";
-import { StatusBadge } from "@/components/hiring-process/status-badge";
-import { HiringProcessTableSkeleton } from "@/components/hiring-process/hiring-process-table-skeleton";
 import {
   useHiringProcesses,
   useDeleteHiringProcess,
   hiringProcessesQueryOptions,
   type FilterParams,
 } from "@/hooks/use-hiring-processes";
-import { Plus, Filter, X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { useState, useCallback } from "react";
+
+const ACTIVE_STATUSES = getActiveStatuses();
+const TERMINAL_STATUSES = getTerminalStatuses();
 
 export const Route = createFileRoute("/_authenticated/hiring-processes/")({
   loader: ({ context }) =>
-    context.queryClient.ensureQueryData(hiringProcessesQueryOptions({ page: 1, limit: 5 })),
+    context.queryClient.ensureQueryData(hiringProcessesQueryOptions({ page: 1, limit: 10 })),
   component: HiringProcessesComponent,
 });
 
+/* Skeleton — 40px bars over bg, no card */
+function TableSkeleton() {
+  return (
+    <div>
+      <div className="flex gap-16 border-b border-border pb-3">
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="h-3 w-40" />
+        <Skeleton className="h-3 w-20" />
+      </div>
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-16 border-b border-border py-3.5">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-4 w-56" />
+          <Skeleton className="h-5 w-24 rounded-[5px]" />
+          <Skeleton className="h-4 w-28" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function HiringProcessesComponent() {
+  const t = useTranslations("dashboard");
+  const statusLabel = useStatusLabel();
+
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 5,
+    pageSize: 10,
   });
 
   const [filters, setFilters] = useState<FilterParams>({});
@@ -71,11 +96,26 @@ function HiringProcessesComponent() {
     data: hiringProcessesData,
     isLoading,
     error,
+    refetch,
   } = useHiringProcesses({
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
     filters: hasActiveFilters ? filters : undefined,
   });
+
+  /* Active / closed counts for the header — lightweight total-only queries */
+  const { data: activeData } = useHiringProcesses({
+    page: 1,
+    limit: 1,
+    filters: { statuses: ACTIVE_STATUSES },
+  });
+  const { data: closedData } = useHiringProcesses({
+    page: 1,
+    limit: 1,
+    filters: { statuses: TERMINAL_STATUSES },
+  });
+  const activeCount = activeData?.meta?.pagination?.total;
+  const closedCount = closedData?.meta?.pagination?.total;
 
   const deleteHiringProcess = useDeleteHiringProcess();
 
@@ -96,173 +136,164 @@ function HiringProcessesComponent() {
 
   const hiringProcesses = hiringProcessesData?.data || [];
   const paginationMeta = hiringProcessesData?.meta?.pagination;
+  const isEmpty = !isLoading && !error && hiringProcesses.length === 0;
+  const selectedStatuses = filters.statuses?.length ?? 0;
+
+  /* First-run empty state: full-page invitation, single primary */
+  if (isEmpty && !hasActiveFilters) {
+    return (
+      <div className="container mx-auto flex max-w-6xl flex-col items-center px-4 pt-36 pb-24 text-center">
+        <TapuyMark mono className="size-14 text-text-muted" />
+        <h1 className="mt-8 text-2xl font-medium text-text">{t("emptyTitle")}</h1>
+        <p className="mt-2 text-base text-text-secondary">{t("emptyBody")}</p>
+        <Link to="/hiring-processes/new" className="mt-8">
+          <Button>{t("createProcess")}</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="container mx-auto max-w-6xl px-4 py-10">
+      {/* Page header */}
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">My Job Applications</h1>
-          <p className="text-muted-foreground mt-1">Manage your job applications</p>
+          <h1 className="text-[32px] leading-tight font-medium text-text">{t("title")}</h1>
+          {activeCount !== undefined && closedCount !== undefined && (
+            <p className="mono mt-2 text-sm text-text-muted">
+              {t("activeCount", { count: activeCount })} ·{" "}
+              {t("closedCount", { count: closedCount })}
+            </p>
+          )}
         </div>
-        <Link to="/hiring-processes/new">
-          <Button>
-            <Plus className="mr-2 size-4" />
-            Create Job Application
-          </Button>
+        <Link to="/hiring-processes/new" className="shrink-0">
+          <Button>{t("createProcess")}</Button>
         </Link>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>All Hiring Processes</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {/* Filters */}
-          <div className="mb-4 flex flex-wrap items-end gap-x-4 gap-y-3">
-            {/* Status multi-select */}
-            <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-muted-foreground">Status</Label>
-              <DropdownMenu>
-                <DropdownMenuTrigger className="border-input dark:bg-input/30 dark:hover:bg-input/50 focus-visible:border-ring focus-visible:ring-ring/50 inline-flex h-8 min-w-32 items-center gap-1.5 rounded-md border bg-transparent px-2.5 text-xs transition-colors focus-visible:ring-1">
-                  <Filter className="size-3.5 shrink-0" />
-                  {filters.statuses && filters.statuses.length > 0 ? (
-                    <span className="flex flex-1 flex-wrap items-center gap-1">
-                      {filters.statuses.slice(0, 3).map((status) => (
-                        <StatusBadge key={status} status={status} />
-                      ))}
-                      {filters.statuses.length > 3 && (
-                        <span className="text-muted-foreground text-xs">
-                          +{filters.statuses.length - 3}
-                        </span>
-                      )}
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground">All statuses</span>
-                  )}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-48">
-                  <DropdownMenuGroup>
-                    <DropdownMenuLabel>Filter by status</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {HIRING_PROCESS_STATUS_VALUES.map((status) => (
-                      <DropdownMenuCheckboxItem
-                        key={status}
-                        checked={filters.statuses?.includes(status) ?? false}
-                        onCheckedChange={() => toggleStatus(status)}
-                      >
-                        {HIRING_PROCESS_STATUS_INFO[status].label}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+      {/* Filters — compact, no accent */}
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-transparent px-3 text-sm text-text transition-colors hover:border-border-strong">
+            {selectedStatuses > 0
+              ? t("statusFilterCount", { count: selectedStatuses })
+              : t("statusFilterAll")}
+            <ChevronDown className="size-3.5 text-text-muted" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-52">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>{t("filterByStatus")}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {HIRING_PROCESS_STATUS_VALUES.map((status) => (
+                <DropdownMenuCheckboxItem
+                  key={status}
+                  checked={filters.statuses?.includes(status) ?? false}
+                  onCheckedChange={() => toggleStatus(status)}
+                >
+                  {statusLabel(status)}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-            {/* Salary declared filter */}
-            <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-muted-foreground">Salary</Label>
-              <Select
-                value={
-                  filters.salaryDeclared === undefined
-                    ? "all"
-                    : filters.salaryDeclared
-                      ? "declared"
-                      : "not-declared"
-                }
-                onValueChange={(value) => {
-                  if (!value || value === "all") {
-                    updateFilters({
-                      salaryDeclared: undefined,
-                      salaryMin: undefined,
-                      salaryMax: undefined,
-                    });
-                  } else {
-                    updateFilters({
-                      salaryDeclared: value === "declared",
-                      ...(value === "not-declared"
-                        ? { salaryMin: undefined, salaryMax: undefined }
-                        : {}),
-                    });
-                  }
-                }}
-              >
-                <SelectTrigger className="h-8 w-30">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="declared">Declared</SelectItem>
-                  <SelectItem value="not-declared">Not declared</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        <Select
+          value={
+            filters.salaryDeclared === undefined
+              ? "all"
+              : filters.salaryDeclared
+                ? "declared"
+                : "not-declared"
+          }
+          onValueChange={(value) => {
+            if (!value || value === "all") {
+              updateFilters({
+                salaryDeclared: undefined,
+                salaryMin: undefined,
+                salaryMax: undefined,
+              });
+            } else {
+              updateFilters({
+                salaryDeclared: value === "declared",
+                ...(value === "not-declared" ? { salaryMin: undefined, salaryMax: undefined } : {}),
+              });
+            }
+          }}
+        >
+          <SelectTrigger className="bg-transparent">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t("salaryAll")}</SelectItem>
+            <SelectItem value="declared">{t("salaryDeclared")}</SelectItem>
+            <SelectItem value="not-declared">{t("salaryNotDeclared")}</SelectItem>
+          </SelectContent>
+        </Select>
 
-            {/* Salary range (only when salaryDeclared === true) */}
-            {filters.salaryDeclared === true && (
-              <>
-                <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs text-muted-foreground">Min salary</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    placeholder="Min"
-                    className="h-8 w-28"
-                    value={filters.salaryMin ?? ""}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      updateFilters({
-                        salaryMin: val ? Number(val) : undefined,
-                      });
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs text-muted-foreground">Max salary</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    placeholder="Max"
-                    className="h-8 w-28"
-                    value={filters.salaryMax ?? ""}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      updateFilters({
-                        salaryMax: val ? Number(val) : undefined,
-                      });
-                    }}
-                  />
-                </div>
-              </>
-            )}
-
-            {/* Clear filters */}
-            {hasActiveFilters && (
-              <Button variant="ghost" size="sm" className="h-8" onClick={clearFilters}>
-                <X className="mr-1 size-3.5" />
-                Clear filters
-              </Button>
-            )}
-          </div>
-
-          {isLoading ? (
-            <HiringProcessTableSkeleton />
-          ) : error ? (
-            <div className="text-center py-12 text-destructive">
-              <p>Error loading hiring processes: {error.message}</p>
-            </div>
-          ) : (
-            <InterviewTable
-              interviews={hiringProcesses}
-              onDelete={handleDelete}
-              isDeleting={deleteHiringProcess.isPending}
-              pagination={pagination}
-              onPaginationChange={setPagination}
-              totalCount={paginationMeta?.total || 0}
-              isLoading={isLoading}
+        {filters.salaryDeclared === true && (
+          <>
+            <Input
+              type="number"
+              min={0}
+              placeholder={t("minSalary")}
+              className="mono h-9 w-24"
+              value={filters.salaryMin ?? ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                updateFilters({ salaryMin: val ? Number(val) : undefined });
+              }}
             />
-          )}
-        </CardContent>
-      </Card>
+            <Input
+              type="number"
+              min={0}
+              placeholder={t("maxSalary")}
+              className="mono h-9 w-24"
+              value={filters.salaryMax ?? ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                updateFilters({ salaryMax: val ? Number(val) : undefined });
+              }}
+            />
+          </>
+        )}
+
+        {hasActiveFilters && (
+          <Button variant="ghost" size="sm" onClick={clearFilters}>
+            <X className="size-3.5" />
+            {t("clearFilters")}
+          </Button>
+        )}
+      </div>
+
+      {/* Content */}
+      {isLoading ? (
+        <TableSkeleton />
+      ) : error ? (
+        <div className="py-20 text-center">
+          <p className="text-sm text-danger">{t("loadError")}</p>
+          <Button variant="secondary" size="sm" className="mt-4" onClick={() => refetch()}>
+            {t("retry")}
+          </Button>
+        </div>
+      ) : isEmpty ? (
+        <div className="py-20 text-center">
+          <p className="text-base font-medium text-text">{t("noMatchTitle")}</p>
+          <p className="mt-1 text-sm text-text-secondary">{t("noMatchBody")}</p>
+          <Button variant="ghost" size="sm" className="mt-4" onClick={clearFilters}>
+            {t("clearFilters")}
+          </Button>
+        </div>
+      ) : (
+        <InterviewTable
+          interviews={hiringProcesses}
+          onDelete={handleDelete}
+          isDeleting={deleteHiringProcess.isPending}
+          pagination={pagination}
+          onPaginationChange={setPagination}
+          totalCount={paginationMeta?.total || 0}
+          isLoading={isLoading}
+        />
+      )}
     </div>
   );
 }

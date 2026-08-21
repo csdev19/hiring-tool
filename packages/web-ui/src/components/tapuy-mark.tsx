@@ -7,7 +7,14 @@ import { cn } from "../lib/utils";
  * the mark. Canonical SVG sources live in apps/web/public and the brand
  * icon set (favicon, app icon, og-image) uses this same glyph.
  */
-function TapuyMark({ className, ...props }: React.ComponentProps<"svg">) {
+function TapuyMark({
+  className,
+  mono = false,
+  ...props
+}: React.ComponentProps<"svg"> & {
+  /** Monochrome variant (dot follows currentColor) — empty states, print. */
+  mono?: boolean;
+}) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -28,7 +35,7 @@ function TapuyMark({ className, ...props }: React.ComponentProps<"svg">) {
         strokeWidth="2.4"
         strokeLinecap="round"
       />
-      <circle cx="12" cy="12" r="1.9" fill="var(--mint)" />
+      <circle cx="12" cy="12" r="1.9" fill={mono ? "currentColor" : "var(--mint)"} />
     </svg>
   );
 }
