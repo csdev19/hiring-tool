@@ -37,50 +37,67 @@
   },
   "landing": {
     "hero": {
-      "titleLine1": "Track Your Job Applications",
-      "titleLine2": "All in One Place",
-      "subtitle": "Stay organized during your job search. Manage applications, track company details, and record every interaction in your hiring journey.",
-      "goToDashboard": "Go to Dashboard",
-      "getStarted": "Get Started",
-      "signIn": "Sign In"
+      "kicker": "Ask. Listen. Remember.",
+      "titlePlain": "Every question in the process,",
+      "titleEmphasis": "on record.",
+      "subtitle": "The interview log for people who want to remember.",
+      "description": "Open-source interview and hiring process tracker. Log every conversation, offer, and decision — from either side of the table.",
+      "createAccount": "Create account",
+      "signIn": "Sign in",
+      "openPipeline": "Open your pipeline"
     },
     "features": {
-      "heading": "Everything You Need to Manage Your Job Search",
-      "applicationTracking": {
-        "title": "Application Tracking",
-        "description": "Keep track of all your job applications with detailed status updates: ongoing, rejected, dropped-out, or hired."
+      "pipeline": {
+        "title": "Pipeline",
+        "description": "Eight statuses, from first contact to signed offer. Every process shows where it stands — no digging through email."
       },
-      "companyDetails": {
-        "title": "Company Details",
-        "description": "Store comprehensive company information including salary, benefits, location, website, and contact details."
+      "numbers": {
+        "title": "Numbers, not vibes",
+        "description": "Salary in figures with explicit currency. Stages counted. What they offered is what you compare."
       },
-      "interactionHistory": {
-        "title": "Interaction History",
-        "description": "Record every communication with companies during your hiring process to stay on top of your conversations."
-      },
-      "pipelineManagement": {
-        "title": "Pipeline Management",
-        "description": "Visualize your entire hiring pipeline and track progress through multiple interview stages."
-      },
-      "statusUpdates": {
-        "title": "Status Updates",
-        "description": "Quickly update application statuses and see at a glance where each opportunity stands."
-      },
-      "centralizedDashboard": {
-        "title": "Centralized Dashboard",
-        "description": "Access all your job applications from a clean, organized dashboard with powerful search and filtering."
+      "timeline": {
+        "title": "Timeline",
+        "description": "Every call, take-home and offer, logged in Markdown. What they said in the second call is leverage in the fifth."
       }
     },
-    "cta": {
-      "headingAuthenticated": "Your Dashboard Awaits",
-      "headingGuest": "Ready to Organize Your Job Search?",
-      "bodyAuthenticated": "Access your applications and continue tracking your hiring journey.",
-      "bodyGuest": "Join now and take control of your hiring journey. Start tracking your applications today.",
-      "goToDashboard": "Go to Dashboard",
-      "createFreeAccount": "Create Free Account"
+    "principles": {
+      "heading": "Five principles",
+      "one": {
+        "title": "Your side of the table",
+        "description": "Whoever keeps the record runs it. The model has no side — a candidate and a hiring team use the same one."
+      },
+      "two": {
+        "title": "Memory is leverage",
+        "description": "Remembering what they told you on the second call is negotiating power."
+      },
+      "three": {
+        "title": "Numbers, not vibes",
+        "description": "Salary in figures, currency explicit, stages counted. Data doesn't get dressed up."
+      },
+      "four": {
+        "title": "Calm by default",
+        "description": "No gamification, no confetti. A rejection is a status, not a failure. The interface never judges."
+      },
+      "five": {
+        "title": "Yours to run",
+        "description": "Open source, your data in your Postgres. Privacy is the premise."
+      }
+    },
+    "yoursToRun": {
+      "heading": "Yours to run",
+      "description": "Self-hosted and open source. Your negotiations live in your Postgres, not on someone else's server.",
+      "starOnGitHub": "Star on GitHub"
+    },
+    "finalCta": {
+      "heading": "Start the record.",
+      "description": "Add the first company you're talking to.",
+      "createAccount": "Create account",
+      "openPipeline": "Open your pipeline"
     },
     "footer": {
-      "tagline": "Hiring Tool - Manage your job applications with ease"
+      "tagline": "tapuy — every question in the process, on record",
+      "github": "GitHub",
+      "docs": "Docs"
     }
   },
   "statuses": {

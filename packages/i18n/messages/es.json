@@ -37,50 +37,67 @@
   },
   "landing": {
     "hero": {
-      "titleLine1": "Haz seguimiento de tus postulaciones",
-      "titleLine2": "Todo en un solo lugar",
-      "subtitle": "Mantente organizado durante tu búsqueda de empleo. Gestiona postulaciones, registra los detalles de cada empresa y anota cada interacción de tu proceso de contratación.",
-      "goToDashboard": "Ir al panel",
-      "getStarted": "Comenzar",
-      "signIn": "Iniciar sesión"
+      "kicker": "Pregunta. Escucha. Recuerda.",
+      "titlePlain": "Cada pregunta del proceso,",
+      "titleEmphasis": "registrada.",
+      "subtitle": "La bitácora de entrevistas para quienes quieren recordar.",
+      "description": "Tracker open source de procesos de contratación y entrevistas. Registra cada conversación, oferta y decisión, desde cualquier lado de la mesa.",
+      "createAccount": "Crear cuenta",
+      "signIn": "Iniciar sesión",
+      "openPipeline": "Abrir tu pipeline"
     },
     "features": {
-      "heading": "Todo lo que necesitas para gestionar tu búsqueda de empleo",
-      "applicationTracking": {
-        "title": "Seguimiento de postulaciones",
-        "description": "Haz seguimiento de todas tus postulaciones con estados detallados: en curso, rechazada, abandonada o contratado."
+      "pipeline": {
+        "title": "Pipeline",
+        "description": "Ocho estados, del primer contacto a la oferta firmada. Cada proceso muestra dónde está — sin buscar en el correo."
       },
-      "companyDetails": {
-        "title": "Detalles de la empresa",
-        "description": "Guarda información completa de cada empresa: salario, beneficios, ubicación, sitio web y datos de contacto."
+      "numbers": {
+        "title": "Números, no sensaciones",
+        "description": "Salario en cifras con moneda explícita. Etapas contadas. Lo que ofrecieron es lo que comparas."
       },
-      "interactionHistory": {
-        "title": "Historial de interacciones",
-        "description": "Registra cada comunicación con las empresas durante tu proceso de contratación para no perder el hilo de tus conversaciones."
-      },
-      "pipelineManagement": {
-        "title": "Gestión del pipeline",
-        "description": "Visualiza todo tu pipeline de contratación y sigue tu progreso a través de múltiples etapas de entrevistas."
-      },
-      "statusUpdates": {
-        "title": "Actualización de estados",
-        "description": "Actualiza rápidamente el estado de tus postulaciones y ve de un vistazo cómo va cada oportunidad."
-      },
-      "centralizedDashboard": {
-        "title": "Panel centralizado",
-        "description": "Accede a todas tus postulaciones desde un panel limpio y organizado con búsqueda y filtros potentes."
+      "timeline": {
+        "title": "Timeline",
+        "description": "Cada llamada, reto y oferta, registrados en Markdown. Lo que dijeron en la segunda llamada es ventaja en la quinta."
       }
     },
-    "cta": {
-      "headingAuthenticated": "Tu panel te espera",
-      "headingGuest": "¿Listo para organizar tu búsqueda de empleo?",
-      "bodyAuthenticated": "Accede a tus postulaciones y continúa el seguimiento de tu proceso.",
-      "bodyGuest": "Únete ahora y toma el control de tu proceso de contratación. Empieza a registrar tus postulaciones hoy.",
-      "goToDashboard": "Ir al panel",
-      "createFreeAccount": "Crear cuenta gratis"
+    "principles": {
+      "heading": "Cinco principios",
+      "one": {
+        "title": "Tu lado de la mesa",
+        "description": "Quien lleva el registro, manda. El modelo no tiene lado — un candidato y un equipo de contratación usan el mismo."
+      },
+      "two": {
+        "title": "La memoria es ventaja",
+        "description": "Recordar qué te dijeron en la segunda llamada es poder de negociación."
+      },
+      "three": {
+        "title": "Números, no sensaciones",
+        "description": "Salario en cifras, moneda explícita, etapas contadas. Los datos no se adornan."
+      },
+      "four": {
+        "title": "Calma por defecto",
+        "description": "Sin gamificación ni confeti. Un rechazo es un estado, no un fracaso. La interfaz nunca juzga."
+      },
+      "five": {
+        "title": "Tuyo de verdad",
+        "description": "Open source, tus datos en tu Postgres. La privacidad es la premisa."
+      }
+    },
+    "yoursToRun": {
+      "heading": "Tuyo de verdad",
+      "description": "Self-hosted y open source. Tus negociaciones viven en tu Postgres, no en el servidor de alguien más.",
+      "starOnGitHub": "Star en GitHub"
+    },
+    "finalCta": {
+      "heading": "Empieza el registro.",
+      "description": "Agrega la primera empresa con la que estás hablando.",
+      "createAccount": "Crear cuenta",
+      "openPipeline": "Abrir tu pipeline"
     },
     "footer": {
-      "tagline": "Hiring Tool - Gestiona tus postulaciones con facilidad"
+      "tagline": "tapuy — cada pregunta del proceso, registrada",
+      "github": "GitHub",
+      "docs": "Docs"
     }
   },
   "statuses": {
