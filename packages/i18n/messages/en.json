@@ -17,22 +17,33 @@
     "signOut": "Sign Out"
   },
   "auth": {
-    "welcomeBack": "Welcome Back",
-    "createAccount": "Create Account",
+    "tagline": "Ask. Listen. Remember.",
+    "signInTitle": "Sign in",
+    "signUpTitle": "Create your account",
+    "name": "Name",
     "email": "Email",
     "password": "Password",
-    "name": "Name",
-    "signIn": "Sign In",
-    "signUp": "Sign Up",
-    "submitting": "Submitting...",
-    "needAccount": "Need an account?",
+    "namePlaceholder": "Ana Torres",
+    "emailPlaceholder": "ana@acme.com",
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "signingIn": "Signing in…",
+    "creatingAccount": "Creating account…",
+    "noAccount": "No account?",
+    "createOne": "Create one",
     "alreadyHaveAccount": "Already have an account?",
-    "signInSuccess": "Sign in successful",
-    "signUpSuccess": "Sign up successful",
+    "signedIn": "Signed in",
+    "accountCreated": "Account created",
+    "errors": {
+      "signInFailed": "Couldn't sign you in. Check your connection and try again.",
+      "signUpFailed": "Couldn't create your account. Check your connection and try again.",
+      "emailTaken": "That email's already registered.",
+      "signInInstead": "Sign in instead."
+    },
     "validation": {
-      "invalidEmail": "Invalid email address",
-      "passwordMin": "Password must be at least 8 characters",
-      "nameMin": "Name must be at least 2 characters"
+      "invalidEmail": "Enter a valid email address.",
+      "passwordMin": "Password needs at least 8 characters.",
+      "nameMin": "Name needs at least 2 characters."
     }
   },
   "landing": {

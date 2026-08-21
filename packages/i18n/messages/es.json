@@ -17,22 +17,33 @@
     "signOut": "Cerrar sesión"
   },
   "auth": {
-    "welcomeBack": "Bienvenido de nuevo",
-    "createAccount": "Crear cuenta",
-    "email": "Correo electrónico",
-    "password": "Contraseña",
+    "tagline": "Pregunta. Escucha. Recuerda.",
+    "signInTitle": "Inicia sesión",
+    "signUpTitle": "Crea tu cuenta",
     "name": "Nombre",
+    "email": "Correo",
+    "password": "Contraseña",
+    "namePlaceholder": "Ana Torres",
+    "emailPlaceholder": "ana@acme.com",
     "signIn": "Iniciar sesión",
-    "signUp": "Registrarse",
-    "submitting": "Enviando...",
-    "needAccount": "¿Necesitas una cuenta?",
-    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
-    "signInSuccess": "Inicio de sesión exitoso",
-    "signUpSuccess": "Registro exitoso",
+    "createAccount": "Crear cuenta",
+    "signingIn": "Iniciando sesión…",
+    "creatingAccount": "Creando cuenta…",
+    "noAccount": "¿No tienes cuenta?",
+    "createOne": "Crea una",
+    "alreadyHaveAccount": "¿Ya tienes cuenta?",
+    "signedIn": "Sesión iniciada",
+    "accountCreated": "Cuenta creada",
+    "errors": {
+      "signInFailed": "No pudimos iniciar tu sesión. Revisa tu conexión e intenta de nuevo.",
+      "signUpFailed": "No pudimos crear tu cuenta. Revisa tu conexión e intenta de nuevo.",
+      "emailTaken": "Ese correo ya está registrado.",
+      "signInInstead": "Inicia sesión."
+    },
     "validation": {
-      "invalidEmail": "Correo electrónico inválido",
-      "passwordMin": "La contraseña debe tener al menos 8 caracteres",
-      "nameMin": "El nombre debe tener al menos 2 caracteres"
+      "invalidEmail": "Ingresa un correo válido.",
+      "passwordMin": "La contraseña necesita al menos 8 caracteres.",
+      "nameMin": "El nombre necesita al menos 2 caracteres."
     }
   },
   "landing": {
