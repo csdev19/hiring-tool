@@ -26,18 +26,19 @@ export function formatDuration(seconds: number): string | null {
 }
 
 /* Slash menu items — insertion snippets. `id` doubles as the i18n key
-   under capture.slash.* */
+   under capture.slash.*; `hint` is the mono glyph shown right-aligned. */
 export interface SlashItem {
   id: "timestamp" | "question" | "figure" | "nextStep" | "followUp";
+  hint: string;
   insert: () => string;
 }
 
 export const SLASH_ITEMS: SlashItem[] = [
-  { id: "timestamp", insert: () => `**${formatClock()}** ` },
-  { id: "question", insert: () => "**Q:** " },
-  { id: "figure", insert: () => "`$` " },
-  { id: "nextStep", insert: () => "**Next step:** " },
-  { id: "followUp", insert: () => "- [ ] " },
+  { id: "timestamp", hint: "hh:mm", insert: () => `**${formatClock()}** ` },
+  { id: "question", hint: "Q:", insert: () => "**Q:** " },
+  { id: "figure", hint: "`$`", insert: () => "`$` " },
+  { id: "nextStep", hint: "→", insert: () => "**Next step:** " },
+  { id: "followUp", hint: "- [ ]", insert: () => "- [ ] " },
 ];
 
 /* Type templates — inserted only when the writing area is empty.

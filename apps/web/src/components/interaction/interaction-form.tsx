@@ -16,7 +16,8 @@ import { INTERACTION_TYPE_VALUES, type InteractionType } from "@interviews-tool/
 import { useCreateInteraction, type CreateInteractionInput } from "@/hooks/use-interactions";
 import { useInteractionTypeLabel } from "@/lib/i18n-labels";
 import { useSlashMenu } from "./slash-menu";
-import { TYPE_TEMPLATES } from "@/lib/capture";
+import { EditorToolbar, useMdEditing } from "./editor-toolbar";
+import { TYPE_TEMPLATES, formatClock } from "@/lib/capture";
 import type { InteractionDraftState } from "@/lib/interaction-draft";
 import { toast } from "sonner";
 
@@ -49,6 +50,12 @@ export function InteractionForm({ hiringProcessId, draft, onSuccess }: Interacti
   const overMax = content.length > CONTENT_MAX;
 
   const slash = useSlashMenu({
+    value: content,
+    onValueChange: setContent,
+    textareaRef,
+  });
+
+  const md = useMdEditing({
     value: content,
     onValueChange: setContent,
     textareaRef,
@@ -110,7 +117,14 @@ export function InteractionForm({ hiringProcessId, draft, onSuccess }: Interacti
       onSubmit={handleSubmit}
       className="grid gap-4 rounded-xl border border-border bg-surface p-5"
     >
-      <h3 className="text-base font-medium text-text">{t("logInteraction")}</h3>
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="text-base font-medium text-text">{t("logInteraction")}</h3>
+        {draft.savedAt && (
+          <span className="mono truncate text-xs text-text-muted">
+            {tCapture("draftSaved", { time: formatClockAt(draft.savedAt) })}
+          </span>
+        )}
+      </div>
 
       {draft.restoredFrom && (
         <div className="flex items-center justify-between rounded-md border border-border bg-surface-2 px-3 py-2">
@@ -150,29 +164,45 @@ export function InteractionForm({ hiringProcessId, draft, onSuccess }: Interacti
         {tab === "write" ? (
           <div className="relative">
             {slash.menu}
-            <textarea
-              ref={textareaRef}
-              id={INTERACTION_CONTENT_ID}
-              value={content}
-              onChange={(e) => {
-                setContent(e.target.value);
-                slash.detect(e.target);
-                if (contentError && e.target.value.length >= CONTENT_MIN) setContentError(false);
-              }}
-              onKeyDown={(e) => {
-                if (slash.handleKeyDown(e)) return;
-                if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-                  e.preventDefault();
-                  handleSubmit();
-                }
-              }}
-              onPointerDown={(e) => {
-                e.currentTarget.dataset.touched = "1";
-              }}
-              placeholder={t("contentPlaceholder")}
-              style={{ maxHeight: "52vh" }}
-              className="mono min-h-[200px] w-full resize-none overflow-y-auto rounded-md border border-border bg-surface-2 px-3 py-2 text-[13px] leading-[1.65] text-text"
-            />
+            <div className="rounded-md border border-border bg-surface-2">
+              <EditorToolbar run={md.run} className="border-b border-border px-1.5 py-1">
+                <button
+                  type="button"
+                  title={t("type")}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    slash.insertSnippet(`**${formatClock()}** `);
+                  }}
+                  className="mono ml-1 flex h-7 items-center rounded-[5px] border-l border-border px-2.5 pl-3 text-[12px] text-text-secondary transition-colors hover:text-text"
+                >
+                  {formatClock()}
+                </button>
+              </EditorToolbar>
+              <textarea
+                ref={textareaRef}
+                id={INTERACTION_CONTENT_ID}
+                value={content}
+                onChange={(e) => {
+                  setContent(e.target.value);
+                  slash.detect(e.target);
+                  if (contentError && e.target.value.length >= CONTENT_MIN) setContentError(false);
+                }}
+                onKeyDown={(e) => {
+                  if (slash.handleKeyDown(e)) return;
+                  if (md.handleKeyDown(e)) return;
+                  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit();
+                  }
+                }}
+                onPointerDown={(e) => {
+                  e.currentTarget.dataset.touched = "1";
+                }}
+                placeholder={t("contentPlaceholder")}
+                style={{ maxHeight: "52vh" }}
+                className="mono block min-h-[200px] w-full resize-none overflow-y-auto rounded-b-md border-0 bg-transparent px-3 py-2 text-[13px] leading-[1.65] text-text outline-none [caret-color:var(--mint)] focus-visible:shadow-none"
+              />
+            </div>
           </div>
         ) : (
           <div className="min-h-[200px] rounded-md border border-border bg-surface-2 px-3 py-2">
@@ -187,15 +217,7 @@ export function InteractionForm({ hiringProcessId, draft, onSuccess }: Interacti
         {contentError && <p className="text-xs text-danger">{t("contentMinError")}</p>}
 
         <div className="flex items-center justify-between gap-3">
-          <span className="truncate text-xs text-text-muted">
-            {tCapture("shortcutsHint")}
-            {draft.savedAt && (
-              <span className="mono">
-                {" · "}
-                {tCapture("draftSaved", { time: formatClockAt(draft.savedAt) })}
-              </span>
-            )}
-          </span>
+          <span className="truncate text-xs text-text-muted">{tCapture("shortcutsHint")}</span>
           <span
             className={cn("mono shrink-0 text-xs", overMax ? "text-danger" : "text-text-muted")}
           >

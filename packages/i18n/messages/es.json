@@ -273,7 +273,7 @@
     "draftRestored": "Borrador restaurado de {time}",
     "discard": "Descartar",
     "notes": "Notas",
-    "shortcutsHint": "/ para atajos · ⌘↵ para guardar",
+    "shortcutsHint": "⌘B negrita · ⌘K link · / atajos · ⌘↵ guardar",
     "quickCapturePlaceholder": "¿Qué acaba de pasar? Enter registra una nota",
     "log": "Registrar",
     "templateInserted": "Plantilla insertada",
@@ -300,6 +300,15 @@
       "figure": "Cifra",
       "nextStep": "Siguiente paso",
       "followUp": "Hacer seguimiento"
+    },
+    "toolbar": {
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "code": "Código",
+      "heading": "Título",
+      "bullet": "Lista",
+      "checkbox": "Casilla",
+      "link": "Enlace"
     }
   }
 }

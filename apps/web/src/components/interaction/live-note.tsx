@@ -11,6 +11,7 @@ import { useInteractionTypeLabel } from "@/lib/i18n-labels";
 import { SLASH_ITEMS, excerpt, formatDuration, formatTimer } from "@/lib/capture";
 import type { InteractionDraftState } from "@/lib/interaction-draft";
 import { useSlashMenu } from "./slash-menu";
+import { EditorToolbar, useMdEditing } from "./editor-toolbar";
 import { QuestionsPanel } from "./questions-panel";
 
 const CONTENT_MIN = 10;
@@ -61,7 +62,12 @@ export function LiveNote({
     value: content,
     onValueChange: setContent,
     textareaRef,
-    menuClassName: "bottom-4 left-7 mb-0",
+  });
+
+  const md = useMdEditing({
+    value: content,
+    onValueChange: setContent,
+    textareaRef,
   });
 
   /* Timer */
@@ -193,6 +199,10 @@ export function LiveNote({
                 e.stopPropagation();
                 return;
               }
+              if (md.handleKeyDown(e)) {
+                e.stopPropagation();
+                return;
+              }
               if (e.key === "Escape") return; /* bubbles to the overlay: close */
               if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
                 e.preventDefault();
@@ -207,14 +217,19 @@ export function LiveNote({
             className="mono w-full flex-1 resize-none border-0 bg-transparent p-7 text-[15px] leading-[1.8] text-text outline-none [caret-color:var(--mint)] focus-visible:shadow-none"
           />
 
-          {/* Quick-insert chips */}
+          {/* Markdown controls + quick-insert chips */}
           <div className="flex shrink-0 flex-wrap items-center gap-2 px-7 pb-5">
+            <EditorToolbar
+              run={md.run}
+              actions={["bold", "italic", "code", "bullet", "checkbox"]}
+              className="mr-2 gap-1 [&>button]:h-[30px] [&>button]:min-w-[30px] [&>button]:rounded-md [&>button]:border [&>button]:border-border [&>button]:hover:border-border-strong"
+            />
             {SLASH_ITEMS.slice(0, 4).map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => slash.insertSnippet(item.insert())}
-                className="rounded-md border border-border bg-transparent px-2.5 py-1 text-xs text-text-secondary transition-colors hover:border-border-strong hover:text-text"
+                className="h-[30px] rounded-md border border-border bg-transparent px-2.5 text-xs text-text-secondary transition-colors hover:border-border-strong hover:text-text"
               >
                 {t(`slash.${item.id}`)}
               </button>
