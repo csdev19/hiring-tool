@@ -1,14 +1,18 @@
 import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@interviews-tool/web-ui";
+import { useTranslations } from "@interviews-tool/i18n";
 
 interface DeleteConfirmDialogProps {
   companyName: string;
+  /** When unknown (e.g. from the table), the confirmation omits the count. */
+  interactionCount?: number;
   onConfirm: () => void;
   onCancel: () => void;
   isDeleting?: boolean;
@@ -16,31 +20,35 @@ interface DeleteConfirmDialogProps {
 
 export function DeleteConfirmDialog({
   companyName,
+  interactionCount,
   onConfirm,
   onCancel,
   isDeleting = false,
 }: DeleteConfirmDialogProps) {
+  const t = useTranslations("process");
+  const tCommon = useTranslations("common");
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Delete Interview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Are you sure you want to delete the interview with{" "}
-            <span className="font-semibold">{companyName}</span>? This action cannot be undone.
-          </p>
-        </CardContent>
-        <CardFooter className="gap-2 justify-end">
-          <Button variant="outline" onClick={onCancel} disabled={isDeleting}>
-            Cancel
-          </Button>
-          <Button variant="destructive" onClick={onConfirm} disabled={isDeleting}>
-            {isDeleting ? "Deleting..." : "Delete"}
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+    <AlertDialog open onOpenChange={(open) => !open && onCancel()}>
+      <AlertDialogContent className="rounded-xl border-border-strong bg-surface p-6">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-base font-medium">
+            {interactionCount === undefined
+              ? t("deleteConfirmSimple", { company: companyName })
+              : t("deleteConfirm", { company: companyName, count: interactionCount })}
+          </AlertDialogTitle>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isDeleting}>{tCommon("cancel")}</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className="bg-status-rejected-bg text-status-rejected-text hover:bg-danger"
+          >
+            {t("deleteAction")}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
