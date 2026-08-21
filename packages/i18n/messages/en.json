@@ -269,7 +269,7 @@
     "pageOf": "Page {page} of {pages}",
     "loadError": "Couldn't load your processes. Check your connection and try again.",
     "retry": "Retry",
-    "liveTip": "On a call? Open a process and hit <kbd>⌘L</kbd> for live notes.",
+    "liveTip": "On a call? Open a process and hit <kbd>L</kbd> for live notes.",
     "liveNote": "Live note"
   },
   "capture": {

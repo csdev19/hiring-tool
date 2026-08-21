@@ -269,7 +269,7 @@
     "pageOf": "Página {page} de {pages}",
     "loadError": "No pudimos cargar tus procesos. Revisa tu conexión e intenta de nuevo.",
     "retry": "Reintentar",
-    "liveTip": "¿En una llamada? Abre un proceso y presiona <kbd>⌘L</kbd> para notas en vivo.",
+    "liveTip": "¿En una llamada? Abre un proceso y presiona <kbd>L</kbd> para notas en vivo.",
     "liveNote": "Nota en vivo"
   },
   "capture": {

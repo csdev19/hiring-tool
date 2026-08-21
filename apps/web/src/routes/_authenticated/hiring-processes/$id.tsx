@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useHotkey } from "@tanstack/react-hotkeys";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
@@ -111,17 +112,10 @@ function HiringProcessDetailPage() {
     }
   };
 
-  /* ⌘L / Ctrl+L opens live mode from anywhere on the page */
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "l") {
-        e.preventDefault();
-        setLiveOpen(true);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  /* L opens live mode from anywhere on the page. A bare key (Linear-style)
+     because browsers reserve ⌘L for the address bar; ignoreInputs defaults
+     to true for single keys, so typing in the notepad never triggers it. */
+  useHotkey("L", () => setLiveOpen(true));
 
   const interactions = interactionsData?.data ?? [];
   const interactionCount = interactions.length;
@@ -447,7 +441,9 @@ function HiringProcessDetailPage() {
               </p>
               <Button className="mt-4 w-full gap-2.5" onClick={() => setLiveOpen(true)}>
                 {tCapture("startLiveNote")}
-                <kbd className="mono text-xs font-normal opacity-60">⌘L</kbd>
+                <kbd className="mono rounded border border-mint-on/30 px-1.5 text-xs font-normal opacity-70">
+                  L
+                </kbd>
               </Button>
             </section>
             <InteractionForm hiringProcessId={id} draft={draft} />
