@@ -68,9 +68,11 @@ jobs:
             DATABASE_URL
             DATABASE_URL_DIRECT
             BETTER_AUTH_SECRET
+            BETTER_AUTH_URL
             CORS_ORIGIN
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_URL_DIRECT: ${{ secrets.DATABASE_URL_DIRECT }}
           CORS_ORIGIN: ${{ vars.CORS_ORIGIN }}
+          BETTER_AUTH_URL: ${{ vars.BETTER_AUTH_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
