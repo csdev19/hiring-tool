@@ -16,8 +16,8 @@
 - **Un solo botón primario**: `Create process` (menta). Todo lo demás secondary/ghost. Los tres icon-buttons de acciones por fila quedan ghost, visibles solo on-hover de la fila si el diseño lo prefiere.
 - Badges de estado según sistema: activos tintados con borde, terminales sólidos, sentence case ("First contact", "On hold").
 - La menta aparece en ≤3 puntos en toda la vista (logo del header, botón primario, focus/selección). Los filtros no llevan acento.
-- **Empty state del dashboard** (hoy es el más débil; copy literal): **Your pipeline starts here** / *Add the first company you're talking to.* / `Create process`. Merece composición propia (es lo primero que ve un usuario nuevo), pero sin ilustración estridente — puede usar el símbolo del logo en `text-muted`.
-- Empty de filtros: **No processes match** / *Try widening the status or salary filter.* / `Clear filters`.
+- **Empty state del dashboard** (hoy es el más débil; copy literal): **Your pipeline starts here** / _Add the first company you're talking to._ / `Create process`. Merece composición propia (es lo primero que ve un usuario nuevo), pero sin ilustración estridente — puede usar el símbolo del logo en `text-muted`.
+- Empty de filtros: **No processes match** / _Try widening the status or salary filter._ / `Clear filters`.
 - Diálogo de borrado con el copy canónico (nombra empresa + nº de interacciones).
 
 ## Copy actual → nuevo

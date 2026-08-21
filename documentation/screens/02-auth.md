@@ -10,9 +10,9 @@
 
 ## Directivas Tapuy
 
-- Primera pantalla "propia" que ve un usuario: aquí se presenta la marca. Columna centrada sobre `bg` con el **lockup** (símbolo + "tapuy") arriba del form; opcionalmente el tagline *Ask. Listen. Remember.* en `text-secondary`. No hace falta split-screen ni ilustración: la sobriedad es la marca.
+- Primera pantalla "propia" que ve un usuario: aquí se presenta la marca. Columna centrada sobre `bg` con el **lockup** (símbolo + "tapuy") arriba del form; opcionalmente el tagline _Ask. Listen. Remember._ en `text-secondary`. No hace falta split-screen ni ilustración: la sobriedad es la marca.
 - Card del form sobre `surface` (o form directo sobre `bg` con inputs `surface-2`); un solo botón primario (submit).
-- Errores inline en danger (`#E05252` dark), no `text-red-500` genérico. Error de email duplicado con el copy canónico: *That email's already registered. Sign in instead.* (con link).
+- Errores inline en danger (`#E05252` dark), no `text-red-500` genérico. Error de email duplicado con el copy canónico: _That email's already registered. Sign in instead._ (con link).
 - Focus ring menta = el acento de la vista.
 - Sin exclamaciones, sin "Welcome back!" con signo.
 

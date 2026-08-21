@@ -1,6 +1,6 @@
 # Brand Brief — insumos para nombre, filosofía e identidad
 
-Este archivo es el material para la sesión de branding con Claude. No define la marca: reúne lo que la app *ya es* para que el nombre y la filosofía salgan de ahí y no de un moodboard genérico.
+Este archivo es el material para la sesión de branding con Claude. No define la marca: reúne lo que la app _ya es_ para que el nombre y la filosofía salgan de ahí y no de un moodboard genérico.
 
 ## Dirección estratégica (decidida, 2026-08)
 
@@ -17,8 +17,8 @@ Consecuencias para la marca:
 
 **Es la memoria y el mapa de tu búsqueda de trabajo.** Dos verdades que la app ya expresa en su UI:
 
-1. **Del lado del candidato.** Todo ATS existente (Greenhouse, Lever, Workable) es para el que contrata. Esta app invierte la perspectiva: el candidato es quien gestiona *su* pipeline de empresas. Las empresas son filas en *tu* tabla.
-2. **La memoria vale oro.** El empty state del timeline lo dice: *"Start by logging your first meeting or note. It will help future you remember why this mattered."* El producto apuesta a que documentar cada interacción (con Markdown, con tipos, con fechas) te da ventaja: negocias mejor, comparas mejor, no te pierden los hilos.
+1. **Del lado del candidato.** Todo ATS existente (Greenhouse, Lever, Workable) es para el que contrata. Esta app invierte la perspectiva: el candidato es quien gestiona _su_ pipeline de empresas. Las empresas son filas en _tu_ tabla.
+2. **La memoria vale oro.** El empty state del timeline lo dice: _"Start by logging your first meeting or note. It will help future you remember why this mattered."_ El producto apuesta a que documentar cada interacción (con Markdown, con tipos, con fechas) te da ventaja: negocias mejor, comparas mejor, no te pierden los hilos.
 
 ## Emociones del contexto de uso
 

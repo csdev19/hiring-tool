@@ -18,9 +18,9 @@ Ver todo lo de un proceso y registrar interacciones sin fricción. Estructura ac
 - Badges de tipo de interacción: mismo lenguaje que los de estado (sentence case, sin ícono dentro del badge — los íconos lucide actuales se eliminan del badge; pueden vivir en el nodo o desaparecer).
 - **Un solo botón primario en la vista**: el submit del form (`Log interaction`). Edit/Delete del proceso son ghost/secondary; Delete con hover danger.
 - Salario en Geist Mono, protagonismo visual dentro del grid de datos (es el dato estrella).
-- Empty state del timeline (copy literal): **Nothing logged yet** / *Write down what happened. Future you will thank you.* / `Log first interaction`.
+- Empty state del timeline (copy literal): **Nothing logged yet** / _Write down what happened. Future you will thank you._ / `Log first interaction`.
 - Toasts canónicos: `Interaction saved` · `Marked as rejected. The notes stay.`
-- Confirmación de borrado: *Delete {company} and its {n} interactions? This can't be undone.* → `Delete process` / `Cancel`.
+- Confirmación de borrado: _Delete {company} and its {n} interactions? This can't be undone._ → `Delete process` / `Cancel`.
 - Sin celebración al pasar a hired; el badge verde sólido es todo el mensaje.
 - El editor Markdown (`@uiw/react-md-editor`) debe tematizarse con los tokens (hoy trae estilos propios light/dark duplicados); si el diseño propone reemplazarlo por un textarea con preview, mejor.
 

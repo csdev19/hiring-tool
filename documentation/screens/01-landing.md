@@ -23,7 +23,7 @@
 ## Copy (canónico, usar literal)
 
 - H1: **Every question in the process, on record.**
-- Subtítulo: *The interview log for people who want to remember.*
-- Descripción: la del About de GitHub (*Open-source interview and hiring process tracker. Log every conversation, offer, and decision — from either side of the table.*)
+- Subtítulo: _The interview log for people who want to remember._
+- Descripción: la del About de GitHub (_Open-source interview and hiring process tracker. Log every conversation, offer, and decision — from either side of the table._)
 - CTAs: **Create account** (primario) · **Sign in** (secundario) · **Star on GitHub** (secundario persistente). Con sesión: **Open your pipeline**.
 - Prohibido en esta página: "job hunt", "land your dream job", "supercharge", exclamaciones.

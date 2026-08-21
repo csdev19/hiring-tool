@@ -1,19 +1,19 @@
 # Tapuy — Documentación de diseño (handoff a Claude Design)
 
-Marca cerrada (2026-08): **Tapuy** (quechua: *preguntar*). Estos docs fusionan la identidad ya decidida con la estructura funcional real de cada pantalla, para que Claude Design produzca los mockups/rediseños sin re-litigar decisiones.
+Marca cerrada (2026-08): **Tapuy** (quechua: _preguntar_). Estos docs fusionan la identidad ya decidida con la estructura funcional real de cada pantalla, para que Claude Design produzca los mockups/rediseños sin re-litigar decisiones.
 
 ## Archivos
 
-| Archivo | Qué contiene | Cuándo pasarlo |
-| --- | --- | --- |
-| [01-brand.md](./01-brand.md) | Nombre, posicionamiento, principios, voz y microcopy canónico | Siempre, junto a cualquier pantalla |
-| [02-visual-system.md](./02-visual-system.md) | Paleta, reglas de dosificación, tipografía, logo, specs de componentes, tokens | Siempre, junto a cualquier pantalla |
-| [screens/01-landing.md](./screens/01-landing.md) | Brief de rediseño de la landing | Al diseñar esa pantalla |
-| [screens/02-auth.md](./screens/02-auth.md) | Login / Signup | ídem |
-| [screens/03-dashboard.md](./screens/03-dashboard.md) | Dashboard (tabla + filtros) | ídem |
-| [screens/04-process-detail.md](./screens/04-process-detail.md) | Detalle + timeline (pantalla escaparate) | ídem |
-| [screens/05-create-edit.md](./screens/05-create-edit.md) | Formularios crear/editar | ídem |
-| [screens/06-mobile.md](./screens/06-mobile.md) | App Expo completa | ídem |
+| Archivo                                                        | Qué contiene                                                                   | Cuándo pasarlo                      |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------- |
+| [01-brand.md](./01-brand.md)                                   | Nombre, posicionamiento, principios, voz y microcopy canónico                  | Siempre, junto a cualquier pantalla |
+| [02-visual-system.md](./02-visual-system.md)                   | Paleta, reglas de dosificación, tipografía, logo, specs de componentes, tokens | Siempre, junto a cualquier pantalla |
+| [screens/01-landing.md](./screens/01-landing.md)               | Brief de rediseño de la landing                                                | Al diseñar esa pantalla             |
+| [screens/02-auth.md](./screens/02-auth.md)                     | Login / Signup                                                                 | ídem                                |
+| [screens/03-dashboard.md](./screens/03-dashboard.md)           | Dashboard (tabla + filtros)                                                    | ídem                                |
+| [screens/04-process-detail.md](./screens/04-process-detail.md) | Detalle + timeline (pantalla escaparate)                                       | ídem                                |
+| [screens/05-create-edit.md](./screens/05-create-edit.md)       | Formularios crear/editar                                                       | ídem                                |
+| [screens/06-mobile.md](./screens/06-mobile.md)                 | App Expo completa                                                              | ídem                                |
 
 ## Cómo usarlos con Claude Design
 

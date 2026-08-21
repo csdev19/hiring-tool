@@ -15,15 +15,18 @@ Columna centrada `max-w-2xl`:
 2. **Card "Hiring Process Details"** con el formulario:
 
 ### Campos principales
-| Campo | Tipo | Notas |
-| --- | --- | --- |
-| Company Name * | Input | único requerido; error inline |
-| Job Title | Input | placeholder con ejemplos tech |
-| Status * | `<select>` nativo | 8 estados ordenados por `order`; default First Contact |
+
+| Campo                    | Tipo                | Notas                                                                                                                                 |
+| ------------------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Company Name \*          | Input               | único requerido; error inline                                                                                                         |
+| Job Title                | Input               | placeholder con ejemplos tech                                                                                                         |
+| Status \*                | `<select>` nativo   | 8 estados ordenados por `order`; default First Contact                                                                                |
 | Salary + rate + currency | fila de 3 controles | Input numérico (máx 25.000) + select Monthly/Hourly + select USD/PEN; el label cambia según tarifa ("Monthly Salary" / "Hourly Rate") |
 
 ### Sección colapsable "Company Details (Optional)"
+
 Toggle con chevron (se auto-abre en edit si hay website/location):
+
 - Website (url), Location ("City, Country"), Benefits (textarea 3 filas), Contacted Via (select: LinkedIn/Email/Facebook/Other), Contact Person ("@username or name"), Hiring Process Steps (número).
 - Solo se envía si al menos un campo tiene valor.
 

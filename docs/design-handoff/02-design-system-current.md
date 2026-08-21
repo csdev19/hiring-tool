@@ -2,7 +2,7 @@
 
 ## Diagnóstico honesto
 
-La app funciona end-to-end pero visualmente es "shadcn por defecto": tokens neutros (`background`, `muted`, `primary`), tipografía del sistema, cero identidad. Nada está roto — está *sin diseñar*. Todo el layout y la jerarquía funcional ya existen; lo que falta es una capa de identidad encima.
+La app funciona end-to-end pero visualmente es "shadcn por defecto": tokens neutros (`background`, `muted`, `primary`), tipografía del sistema, cero identidad. Nada está roto — está _sin diseñar_. Todo el layout y la jerarquía funcional ya existen; lo que falta es una capa de identidad encima.
 
 ## Sistema de componentes actual
 
@@ -26,16 +26,16 @@ Paquete propio `@interviews-tool/web-ui` (estilo shadcn sobre Tailwind CSS 4 + B
 
 Los colores canónicos viven en el dominio (`HIRING_PROCESS_STATUS_INFO.color`, hex) y la web los **duplica** con clases Tailwind en `status-badge.tsx`. Dos fuentes de verdad:
 
-| Estado | Hex (dominio, usa móvil) | Tailwind (web badge) |
-| --- | --- | --- |
-| first-contact | `#8b5cf6` | purple-100/800 |
-| ongoing | `#3b82f6` | blue-100/800 |
-| on-hold | `#f59e0b` | yellow-100/800 |
-| offer-made | `#06b6d4` | cyan-100/800 |
-| offer-accepted | `#10b981` | emerald-100/800 |
-| hired | `#22c55e` | green-100/800 |
-| rejected | `#ef4444` | red-100/800 |
-| dropped-out | `#6b7280` | gray-100/800 |
+| Estado         | Hex (dominio, usa móvil) | Tailwind (web badge) |
+| -------------- | ------------------------ | -------------------- |
+| first-contact  | `#8b5cf6`                | purple-100/800       |
+| ongoing        | `#3b82f6`                | blue-100/800         |
+| on-hold        | `#f59e0b`                | yellow-100/800       |
+| offer-made     | `#06b6d4`                | cyan-100/800         |
+| offer-accepted | `#10b981`                | emerald-100/800      |
+| hired          | `#22c55e`                | green-100/800        |
+| rejected       | `#ef4444`                | red-100/800          |
+| dropped-out    | `#6b7280`                | gray-100/800         |
 
 Al definir la paleta de marca, estos 8 colores deben rediseñarse como familia coherente (misma saturación/luminosidad percibida, legibles en light y dark) y unificarse en una sola fuente de verdad en el dominio.
 

@@ -13,12 +13,14 @@ Ver todo el pipeline de procesos de un vistazo, filtrarlo, y entrar/editar/borra
 2. **Card "All Hiring Processes"** que contiene filtros + tabla:
 
 ### Filtros (fila superior, compactos h-8)
+
 - **Status**: dropdown multi-select con checkboxes de los 8 estados; el trigger muestra hasta 3 `StatusBadge` seleccionados + contador "+N".
 - **Salary**: select All / Declared / Not declared.
 - **Min/Max salary**: inputs numéricos, solo visibles cuando Salary = Declared.
 - **Clear filters**: botón ghost con ✕, solo visible con filtros activos. Cambiar filtros resetea a página 1.
 
 ### Tabla (TanStack Table, paginación server-side)
+
 Columnas:
 | Columna | Contenido | Sortable |
 | --- | --- | --- |
@@ -33,6 +35,7 @@ Columnas:
 - Indicador de sort: flecha ↑/↓ textual.
 
 ### Paginación (pie de tabla)
+
 - "Showing X to Y of Z entries" a la izquierda.
 - "Rows per page" (5/10/20/50, default 5) + botones first/prev/página "N of M"/next/last a la derecha.
 

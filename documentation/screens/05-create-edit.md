@@ -4,7 +4,7 @@
 
 ## Función (se conserva)
 
-- Campos principales: **Company name*** (único requerido) · Job title · Status (8 opciones ordenadas, default First contact) · fila salario: monto (máx 25.000) + rate (Monthly/Hourly, cambia el label) + moneda (USD/PEN).
+- Campos principales: **Company name\*** (único requerido) · Job title · Status (8 opciones ordenadas, default First contact) · fila salario: monto (máx 25.000) + rate (Monthly/Hourly, cambia el label) + moneda (USD/PEN).
 - Sección colapsable **Company details** (opcional): Website, Location, Benefits (textarea), Contacted via (LinkedIn/Email/Facebook/Other), Contact person, Interview steps (número). Solo se envía si algo tiene valor; en edit se auto-abre si hay datos.
 - Footer: Cancel + submit. Tras crear/editar navega al detalle con toast.
 

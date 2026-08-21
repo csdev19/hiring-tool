@@ -33,15 +33,18 @@ El orden se invierte: **Notes primero**, luego una fila `Type` (150px) + `Title`
 Overlay `position:fixed; inset:0; z-index:70` sobre `bg`. Se abre desde el header de Interactions, desde el sticky header y desde el empty state. **Esc** cierra (el borrador queda guardado).
 
 **Top bar 52px** — flex, hairline inferior:
+
 - Punto fucsia 7px (grabando) + **cronómetro** en mono `tabular-nums` (`12:04`, `1:03:22`), corre desde que se abre.
 - Contexto: empresa (14/500, `flex-shrink:0` — nunca se recorta) · puesto (13 `text-muted`, cede primero) · badge de estado · salario en mono.
 - Derecha: `Draft saved 9:14` (mono 12, elipsis) · `Hide panel` secondary · **`Save interaction`** primario · cerrar (ghost 30px). Los tres botones `flex-shrink:0; white-space:nowrap`.
 
 **Editor** — `flex:1`, textarea a **Geist Mono 15 / 1.8**, padding 28, sin borde ni fondo propio: el texto está sobre `bg`, a toda la anchura disponible.
+
 - **Sin focus ring**: `#live-content:focus { box-shadow:none; caret-color:#00FFC2 }`. Un marco menta de 600×450 rompería las reglas de dosificación; el cursor menta es el indicador.
 - Bajo el editor, chips de inserción rápida (Timestamp · Question I asked · Figure · Next step) para quien prefiere ratón.
 
 **Panel derecho** — `aside` de **320px `box-sizing:border-box`**, colapsable con `Hide panel`. En pantalla partida se cierra y el texto recupera los 320px. Contiene:
+
 - **Questions to ask** con checkboxes (ver 4).
 - **Earlier notes**: las 4 últimas interacciones como badge + fecha mono + extracto de 150 caracteres. El extracto limpia marcadores Markdown **por línea** (`/^\s*(?:[-*>#]+\s*)+/gm`), nunca globalmente: `Sign-on`, `take-home`, `async-first` deben sobrevivir — es el panel cuyo trabajo es recordar con exactitud.
 
@@ -51,40 +54,42 @@ Al guardar: se crea **una** interacción con la duración medida (`· 1h 34m` si
 
 Se detecta con `(?:^|\s)\/(\w*)$` sobre el texto anterior al cursor. Menú de 250–260px sobre el área de escritura; `↑ ↓` navegan, `Enter`/`Tab` insertan, `Esc` cierra, hover cambia la selección. Al insertar se **reemplaza el `/query`** (se guarda `slashAt`).
 
-| Ítem | Inserta |
-| --- | --- |
-| Timestamp | `**9:14 AM** ` |
-| Question I asked | `**Q:** ` |
-| Figure | `` `$` `` |
-| Next step | `**Next step:** ` |
-| Follow up on this | `- [ ] ` |
+| Ítem              | Inserta           |
+| ----------------- | ----------------- |
+| Timestamp         | `**9:14 AM** `    |
+| Question I asked  | `**Q:** `         |
+| Figure            | `` `$` ``         |
+| Next step         | `**Next step:** ` |
+| Follow up on this | `- [ ] `          |
 
 Detalle de cursor: si el textarea no ha sido tocado (`dataset.touched !== '1'`), la inserción va **al final**, no en la posición 0 — si no, recuperar un borrador y tildar una pregunta escribía arriba del todo. Al abrir el modo vivo el caret se coloca al final (`setSelectionRange(len, len)`).
 
 ### 4. Questions to ask
 
 Dos orígenes, mezclados en una sola lista:
+
 - **Lista por defecto** reutilizable en todos los procesos (`scope: 'default'`, editable desde ajustes → `Edit defaults`).
 - **Preguntas del proceso** (`scope: 'process'`), añadidas con el input `Add a question`.
 
 Cada pendiente muestra su origen en mono 11: `default list`, `this process`, o **`carried from Aug 11`** en violeta cuando quedó sin hacer en la conversación anterior. Las hechas se agrupan bajo `Show N asked` con tachado.
 
 Comportamiento distinto según contexto:
+
 - En la columna normal, tildar solo marca la pregunta como hecha.
-- **En el modo vivo, tildar escribe `**Q:** <pregunta>` en la nota** en la posición del cursor, además de marcarla. La leyenda del panel lo dice: *Ticking a question writes it into your note.*
+- **En el modo vivo, tildar escribe `**Q:** <pregunta>` en la nota** en la posición del cursor, además de marcarla. La leyenda del panel lo dice: _Ticking a question writes it into your note._
 
 ### 5. Borrador que no se pierde
 
 - Se persiste en `localStorage`, clave **`tapuy:draft:v2:<slug del proceso>`**, con `{content, title, type, at}`, en cada cambio de contenido, título o tipo. Contenido vacío → se borra la clave.
 - Indicador `Draft saved 9:14` en mono `text-muted` (form y top bar del modo vivo).
-- Al montar, si hay borrador se restaura y aparece una tira: *Draft restored from 4:32 PM* + `Discard`.
+- Al montar, si hay borrador se restaura y aparece una tira: _Draft restored from 4:32 PM_ + `Discard`.
 - Al guardar la interacción, **se limpia la clave**.
-- **Guardas de salida**: `beforeunload` cuando hay texto sin guardar, y un listener de click en captura sobre `a[href]` (ignora anclas `#`) que abre el diálogo *You have an unsaved note · It stays as a draft on this device — nothing is lost if you leave.* → `Leave anyway` / `Keep writing`.
+- **Guardas de salida**: `beforeunload` cuando hay texto sin guardar, y un listener de click en captura sobre `a[href]` (ignora anclas `#`) que abre el diálogo _You have an unsaved note · It stays as a draft on this device — nothing is lost if you leave._ → `Leave anyway` / `Keep writing`.
 
 ### 6. Captura rápida y plantillas
 
 - **Quick capture**: input de 40px sobre el timeline, `What just happened? Enter logs a note`. Enter crea una interacción tipo Note sellada con la hora (`**9:14 AM** …`). Para fragmentos sueltos entre llamadas.
-- **Plantillas por tipo**: elegir `Offer`, `Call`, `Technical interview`, `Interview` o `Rejection` **con el área vacía** inserta su esqueleto (Offer → base / deadline / *not in the letter yet*). Nunca sobrescribe texto existente; toast `Template inserted`.
+- **Plantillas por tipo**: elegir `Offer`, `Call`, `Technical interview`, `Interview` o `Rejection` **con el área vacía** inserta su esqueleto (Offer → base / deadline / _not in the letter yet_). Nunca sobrescribe texto existente; toast `Template inserted`.
 
 ---
 

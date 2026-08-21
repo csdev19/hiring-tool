@@ -4,11 +4,11 @@ Condensado de la identidad cerrada en 2026-08. Nada de esto está abierto a camb
 
 ## Nombre y qué es
 
-**Tapuy** — quechua: *preguntar* (raíz de *tapukuy*). Una entrevista es una secuencia de preguntas entre dos partes; el nombre es bidireccional por construcción. Pronunciación: **ta-POOY**. En prosa "Tapuy"; en código, URLs y lockups `tapuy` (minúsculas). Nunca "TAPUY".
+**Tapuy** — quechua: _preguntar_ (raíz de _tapukuy_). Una entrevista es una secuencia de preguntas entre dos partes; el nombre es bidireccional por construcción. Pronunciación: **ta-POOY**. En prosa "Tapuy"; en código, URLs y lockups `tapuy` (minúsculas). Nunca "TAPUY".
 
 **Qué es el producto:** tracker open source, self-hosted y Markdown-first de procesos de contratación y las entrevistas que los componen. El candidato lleva su pipeline de empresas (estados, salarios, contactos, timeline de interacciones); un equipo chico/bootcamp/agencia puede usar el mismo modelo desde el otro lado.
 
-**Idea central:** *la memoria es ventaja.* El timeline es el centro del producto, no la tabla.
+**Idea central:** _la memoria es ventaja._ El timeline es el centro del producto, no la tabla.
 
 ## Los 5 principios
 
@@ -21,10 +21,10 @@ Condensado de la identidad cerrada en 2026-08. Nada de esto está abierto a camb
 ## Taglines y mensajes canónicos
 
 - Tagline principal: **Every question in the process, on record.**
-- Lockup corto / splash: *Ask. Listen. Remember.*
-- Subtítulo de landing: *The interview log for people who want to remember.*
-- GitHub About: *Open-source interview and hiring process tracker. Log every conversation, offer, and decision — from either side of the table.*
-- Español: *Cada pregunta del proceso, registrada.* / *Pregunta. Escucha. Recuerda.*
+- Lockup corto / splash: _Ask. Listen. Remember._
+- Subtítulo de landing: _The interview log for people who want to remember._
+- GitHub About: _Open-source interview and hiring process tracker. Log every conversation, offer, and decision — from either side of the table._
+- Español: _Cada pregunta del proceso, registrada._ / _Pregunta. Escucha. Recuerda._
 
 ## Voz
 
@@ -36,18 +36,18 @@ Un colega competente que habla en llano. Segunda persona, contracciones en ingl�
 
 **Empty states:**
 
-| Dónde | Título | Cuerpo | CTA |
-| --- | --- | --- | --- |
-| Timeline vacío | Nothing logged yet | Write down what happened. Future you will thank you. | `Log first interaction` |
-| Dashboard vacío | Your pipeline starts here | Add the first company you're talking to. | `Create process` |
-| Filtros sin resultados | No processes match | Try widening the status or salary filter. | `Clear filters` |
+| Dónde                  | Título                    | Cuerpo                                               | CTA                     |
+| ---------------------- | ------------------------- | ---------------------------------------------------- | ----------------------- |
+| Timeline vacío         | Nothing logged yet        | Write down what happened. Future you will thank you. | `Log first interaction` |
+| Dashboard vacío        | Your pipeline starts here | Add the first company you're talking to.             | `Create process`        |
+| Filtros sin resultados | No processes match        | Try widening the status or salary filter.            | `Clear filters`         |
 
 **Toasts** (pasado, sin "successfully"): `Process created` · `Interaction saved` · `Marked as rejected. The notes stay.` · `Marked as hired.` (sin celebración).
 
 **Confirmaciones destructivas** (qué, cuánto, irreversible; sin "Are you sure?"):
-*Delete Acme Corp and its 12 interactions? This can't be undone.* → `Delete process` / `Cancel`.
+_Delete Acme Corp and its 12 interactions? This can't be undone._ → `Delete process` / `Cancel`.
 
-**Errores** (qué pasó + qué hacer, sin prefijo "Error:"): *Couldn't save the interaction. Check your connection and try again.* · *Content needs at least 10 characters.* · *That email's already registered. Sign in instead.*
+**Errores** (qué pasó + qué hacer, sin prefijo "Error:"): _Couldn't save the interaction. Check your connection and try again._ · _Content needs at least 10 characters._ · _That email's already registered. Sign in instead._
 
 **Placeholders** (ejemplo real, sin "e.g."): Company `Acme Corp` · Job title `React Native Developer` · Contact `Ana Torres, Engineering Manager`.
 

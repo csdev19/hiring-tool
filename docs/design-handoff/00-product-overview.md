@@ -4,7 +4,7 @@
 
 Un tracker personal de búsqueda de trabajo. El usuario (un candidato, no una empresa) registra cada proceso de contratación en el que participa —empresa, puesto, salario, estado— y documenta cada interacción del proceso (emails, llamadas, entrevistas, retos técnicos, ofertas) en un timeline con notas en Markdown.
 
-**La perspectiva es la del candidato**: no es un ATS para reclutadores, es la herramienta del otro lado de la mesa. El "pipeline" es *mi* pipeline de oportunidades.
+**La perspectiva es la del candidato**: no es un ATS para reclutadores, es la herramienta del otro lado de la mesa. El "pipeline" es _mi_ pipeline de oportunidades.
 
 ## Para quién
 
@@ -18,7 +18,7 @@ Una búsqueda de trabajo seria son 10–30 procesos simultáneos, cada uno con s
 
 1. **Estado de cada proceso** — un pipeline de 8 estados con transiciones válidas.
 2. **Datos duros** — salario, moneda, tipo de tarifa, beneficios, ubicación, sitio web, persona de contacto, canal de contacto, número de etapas.
-3. **Memoria de la conversación** — timeline de interacciones con contenido Markdown. El empty state lo dice literal: *"It will help future you remember why this mattered."*
+3. **Memoria de la conversación** — timeline de interacciones con contenido Markdown. El empty state lo dice literal: _"It will help future you remember why this mattered."_
 
 ## Modelo de datos (conceptual)
 
@@ -45,16 +45,16 @@ User
 
 Definidos en `packages/domain/src/constants/hiring-process-status.ts`, con orden, categoría (active/terminal), color y transiciones válidas:
 
-| Estado | Label | Categoría | Color actual | Significado |
-| --- | --- | --- | --- | --- |
-| `first-contact` | First Contact | active | `#8b5cf6` violeta | Outreach inicial (LinkedIn, email…) |
-| `ongoing` | Ongoing | active | `#3b82f6` azul | Proceso de entrevistas activo |
-| `on-hold` | On Hold | active | `#f59e0b` ámbar | Proceso frío / sin novedades |
-| `offer-made` | Offer Made | active | `#06b6d4` cian | La empresa hizo oferta |
-| `offer-accepted` | Offer Accepted | terminal | `#10b981` esmeralda | Oferta aceptada |
-| `hired` | Hired | terminal | `#22c55e` verde | Contratado |
-| `rejected` | Rejected | terminal | `#ef4444` rojo | Rechazado |
-| `dropped-out` | Dropped Out | terminal | `#6b7280` gris | El candidato se retiró |
+| Estado           | Label          | Categoría | Color actual        | Significado                         |
+| ---------------- | -------------- | --------- | ------------------- | ----------------------------------- |
+| `first-contact`  | First Contact  | active    | `#8b5cf6` violeta   | Outreach inicial (LinkedIn, email…) |
+| `ongoing`        | Ongoing        | active    | `#3b82f6` azul      | Proceso de entrevistas activo       |
+| `on-hold`        | On Hold        | active    | `#f59e0b` ámbar     | Proceso frío / sin novedades        |
+| `offer-made`     | Offer Made     | active    | `#06b6d4` cian      | La empresa hizo oferta              |
+| `offer-accepted` | Offer Accepted | terminal  | `#10b981` esmeralda | Oferta aceptada                     |
+| `hired`          | Hired          | terminal  | `#22c55e` verde     | Contratado                          |
+| `rejected`       | Rejected       | terminal  | `#ef4444` rojo      | Rechazado                           |
+| `dropped-out`    | Dropped Out    | terminal  | `#6b7280` gris      | El candidato se retiró              |
 
 Hay una máquina de estados (`STATUS_TRANSITIONS`) que define transiciones válidas; los estados terminales no transicionan. Estado por defecto al crear: `first-contact`.
 

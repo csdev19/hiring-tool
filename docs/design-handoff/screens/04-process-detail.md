@@ -24,7 +24,7 @@ Ver todo lo de un proceso (datos + historia) y registrar interacciones nuevas si
      - Título opcional con borde izquierdo `border-primary/50`.
      - Contenido Markdown renderizado (`MarkdownContent` compact), colapsado a 200px con botón "Read more"/"Show less" si desborda.
      - Hover de card: `bg-muted/30`.
-   - **Empty state** (el mejor de la app): ícono MessageSquarePlus en círculo muted + "No interactions yet" + *"Start by logging your first meeting or note. It will help future you remember why this mattered."*
+   - **Empty state** (el mejor de la app): ícono MessageSquarePlus en círculo muted + "No interactions yet" + _"Start by logging your first meeting or note. It will help future you remember why this mattered."_
 
 ## Diálogos
 

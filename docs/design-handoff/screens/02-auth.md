@@ -12,12 +12,14 @@ Autenticación email + password vía Better Auth. Sin OAuth ni magic links por a
 Ambas son una columna centrada `max-w-md` bajo el header global — sin card, sin fondo propio, sin marca:
 
 ### Login
+
 - H1 "Welcome Back" centrado.
 - Campos: Email, Password (validación zod: email válido, password ≥ 8 chars; errores en texto `text-red-500` — nota: no usa el token `destructive`).
 - Botón full-width "Sign In" (deshabilitado mientras no puede enviar; "Submitting..." al enviar).
 - Link inferior: "Need an account? **Sign Up**".
 
 ### Signup
+
 - Igual estructura con campo extra Nombre.
 - Link inferior: "Already have an account? **Sign In**".
 

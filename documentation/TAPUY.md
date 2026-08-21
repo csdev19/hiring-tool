@@ -9,19 +9,19 @@ Referencia visual construida: `Landing.dc.html`, `Auth.dc.html`, `Dashboard.dc.h
 
 ## 1. Producto
 
-**tapuy** (quechua: *preguntar*; se pronuncia ta-POOY). En prosa "Tapuy"; en código, URLs y lockups `tapuy` en minúsculas. **Nunca "TAPUY"**.
+**tapuy** (quechua: _preguntar_; se pronuncia ta-POOY). En prosa "Tapuy"; en código, URLs y lockups `tapuy` en minúsculas. **Nunca "TAPUY"**.
 
 Tracker open source, self-hosted y Markdown-first de procesos de contratación y las entrevistas que los componen. El candidato lleva su pipeline de empresas; un equipo chico puede usar el mismo modelo desde el otro lado. **El timeline es el centro del producto, no la tabla.**
 
-Los 5 principios: *Your side of the table* · *Memory is leverage* · *Numbers, not vibes* · *Calm by default* · *Yours to run*.
+Los 5 principios: _Your side of the table_ · _Memory is leverage_ · _Numbers, not vibes_ · _Calm by default_ · _Yours to run_.
 
 ### Terminología (unificada — no mezclar)
 
-| Usar | No usar |
-| --- | --- |
-| **process** (proceso de contratación) | application, job application, interview process |
-| **interaction** (entrada del timeline) | note, entry, event |
-| "Your processes" | "My processes" / "My job applications" |
+| Usar                                   | No usar                                         |
+| -------------------------------------- | ----------------------------------------------- |
+| **process** (proceso de contratación)  | application, job application, interview process |
+| **interaction** (entrada del timeline) | note, entry, event                              |
+| "Your processes"                       | "My processes" / "My job applications"          |
 
 ---
 
@@ -42,11 +42,11 @@ Los 5 principios: *Your side of the table* · *Memory is leverage* · *Numbers, 
 
 ### Roles de los neones
 
-| Color | Rol | Dónde |
-| --- | --- | --- |
-| Menta `--mint` | Acento del producto | Botón primario, focus ring, links, selección, punto del logo, tab activo |
-| Fucsia `--fuchsia` | El momento | **Solo** `offer-made` y el nodo `offer` del timeline. Nada más es fucsia. |
-| Violeta `--violet` | Textura de marca | Landing, README, og:image, `first-contact`. Casi invisible dentro de la app. |
+| Color              | Rol                 | Dónde                                                                        |
+| ------------------ | ------------------- | ---------------------------------------------------------------------------- |
+| Menta `--mint`     | Acento del producto | Botón primario, focus ring, links, selección, punto del logo, tab activo     |
+| Fucsia `--fuchsia` | El momento          | **Solo** `offer-made` y el nodo `offer` del timeline. Nada más es fucsia.    |
+| Violeta `--violet` | Textura de marca    | Landing, README, og:image, `first-contact`. Casi invisible dentro de la app. |
 
 Texto sobre neón: el tono oscuro de su propia familia (`--mint-on`, `--fuchsia-on`, `--violet-on`). Nunca negro ni blanco puros.
 
@@ -61,11 +61,11 @@ success reutiliza `hired`, warning `on-hold`, info `ongoing`. Danger propio: `--
 
 ### Tipografía
 
-| Uso | Fuente | Detalle |
-| --- | --- | --- |
-| UI | **Geist** | Pesos 400 y 500 **únicamente**. 600/700 nunca. |
-| Cifras (salarios, fechas, IDs, contadores) | **Geist Mono** | `tabular-nums`. |
-| Display | **Instrument Serif** | Solo titulares de landing/README/og:image. **Nunca dentro de la app.** |
+| Uso                                        | Fuente               | Detalle                                                                |
+| ------------------------------------------ | -------------------- | ---------------------------------------------------------------------- |
+| UI                                         | **Geist**            | Pesos 400 y 500 **únicamente**. 600/700 nunca.                         |
+| Cifras (salarios, fechas, IDs, contadores) | **Geist Mono**       | `tabular-nums`.                                                        |
+| Display                                    | **Instrument Serif** | Solo titulares de landing/README/og:image. **Nunca dentro de la app.** |
 
 Escala: 12 metadata · 13 tabla y badges · 14 cuerpo · 16 prosa Markdown del timeline (line-height 1.7) · 20 h3 · 24 h2 · 32 h1 de página. Landing libre.
 
@@ -95,18 +95,20 @@ Un colega competente que habla en llano. Segunda persona, contracciones en ingl�
 **Toasts** (pasado, sin "successfully"): `Process created` · `Interaction saved` · `Marked as rejected. The notes stay.` · `Marked as hired.` (sin celebración).
 
 **Destructivas** (qué, cuánto, irreversible; sin "Are you sure?"):
+
 > Delete Acme Corp and its 12 interactions? This can't be undone. → `Delete process` / `Cancel`
 
 **Errores** (qué pasó + qué hacer, sin prefijo "Error:"):
+
 > Couldn't save the interaction. Check your connection and try again. · Content needs at least 10 characters. · That email's already registered. Sign in instead.
 
 **Empty states**
 
-| Dónde | Título | Cuerpo | CTA |
-| --- | --- | --- | --- |
-| Timeline vacío | Nothing logged yet | Write down what happened. Future you will thank you. | `Log first interaction` |
-| Dashboard vacío | Your pipeline starts here | Add the first company you're talking to. | `Create process` |
-| Filtros sin resultados | No processes match | Try widening the status or salary filter. | `Clear filters` |
+| Dónde                  | Título                    | Cuerpo                                               | CTA                     |
+| ---------------------- | ------------------------- | ---------------------------------------------------- | ----------------------- |
+| Timeline vacío         | Nothing logged yet        | Write down what happened. Future you will thank you. | `Log first interaction` |
+| Dashboard vacío        | Your pipeline starts here | Add the first company you're talking to.             | `Create process`        |
+| Filtros sin resultados | No processes match        | Try widening the status or salary filter.            | `Clear filters`         |
 
 **Placeholders** (ejemplo real, sin "e.g."): Company `Acme Corp` · Job title `React Native Developer` · Contact `Ana Torres, Engineering Manager`.
 
@@ -121,7 +123,7 @@ Un colega competente que habla en llano. Segunda persona, contracciones en ingl�
 Única superficie donde los tres neones pueden convivir y donde vive Instrument Serif. Base `#0A0F14`, sin gradientes ni glow.
 
 - Header: lockup tapuy · Dashboard (con sesión) · Sign in / user menu · `Star on GitHub` (secundario permanente).
-- Hero: kicker *Ask. Listen. Remember.* (violeta, mono) → H1 **Every question in the process, on record.** (Instrument Serif, "on record" en itálica) → subtítulo *The interview log for people who want to remember.* → descripción del About de GitHub.
+- Hero: kicker _Ask. Listen. Remember._ (violeta, mono) → H1 **Every question in the process, on record.** (Instrument Serif, "on record" en itálica) → subtítulo _The interview log for people who want to remember._ → descripción del About de GitHub.
 - CTAs condicionales: sin sesión `Create account` (primario) + `Sign in` (secundario); con sesión `Open your pipeline`.
 - **Pieza central: mock del timeline en dark** (no la tabla) — la misma imagen que usa el README. Nodo de oferta en fucsia.
 - 3 features (una por principio): **Pipeline** con los 8 badges reales · **Numbers, not vibes** con cifras en Geist Mono · **Timeline** con Markdown crudo.
@@ -133,10 +135,10 @@ Un colega competente que habla en llano. Segunda persona, contracciones en ingl�
 
 Con sesión redirigen al dashboard. Better Auth, email + password; signup agrega nombre.
 
-- Columna centrada sobre `bg`: lockup arriba + tagline *Ask. Listen. Remember.* en `text-secondary`. Sin split-screen ni ilustración — la sobriedad es la marca.
+- Columna centrada sobre `bg`: lockup arriba + tagline _Ask. Listen. Remember._ en `text-secondary`. Sin split-screen ni ilustración — la sobriedad es la marca.
 - Card del form sobre `surface`, inputs `surface-2`. Un solo primario (submit, full-width).
 - Validación (zod): email válido, password ≥8, nombre requerido en signup. Errores inline en `--danger`, **no** `text-red-500`.
-- Email duplicado: *That email's already registered.* + link `Sign in instead.`
+- Email duplicado: _That email's already registered._ + link `Sign in instead.`
 - h1 `Sign in` / `Create your account`. Submit `Sign in` / `Create account`; enviando `Signing in…` / `Creating account…`.
 - Cross-links: `No account? Create one` / `Already have an account? Sign in`.
 - Toast éxito: `Signed in` (o ninguno — la navegación ya lo comunica) y navegar al dashboard.

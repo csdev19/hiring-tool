@@ -9,7 +9,7 @@
 - **Tab Stats** (solo móvil): 3 summary cards (Total / Active / Closed) + desglose por estado con dot de color y count.
 - **Tab Profile**: nombre + email + sign out.
 - **Detalle** (`hiring/[id]`): solo lectura — empresa, puesto, badge, filas Salary/Created/Updated.
-- **Crear** (`hiring/create`): empresa*, puesto, estado, salario/moneda/tarifa; validación zod compartida del dominio.
+- **Crear** (`hiring/create`): empresa\*, puesto, estado, salario/moneda/tarifa; validación zod compartida del dominio.
 
 ## Directivas Tapuy
 
@@ -19,13 +19,13 @@
 - **Stats**: los summary numbers en mono grandes; el desglose con dots usando el color de texto del badge de cada estado. Sin neón en gráficos/barras — regla explícita del sistema.
 - Botón crear (el "＋" circular) = único elemento menta de la pantalla Home.
 - Tab bar: ítem activo en menta (label ≤14px, cumple la regla), inactivos `text-muted`.
-- **App icon**: fondo `#0A0F14`, símbolo (arco + punto menta) centrado al 60% del canvas, sin borde. **Splash**: fondo `#0A0F14` + símbolo; opcional *Ask. Listen. Remember.* debajo en `text-secondary`.
+- **App icon**: fondo `#0A0F14`, símbolo (arco + punto menta) centrado al 60% del canvas, sin borde. **Splash**: fondo `#0A0F14` + símbolo; opcional _Ask. Listen. Remember._ debajo en `text-secondary`.
 - Errores dejan de ser `Alert.alert` nativo cuando sea razonable → toast/inline con la voz de marca.
 
 ## Copy actual → nuevo
 
 - "My Hirings" → **Your processes** (misma terminología que web: process).
-- "No hiring processes yet / Start tracking your job applications!" → empty canónico: **Your pipeline starts here** / *Add the first company you're talking to.* (sin exclamaciones).
+- "No hiring processes yet / Start tracking your job applications!" → empty canónico: **Your pipeline starts here** / _Add the first company you're talking to._ (sin exclamaciones).
 - "Showing X of Y processes" → en Geist Mono, `text-muted`.
 - "Stats" se queda; "Closed" se queda (coincide con la categoría terminal).
 
